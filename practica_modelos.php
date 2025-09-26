@@ -50,7 +50,7 @@ Category::firstOrCreate([
 ]);
 
 //desactivar la categoria 2
-$cat1 = Category::find(2);
+$cat1 = Category::where('slug', 'hogar')->first();
 if ($cat1) {
     $cat1->is_active = false;
     $cat1->save();
@@ -60,7 +60,7 @@ if ($cat1) {
 UPDATE categories
 SET is_active = false
 WHERE id = 2;
-*/ 
+*/
 
 /*
 El equivalente en SQL sería:
