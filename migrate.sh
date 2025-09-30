@@ -7,7 +7,6 @@ if [ -f "$DB_PATH" ]; then
   rm "$DB_PATH"
 fi
 
-# el --forced lo que hace es que no pregunte nada y continue con la migracion
 php artisan migrate --force --seed
 
 status=$?
