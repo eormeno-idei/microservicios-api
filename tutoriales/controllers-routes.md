@@ -174,75 +174,72 @@ Route::get('/api/products', function () {
 });
 
 // Endpoint con parámetros y validación básica
-Route::get('/api/calculator/{operation}/{num1}/{num2}', function ($operation, $num1, $num2) {
-    $num1 = (float) $num1;
-    $num2 = (float) $num2;
-    
+Route::get('/calc/{operation}/{num1}/{num2}', function ($operation, $num1, $num2) {
+    $result = 0;
     switch ($operation) {
         case 'add':
             $result = $num1 + $num2;
             break;
-        case 'subtract':
+        case 'sub':
             $result = $num1 - $num2;
             break;
-        case 'multiply':
+        case 'mul':
             $result = $num1 * $num2;
             break;
-        case 'divide':
-            if ($num2 == 0) {
-                return response()->json(['error' => 'División por cero'], 400);
-            }
-            $result = $num1 / $num2;
+        case 'div':
+            $result = $num2 != 0 ? $num1 / $num2 : 'Error: Zero division';
             break;
         default:
-            return response()->json(['error' => 'Operación no válida'], 400);
+            return response()->json(['error' => 'Invalid operator'], 400);
     }
-    
     return response()->json([
         'operation' => $operation,
-        'operands' => [$num1, $num2],
+        'num1' => $num1,
+        'num2' => $num2,
         'result' => $result
     ]);
-})->where(['num1' => '[0-9.]+', 'num2' => '[0-9.]+']);
+});
 ```
 
 ### Limitaciones de los Controladores Inline
 
 ```php
 // Esto se vuelve difícil de mantener:
-Route::post('/api/complex-calculation', function (Request $request) {
-    // Validación
-    $validated = $request->validate([
+Route::post('/stat', function () {
+    $validated = request()->validate([
         'numbers' => 'required|array|min:2',
         'numbers.*' => 'numeric',
-        'operation' => 'required|string|in:sum,average,median'
+        'operation' => 'required|in:sum,mean'
+    ],
+    [
+        'numbers.required' => 'Debe proporcionar al menos 2 números.',
+        'numbers.array' => 'Los números deben ser un array.',
+        'numbers.min' => 'Debe proporcionar al menos 2 números.',
+        'numbers.*.numeric' => 'Todos los elementos del array deben ser numéricos.',
+        'operation.required' => 'La operación es obligatoria.',
+        'operation.in' => 'La operación debe ser: sum o mean.'
     ]);
-    
+
     $numbers = $validated['numbers'];
     $operation = $validated['operation'];
-    
-    // Lógica de negocio compleja...
+    $result = null;
     switch ($operation) {
         case 'sum':
             $result = array_sum($numbers);
             break;
-        case 'average':
+        case 'mean':
             $result = array_sum($numbers) / count($numbers);
             break;
-        case 'median':
-            sort($numbers);
-            $count = count($numbers);
-            $middle = floor(($count - 1) / 2);
-            if ($count % 2) {
-                $result = $numbers[$middle];
-            } else {
-                $result = ($numbers[$middle] + $numbers[$middle + 1]) / 2;
-            }
-            break;
     }
-    
     return response()->json(['result' => $result]);
 });
+
+
+// El json del post podría ser:
+{
+    "numbers": [1, 2, 3, 4, 5],
+    "operation": "mean"
+}
 
 // En este punto es mejor usar un Controller
 ```
@@ -253,7 +250,7 @@ Route::post('/api/complex-calculation', function (Request $request) {
 
 ```bash
 # Crear un controlador básico
-php artisan make:controller HomeController
+php artisan make:controller HolaController
 
 # Crear controlador con métodos REST
 php artisan make:controller ProductController --resource
@@ -269,56 +266,16 @@ php artisan make:controller ProductController --resource --model=Product
 
 ```php
 <?php
-// app/Http/Controllers/HomeController.php
 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class HomeController extends Controller
+class HolaController extends Controller
 {
-    /**
-     * Mostrar la página principal
-     */
-    public function index()
+    public function saludar()
     {
-        return view('home');
-    }
-    
-    /**
-     * Mostrar página acerca de
-     */
-    public function about()
-    {
-        $data = [
-            'title' => 'Acerca de Nosotros',
-            'company' => 'Mi Empresa',
-            'founded' => 2020,
-            'employees' => 50
-        ];
-        
-        return view('about', compact('data'));
-    }
-    
-    /**
-     * Procesar formulario de contacto
-     */
-    public function contact(Request $request)
-    {
-        // Validación básica
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email',
-            'message' => 'required|string|min:10'
-        ]);
-        
-        // Procesar datos (aquí podrías enviar email, guardar en BD, etc.)
-        $name = $request->input('name');
-        $email = $request->input('email');
-        $message = $request->input('message');
-        
-        // Por ahora solo retornamos confirmación
-        return back()->with('success', 'Mensaje enviado correctamente');
+        return view("hola-mundo");
     }
 }
 ```
@@ -329,15 +286,10 @@ class HomeController extends Controller
 <?php
 // routes/web.php
 
-use App\Http\Controllers\HomeController;
+use App\Http\Controllers\HolaController;
 
 // Método específico
-Route::get('/', [HomeController::class, 'index']);
-Route::get('/about', [HomeController::class, 'about']);
-Route::post('/contact', [HomeController::class, 'contact']);
-
-// Sintaxis alternativa (menos recomendada)
-Route::get('/home', 'HomeController@index');
+Route::get('/', [HolaController::class, 'saludar']);
 ```
 
 ## Controladores Resource (RESTful)

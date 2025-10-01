@@ -2,12 +2,13 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentationController;
+use App\Http\Controllers\HolaController;
 
 Route::get('/', fn() => view('api-client'));
 
 Route::get('/bienvenido', fn() => view('welcome'))->name('welcome');
 
-Route::get('/hola-mundo', fn() => view('hola-mundo'))->name('hola-mundo');
+Route::get('/hola-mundo', [HolaController::class, 'saludar'])->name('hola-mundo');
 
 // Parámetro obligatorio
 // Route::get('/customers/{id}', function ($id) {

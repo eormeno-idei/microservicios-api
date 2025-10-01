@@ -1,4 +1,5 @@
 <?php
+
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,61 @@ Route::get('/status', function () {
         'timestamp' => now(),
         'version' => '1.0.0'
     ]);
+});
+
+Route::get('/calc/{operation}/{num1}/{num2}', function ($operation, $num1, $num2) {
+    $result = 0;
+    switch ($operation) {
+        case 'add':
+            $result = $num1 + $num2;
+            break;
+        case 'sub':
+            $result = $num1 - $num2;
+            break;
+        case 'mul':
+            $result = $num1 * $num2;
+            break;
+        case 'div':
+            $result = $num2 != 0 ? $num1 / $num2 : 'Error: Zero division';
+            break;
+        default:
+            return response()->json(['error' => 'Invalid operator'], 400);
+    }
+    return response()->json([
+        'operation' => $operation,
+        'num1' => $num1,
+        'num2' => $num2,
+        'result' => $result
+    ]);
+});
+
+Route::post('/stat', function () {
+    $validated = request()->validate([
+        'numbers' => 'required|array|min:2',
+        'numbers.*' => 'numeric',
+        'operation' => 'required|in:sum,mean'
+    ],
+    [
+        'numbers.required' => 'Debe proporcionar al menos 2 números.',
+        'numbers.array' => 'Los números deben ser un array.',
+        'numbers.min' => 'Debe proporcionar al menos 2 números.',
+        'numbers.*.numeric' => 'Todos los elementos del array deben ser numéricos.',
+        'operation.required' => 'La operación es obligatoria.',
+        'operation.in' => 'La operación debe ser: sum o mean.'
+    ]);
+
+    $numbers = $validated['numbers'];
+    $operation = $validated['operation'];
+    $result = null;
+    switch ($operation) {
+        case 'sum':
+            $result = array_sum($numbers);
+            break;
+        case 'mean':
+            $result = array_sum($numbers) / count($numbers);
+            break;
+    }
+    return response()->json(['result' => $result]);
 });
 
 // Endpoint de prueba para archivos (sin autenticación para testing)
