@@ -26,8 +26,6 @@ IGNORE_FILES=(
     "config/app.php"
     "config/database.php"
     ".env"
-    ".env.local"
-    ".env.example"
 )
 
 # Función para verificar si un archivo debe ser ignorado
