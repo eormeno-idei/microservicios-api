@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
 
@@ -7,6 +8,8 @@ Route::get('/ping', fn() => response()->json([
     'data' => ['status' => 'ok'],
     'message' => 'API is running correctly'
 ]));
+
+
 
 // Endpoint de prueba para archivos (sin autenticación para testing)
 Route::post('/test-files', [FileController::class, 'upload']);
