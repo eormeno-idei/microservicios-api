@@ -20,6 +20,8 @@ NC='\033[0m' # No Color
 
 # Archivos que se deben ignorar durante la sincronización
 IGNORE_FILES=(
+    "app/Models/User.php",
+    "database/factories/UserFactory.php",
     "database/seeders/DatabaseSeeder.php"
     "routes/api.php"
     "routes/web.php"
