@@ -4,10 +4,6 @@
 
 En este tutorial aprenderás a crear las migraciones y modelos Eloquent para un sistema de gestión de contenido Difexa. Trabajaremos con entidades principales, tablas pivot y enumeraciones (enums).
 
-## ¿Qué son las Migraciones?
-
-Las migraciones en Laravel son archivos PHP que definen la estructura de la base de datos de forma versionada. Permiten crear, modificar y eliminar tablas y campos de manera controlada y compartible entre desarrolladores.
-
 ## ¿Qué son los Enums?
 
 Los enums (enumeraciones) son tipos de datos que permiten definir un conjunto fijo de valores posibles para un campo. Laravel soporta enums nativos de PHP 8.1+ y también mediante validaciones de base de datos.
