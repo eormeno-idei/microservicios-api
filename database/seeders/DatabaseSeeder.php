@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ChannelSeeder::class,
             MediaSeeder::class,
+            PostSeeder::class,
         ]);
     }
 }
