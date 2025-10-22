@@ -37,7 +37,7 @@ El modelo Channel representa canales organizacionales en el sistema. Analicemos 
 - `name`: Nombre del canal (string, 255 caracteres)
 - `description`: Descripción del canal (texto, nullable)
 - `type`: Tipo de canal (enum: department, institute, secretary, center)
-- `semantic_context`: Contexto semántico para búsquedas con IA (texto, nullable)
+- `semantic_context`: Contexto semántico para IA generativa (texto, nullable)
 - `timestamps`: created_at y updated_at (gestionados automáticamente por Laravel)
 
 ### El uso de Enums
@@ -58,6 +58,14 @@ ChannelType::DEPARTMENT->value  // Devuelve 'department'
 ## Implementación del ChannelSeeder
 
 ### Paso 1: Estructura de la clase
+
+Podemos utilizar el comando Artisan para crear el seeder:
+
+```bash
+php artisan make:seeder ChannelSeeder
+```
+
+Esto genera la estructura básica:
 
 ```php
 <?php
@@ -240,23 +248,6 @@ class ChannelSeeder extends Seeder
 }
 ```
 
-## Análisis de los Datos
-
-### Distribución por tipo
-
-- Departamentos: 4
-- Institutos: 3
-- Secretarías: 3
-- Centros: 3
-- Total: 13 canales
-
-### Consideraciones al definir datos
-
-1. **Nombres descriptivos:** Cada canal tiene un nombre claro que indica su función
-2. **Descripciones útiles:** Proporcionan contexto sobre las responsabilidades del canal
-3. **Contexto semántico:** Palabras clave que facilitan búsquedas y clasificaciones automáticas
-4. **Organización por tipo:** Los datos están agrupados lógicamente en el código
-
 ## Ejecución del Seeder
 
 Para ejecutar este seeder específico:
@@ -270,34 +261,3 @@ Para ejecutar todos los seeders (incluyendo este):
 ```bash
 php artisan db:seed
 ```
-
-## Verificación de Resultados
-
-Después de ejecutar el seeder, puedes verificar los datos en Laravel Tinker:
-
-```bash
-php artisan tinker
-```
-
-```php
-// Contar canales
-Channel::count()
-
-// Ver todos los canales
-Channel::all()
-
-// Ver canales por tipo
-Channel::where('type', 'department')->get()
-```
-
-## Resumen
-
-Este seeder básico demuestra:
-
-1. Cómo estructurar datos estáticos en un array
-2. El uso de `firstOrCreate()` para prevenir duplicados
-3. Trabajo con Enums en Laravel
-4. Organización de datos por categorías
-5. Mensajes informativos al usuario
-
-Es el patrón fundamental para seeders de tablas independientes sin relaciones externas.

@@ -1,9 +1,5 @@
 # Tutorial 02: Seeder con Datos JSON y Configuraciones Complejas
 
-## Objetivo
-
-Aprender a crear un seeder que maneja datos complejos en formato JSON, útil para almacenar configuraciones flexibles y estructuradas.
-
 ## Contexto Teórico
 
 ### JSON en la Base de Datos
@@ -33,6 +29,14 @@ PHP proporciona `json_encode()` para convertir arrays o objetos PHP a strings JS
 $array = ['key' => 'value', 'number' => 42];
 $json = json_encode($array);  // '{"key":"value","number":42}'
 ```
+
+En la terminal el código anterior se puede ejecutar así:
+
+```bash
+php -r '$array = ["key" => "value", "number" => 42]; echo json_encode($array, JSON_PRETTY_PRINT); echo "\n";'
+```
+
+>> Nota: El flag `JSON_PRETTY_PRINT` es opcional y solo mejora la legibilidad del JSON generado.El parámetro '-r' permite ejecutar código PHP directamente desde la línea de comandos.
 
 En el modelo de Laravel, cuando se define un cast a `array`, Laravel automáticamente convierte entre JSON y array PHP.
 
@@ -79,6 +83,12 @@ Este campo JSON almacena configuraciones específicas que varían según el tipo
 
 ### Paso 1: Estructura de la clase
 
+El comando Artisan para crear el seeder es:
+
+```bash
+php artisan make:seeder MediaSeeder
+```
+
 ```php
 <?php
 
@@ -120,7 +130,7 @@ $medias = [
 ];
 ```
 
-**Nota importante:** Se usa `json_encode()` para convertir el array de configuración a string JSON antes de insertarlo en la base de datos.
+>> **Nota importante:** Se usa `json_encode()` para convertir el array de configuración a string JSON antes de insertarlo en la base de datos.
 
 ### Paso 3: Organización por tipo de medio
 
@@ -399,15 +409,3 @@ protected $casts = [
 $media = Media::find(1);
 $location = $media->configuration['location'];  // Acceso directo como array
 ```
-
-## Resumen
-
-Este seeder demuestra:
-
-1. Uso de `json_encode()` para almacenar estructuras complejas
-2. Organización de datos heterogéneos con diferentes configuraciones
-3. Manejo de múltiples tipos de medios con configuraciones específicas
-4. Uso del campo `is_active` para control de estado
-5. Integración de webhooks para notificaciones externas
-
-Este patrón es útil cuando cada registro requiere configuraciones únicas y flexibles.
