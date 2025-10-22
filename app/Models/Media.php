@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Channel;
 use App\Enums\MediaType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,7 +13,7 @@ class Media extends Model
      * Especifica el nombre de la tabla explícitamente.
      * Esto previene errores cuando Laravel intenta inferir "media" (singular).
      */
-    protected $table = 'medias';
+    protected $table = 'medias'; // (¡importante!: El plural es "media" y el singular también "medium")
 
     /**
      * Los atributos que se pueden asignar masivamente.

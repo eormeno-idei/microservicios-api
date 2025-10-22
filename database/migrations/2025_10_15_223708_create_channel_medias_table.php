@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('channel_medias', function (Blueprint $table) {
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
-            $table->foreignId('media_id')->constrained()->onDelete('cascade');
+            $table->foreignId('media_id')->constrained("medias")->onDelete('cascade');
+            $table->primary(['channel_id', 'media_id']);
         });
     }
 
