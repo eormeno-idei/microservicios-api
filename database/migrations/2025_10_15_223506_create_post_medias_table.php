@@ -9,8 +9,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('post_medias', function (Blueprint $table) {
-            $table->foreignId('post_id')->constrained();
-            $table->foreignId('media_id')->constrained();
+            $table->foreignId('post_id')->constrained()->onDelete('cascade');
+            $table->foreignId('media_id')->constrained('medias')->onDelete('cascade');
+
+            $table->primary(['post_id', 'media_id']);
         });
     }
 
