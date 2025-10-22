@@ -371,6 +371,109 @@ body {
     margin: 5px 0;
 }
 
+/* Estilos para enlaces - Dark Theme */
+.markdown-content a {
+    color: var(--primary-color);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all var(--transition-fast);
+    font-weight: var(--font-weight-medium);
+    position: relative;
+    padding: 2px 4px;
+    border-radius: 3px;
+}
+
+.markdown-content a:hover {
+    color: var(--primary-light);
+    background: rgba(0, 212, 170, 0.1);
+    border-bottom-color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.markdown-content a:focus {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    background: rgba(0, 212, 170, 0.15);
+}
+
+/* Enlaces externos con icono */
+.markdown-content a[target="_blank"]::after {
+    content: ' 🔗';
+    font-size: 0.8em;
+    margin-left: 4px;
+    opacity: 0.7;
+    transition: opacity var(--transition-fast);
+}
+
+.markdown-content a[target="_blank"]:hover::after {
+    opacity: 1;
+}
+
+/* Enlaces internos (anchors) */
+.markdown-content a[href^="#"] {
+    color: var(--info-color);
+    font-weight: var(--font-weight-normal);
+}
+
+.markdown-content a[href^="#"]:hover {
+    color: var(--text-light);
+    background: rgba(116, 185, 255, 0.1);
+    border-bottom-color: var(--info-color);
+}
+
+/* Enlaces específicos por tipo */
+.markdown-content a.external-link {
+    color: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+}
+
+.markdown-content a.external-link:hover {
+    color: var(--primary-light);
+    box-shadow: 0 2px 8px rgba(0, 212, 170, 0.3);
+}
+
+.markdown-content a.internal-link {
+    color: var(--info-color);
+    font-weight: var(--font-weight-normal);
+}
+
+.markdown-content a.internal-link:hover {
+    color: var(--text-light);
+    background: rgba(116, 185, 255, 0.15);
+    border-bottom-color: var(--info-color);
+}
+
+.markdown-content a.email-link {
+    color: var(--warning-color);
+    font-weight: var(--font-weight-normal);
+}
+
+.markdown-content a.email-link:hover {
+    color: var(--text-light);
+    background: rgba(255, 217, 61, 0.15);
+    border-bottom-color: var(--warning-color);
+}
+
+.markdown-content a.email-link::before {
+    content: '✉ ';
+    font-size: 0.9em;
+    margin-right: 4px;
+}
+
+/* Enlaces en código inline */
+.markdown-content code a {
+    color: var(--json-key-color);
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-family: inherit;
+}
+
+.markdown-content code a:hover {
+    color: var(--primary-light);
+    background: rgba(0, 212, 170, 0.1);
+}
+
 /* Separadores horizontales */
 .markdown-content hr {
     border: none;
@@ -551,5 +654,22 @@ body {
 
     .markdown-content {
         font-size: 0.9rem;
+    }
+
+    /* Enlaces responsive */
+    .markdown-content a {
+        padding: 4px 6px;
+        display: inline-block;
+        margin: 2px 0;
+    }
+
+    .markdown-content a[target="_blank"]::after {
+        content: ' 🔗';
+        font-size: 0.7em;
+    }
+
+    .markdown-content a.email-link::before {
+        content: '✉ ';
+        font-size: 0.8em;
     }
 }

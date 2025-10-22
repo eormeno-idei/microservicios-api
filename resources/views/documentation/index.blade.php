@@ -17,65 +17,163 @@
         }
 
         .doc-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 25px;
+            transition: all var(--transition-normal);
             text-decoration: none;
             color: var(--text-primary);
             display: block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .doc-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform var(--transition-normal);
         }
 
         .doc-card:hover {
-            border-color: var(--primary);
-            background: var(--bg-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border-color: var(--primary-color);
+            background: var(--bg-panel);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 212, 170, 0.15), var(--shadow-lg);
+        }
+
+        .doc-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .doc-card:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
         }
 
         .doc-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 12px;
+            color: var(--text-light);
+            transition: color var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .doc-card:hover .doc-title {
+            color: var(--primary-light);
+        }
+
+        .doc-title::before {
+            content: '📄';
             font-size: 1.2em;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--primary);
+            opacity: 0.8;
         }
 
         .doc-description {
             color: var(--text-secondary);
-            line-height: 1.5;
-            margin-bottom: 10px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: var(--font-size-base);
+            text-align: justify;
         }
 
         .doc-category {
-            display: inline-block;
-            background: var(--primary);
-            color: var(--bg-primary);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-light);
+            padding: 6px 12px;
+            border-radius: var(--border-radius-xl);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0, 212, 170, 0.2);
+            transition: all var(--transition-fast);
+        }
+
+        .doc-category::before {
+            content: '🏷️';
+            margin-right: 4px;
+            font-size: 0.9em;
+        }
+
+        .doc-card:hover .doc-category {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 212, 170, 0.3);
         }
 
         .category-section {
-            margin-bottom: 30px;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(26, 32, 44, 0.3);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--border-color);
         }
 
         .category-title {
-            font-size: 1.5em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-            border-bottom: 2px solid var(--primary);
-            padding-bottom: 8px;
+            font-size: var(--font-size-xxl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: 20px;
+            color: var(--text-light);
+            border-bottom: 3px solid var(--primary-color);
+            padding-bottom: 12px;
+            position: relative;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-light), transparent);
+            border-radius: 2px;
         }
 
         .stats-summary {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 30px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--info-color), var(--primary-color), var(--success-color));
+        }
+
+        .stats-summary h2 {
+            color: var(--text-light);
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         .stats-grid {
@@ -97,6 +195,103 @@
         .stat-label {
             color: var(--text-secondary);
             font-size: 0.9em;
+        }
+
+        /* Efectos de animación para las tarjetas */
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .doc-card {
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        .doc-card:nth-child(odd) {
+            animation-delay: 0.1s;
+        }
+
+        .doc-card:nth-child(even) {
+            animation-delay: 0.2s;
+        }
+
+        /* Estilos para párrafos de navegación */
+        .stats-summary p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .stats-summary p[style*="margin-left"] {
+            background: rgba(0, 212, 170, 0.1);
+            padding: 8px 16px;
+            border-radius: var(--border-radius-sm);
+            border-left: 3px solid var(--primary-color);
+            margin: 8px 0 8px 20px;
+            font-style: italic;
+        }
+
+        .stats-summary strong {
+            color: var(--primary-light);
+            font-weight: var(--font-weight-semibold);
+        }
+
+        /* Responsive mejorado */
+        @media (max-width: 768px) {
+            .docs-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .doc-card {
+                padding: 20px;
+            }
+
+            .category-section {
+                padding: 15px;
+                margin-bottom: 25px;
+            }
+
+            .category-title {
+                font-size: var(--font-size-lg);
+                margin-bottom: 15px;
+            }
+
+            .stats-summary {
+                padding: 20px;
+                margin-bottom: 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .doc-card {
+                padding: 15px;
+            }
+
+            .doc-title {
+                font-size: var(--font-size-md);
+            }
+
+            .doc-description {
+                font-size: var(--font-size-sm);
+            }
+
+            .category-section {
+                padding: 10px;
+            }
+
+            .stats-summary {
+                padding: 15px;
+            }
+
+            .stats-summary p[style*="margin-left"] {
+                margin-left: 10px !important;
+            }
         }
     </style>
 </head>

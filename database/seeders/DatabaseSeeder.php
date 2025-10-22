@@ -15,9 +15,16 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::firstOrCreate(
             ['email' => env('ADMIN_EMAIL')],
-            ['name' => 'Administrador', 'password' => bcrypt(env('ADMIN_PASSWORD'))]
+            [
+                'name' => env('ADMIN_NAME'),
+                'password' => bcrypt(env('ADMIN_PASSWORD'))
+            ]
         );
 
         $admin->assignRole('admin');
+
+        User::factory(10)->create()->each(function ($user) {
+            $user->assignRole('user');
+        });
     }
 }

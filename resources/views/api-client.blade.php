@@ -22,8 +22,8 @@
                 </div>
                 <div class="header-links">
                     <a href="/docs" class="header-link">📚 Documentación</a>
-                    <a href="/docs/api-complete" class="header-link">� API</a>
-                    <a href="/docs/technical-components" class="header-link">�️ Técnico</a>
+                    <a href="/docs/api-complete" class="header-link">📖 API</a>
+                    <a href="/docs/technical-components" class="header-link">📦 Componentes</a>
                 </div>
             </div>
         </div>

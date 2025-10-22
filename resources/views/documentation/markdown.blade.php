@@ -6,7 +6,7 @@
     <title>{{ $title }} - Laravel API Client</title>
 
     <!-- CSS Unificado para tema oscuro de documentación -->
-    <link rel="stylesheet" href="css/documentation-dark-theme.css">
+    <link rel="stylesheet" href="/css/documentation-dark-theme.css">
 
     <!-- Marked.js - Renderizador de Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
@@ -91,8 +91,24 @@
             // Personalizar el renderizado de enlaces
             renderer.link = function(href, title, text) {
                 const titleAttr = title ? ` title="${title}"` : '';
-                const target = href.startsWith('http') ? ' target="_blank" rel="noopener"' : '';
-                return `<a href="${href}"${titleAttr}${target}>${text}</a>`;
+                let target = '';
+                let className = '';
+
+                // Enlaces externos
+                if (href.startsWith('http') && !href.includes(window.location.hostname)) {
+                    target = ' target="_blank" rel="noopener noreferrer"';
+                    className = ' class="external-link"';
+                }
+                // Enlaces internos (anchors)
+                else if (href.startsWith('#')) {
+                    className = ' class="internal-link"';
+                }
+                // Enlaces de email
+                else if (href.startsWith('mailto:')) {
+                    className = ' class="email-link"';
+                }
+
+                return `<a href="${href}"${titleAttr}${target}${className}>${text}</a>`;
             };
 
             // Personalizar el renderizado de tablas
@@ -127,6 +143,31 @@
                     if (code.parentElement.tagName !== 'PRE') {
                         code.classList.add('inline-code');
                     }
+                });
+
+                // Mejorar navegación de enlaces internos
+                renderedContent.querySelectorAll('a.internal-link').forEach((link) => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const targetId = this.getAttribute('href').substring(1);
+                        const targetElement = document.getElementById(targetId);
+
+                        if (targetElement) {
+                            // Smooth scroll al elemento
+                            targetElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+
+                            // Destacar temporalmente el elemento objetivo
+                            targetElement.style.backgroundColor = 'rgba(0, 212, 170, 0.2)';
+                            targetElement.style.transition = 'background-color 0.3s ease';
+
+                            setTimeout(() => {
+                                targetElement.style.backgroundColor = '';
+                            }, 2000);
+                        }
+                    });
                 });
 
             } catch (error) {
