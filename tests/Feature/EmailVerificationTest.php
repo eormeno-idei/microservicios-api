@@ -14,6 +14,8 @@ describe('Email Verification', function () {
 
         $userData = [
             'name' => 'Test User',
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email' => 'test@example.com',
             'password' => 'password123',
             'password_confirmation' => 'password123',
@@ -36,6 +38,8 @@ describe('Email Verification', function () {
     it('verifica el email con un enlace válido', function () {
         $user = User::factory()->create([
             'email' => 'test@example.com',
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email_verified_at' => null,
         ]);
 
@@ -66,6 +70,8 @@ describe('Email Verification', function () {
 
     it('rechaza enlaces de verificación inválidos', function () {
         $user = User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email_verified_at' => null,
         ]);
 
@@ -118,6 +124,8 @@ describe('Email Verification', function () {
 
     it('maneja usuarios con email ya verificado', function () {
         $user = User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email_verified_at' => now(),
         ]);
 
@@ -186,6 +194,8 @@ describe('Email Verification', function () {
 
     it('rechaza enlaces de verificación expirados', function () {
         $user = User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email_verified_at' => null,
         ]);
 
@@ -215,6 +225,8 @@ describe('Email Verification', function () {
 
     it('verifica que el hash coincida con el email del usuario', function () {
         $user = User::factory()->create([
+            'first_name' => 'Test',
+            'last_name' => 'User',
             'email' => 'correct@example.com',
             'email_verified_at' => null,
         ]);
