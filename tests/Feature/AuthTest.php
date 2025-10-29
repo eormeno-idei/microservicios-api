@@ -7,8 +7,6 @@ describe('Authentication', function () {
     it('permite registrar un usuario', function () {
         $response = $this->postJson('/api/register', [
             'name' => 'Juan Pérez',
-            'first_name' => 'Juan',
-            'last_name' => 'Pérez',
             'email' => 'juan@example.com',
             'password' => 'secret123',
             'password_confirmation' => 'secret123',
