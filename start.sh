@@ -27,7 +27,43 @@ if [[ "$*" == *"-r"* ]]; then
     fi
 
     php artisan migrate --force --seed
+    php artisan games
 fi
 
-# Start the artisan server
+# Check if port 8000 is already in use
+if netstat -tuln 2>/dev/null | grep -q ":8000 " || ss -tuln 2>/dev/null | grep -q ":8000 "; then
+    echo "Server is already running on port 8000"
+    echo "Opening browser to http://127.0.0.1:8000"
+    if grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
+        # WSL - use Windows command
+        cmd.exe /c start "http://127.0.0.1:8000"
+    elif command -v xdg-open > /dev/null; then
+        firefox "http://127.0.0.1:8000" &
+    elif command -v start > /dev/null; then
+        start "http://127.0.0.1:8000"
+    else
+        echo "Cannot detect the web browser to launch automatically"
+    fi
+    exit 0
+fi
+
+# Clear cache before starting the server
+echo "Clearing cache..."
+php artisan cache:clear
+
+# Open browser to the demo page
+echo "Opening browser to http://127.0.0.1:8000"
+if grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
+    # WSL - use Windows command
+    cmd.exe /c start "http://127.0.0.1:8000"
+elif command -v xdg-open > /dev/null; then
+    firefox "http://127.0.0.1:8000" &
+elif command -v start > /dev/null; then
+    start "http://127.0.0.1:8000"
+else
+    echo "Cannot detect the web browser to launch automatically"
+fi
+
+# Start the Laravel server (this will block the terminal)
+echo "Starting Laravel server..."
 php artisan serve

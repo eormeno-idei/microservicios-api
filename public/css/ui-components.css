@@ -1,0 +1,1364 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f5f7fa;
+    padding: 20px;
+}
+
+/* Container Styles */
+.ui-container {
+    /* background: white; */
+    border-radius: 6px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 5px;
+    overflow: visible; /* Allow dropdowns and tooltips to overflow */
+    position: relative; /* Establish positioning context */
+}
+
+.ui-container.vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ui-container.horizontal {
+    display: flex;
+    flex-direction: row;
+    /* Remove default gap and align-items - let inline styles or defaults handle it */
+    /* gap: 15px; */
+    /* align-items: stretch; */
+    flex-wrap: wrap;
+    /* Ensure container takes full width of parent */
+    width: 100%;
+}
+
+.ui-container.horizontal > .ui-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.ui-container > .title {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 10px;
+}
+
+/* Button Styles */
+.ui-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.ui-button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.ui-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ui-button.primary {
+    background: #3498db;
+    color: white;
+}
+
+.ui-button.success {
+    background: #2ecc71;
+    color: white;
+}
+
+.ui-button.danger {
+    background: #e74c3c;
+    color: white;
+}
+
+.ui-button.warning {
+    background: #f39c12;
+    color: white;
+}
+
+.ui-button.info {
+    background: #17a2b8;
+    color: white;
+}
+
+/* Label Styles */
+.ui-label {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    /* Preserve line breaks and whitespace when needed */
+    white-space: pre-line;
+}
+
+.ui-label.heading {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 15px 0 10px 0;
+    border-bottom: 2px solid #e0e0e0;
+    margin-top: 10px;
+}
+
+.ui-label.default {
+    color: #34495e;
+}
+
+.ui-label.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.ui-label.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.ui-label.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.ui-label.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Typography Styles for Labels */
+.ui-label.h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 16px 0 12px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.2;
+}
+
+.ui-label.h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #34495e;
+    margin: 14px 0 10px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.3;
+}
+
+.ui-label.h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #34495e;
+    margin: 12px 0 8px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.4;
+}
+
+.ui-label.h4 {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #34495e;
+    margin: 10px 0 6px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.4;
+}
+
+.ui-label.h5 {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #34495e;
+    margin: 8px 0 4px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.4;
+}
+
+.ui-label.h6 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #34495e;
+    margin: 6px 0 4px 0;
+    padding: 0;
+    background: none;
+    border: none;
+    line-height: 1.4;
+}
+
+/* Text Alignment */
+.ui-label.text-left {
+    text-align: left;
+}
+
+.ui-label.text-center {
+    text-align: center;
+}
+
+.ui-label.text-right {
+    text-align: right;
+}
+
+.ui-label.text-justify {
+    text-align: justify;
+}
+
+/* Input Styles */
+.ui-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ui-input-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.ui-input-group label.required::after {
+    content: ' *';
+    color: #e74c3c;
+}
+
+.ui-input {
+    padding: 10px 12px;
+    border: 1px solid #dcdde1;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.ui-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.ui-input:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Select Styles */
+.ui-select-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ui-select-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.ui-select-group label.required::after {
+    content: ' *';
+    color: #e74c3c;
+}
+
+.ui-select {
+    padding: 10px 12px;
+    border: 1px solid #dcdde1;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.ui-select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.ui-select:disabled {
+    background: #f5f5f5;
+    cursor: not-allowed;
+}
+
+/* Checkbox Styles */
+.ui-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.ui-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #3498db;
+}
+
+.ui-checkbox:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.ui-checkbox-label {
+    font-size: 14px;
+    color: #2c3e50;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ui-checkbox-label.required::after {
+    content: ' *';
+    color: #e74c3c;
+}
+
+.ui-checkbox:disabled + .ui-checkbox-label {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ==================== Table Styles ==================== */
+
+/* Table Wrapper */
+.ui-table-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: 5px 0;
+    width: fit-content; /* Let wrapper size based on table content */
+    max-width: 100%; /* But don't overflow container */
+}
+
+/* Table wrapper alignment */
+.ui-table-wrapper.align-left {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.ui-table-wrapper.align-center {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.ui-table-wrapper.align-right {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+/* Table Title */
+.ui-table-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #2c3e50;
+    padding: 10px 10px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    margin: 0;
+    text-align: center;
+}
+
+/* Table */
+.ui-table {
+    width: auto; /* Let table size based on column widths */
+    border-collapse: collapse;
+    font-size: 14px;
+    table-layout: fixed; /* Keep fixed for consistent sizing */
+}
+
+/* Header Row */
+.ui-table-header-row {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Header Cells */
+.ui-table-header-cell {
+    padding: 14px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    width: auto; /* Auto width for adaptive columns */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Table Rows */
+.ui-table-row {
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Support for min-height on rows (applied via inline style) */
+.ui-table-row[style*="min-height"] td {
+    height: inherit;
+}
+
+.ui-table-row:last-child {
+    border-bottom: none;
+}
+
+.ui-table-row:hover {
+    background: #f8f9fa;
+    transform: scale(1.01);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.ui-table-row.selected {
+    background: #e3f2fd;
+}
+
+/* Row Styles */
+.ui-table-row.default {
+    background: white;
+}
+
+.ui-table-row.primary {
+    background: #e3f2fd;
+}
+
+.ui-table-row.success {
+    background: #e8f5e9;
+}
+
+.ui-table-row.warning {
+    background: #fff3e0;
+}
+
+.ui-table-row.danger {
+    background: #ffebee;
+}
+
+/* Table Cells */
+.ui-table-cell {
+    padding: 14px 16px;
+    color: #2c3e50;
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Cells with min/max width constraints should respect them */
+.ui-table-cell[style*="min-width"],
+.ui-table-cell[style*="max-width"] {
+    width: auto;
+}
+
+/* Header cells with width constraints */
+.ui-table-header-cell[style*="min-width"],
+.ui-table-header-cell[style*="max-width"] {
+    width: auto;
+}
+
+/* Cell with image */
+.ui-table-cell-image {
+    max-width: 50px;
+    max-height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* Cell with button */
+.ui-table-cell .ui-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Action columns (buttons) should be centered and compact */
+.ui-table-cell:has(.ui-button) {
+    text-align: center;
+    width: 100px;
+}
+
+/* Zebra striping for better readability */
+.ui-table-row:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.ui-table-row:nth-child(even):hover {
+    background: #e9ecef;
+}
+
+/* Empty state */
+.ui-table-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Pagination Controls */
+.ui-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.ui-pagination-info {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.ui-pagination-controls {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.ui-pagination-button {
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #495057;
+    transition: all 0.2s;
+}
+
+.ui-pagination-button:hover:not(:disabled) {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+}
+
+.ui-pagination-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.ui-pagination-button.active {
+    background: #667eea;
+    border-color: #667eea;
+    color: white;
+    font-weight: 600;
+}
+
+/* Responsive table */
+@media (max-width: 768px) {
+    .ui-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .ui-table {
+        min-width: 600px;
+    }
+
+    .ui-table-header-cell,
+    .ui-table-cell {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .ui-pagination {
+        flex-direction: column;
+        gap: 12px;
+    }
+}
+
+/* Loading state */
+.ui-table-wrapper.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Sortable headers */
+.ui-table-header-cell.sortable {
+    cursor: pointer;
+    user-select: none;
+}
+
+.ui-table-header-cell.sortable:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== Modal Styles ==================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+    padding: 16px;
+    animation: slideIn 0.3s ease-out;
+    min-width: 400px;
+}
+
+/* Disable interaction on main when modal is open */
+body.modal-open #main {
+    pointer-events: none;
+    filter: brightness(0.7);
+}
+
+body.modal-open #menu {
+    pointer-events: none;
+    filter: brightness(0.7);
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal responsive */
+@media (max-width: 768px) {
+    .modal-container {
+        max-width: 95%;
+        min-width: 0;
+        padding: 16px;
+    }
+}
+
+/* ==================== Menu Dropdown Styles ==================== */
+
+/* ==================== TOP MENU BAR ==================== */
+#top-menu-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 0 20px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Space between menu and user-info */
+}
+
+#menu {
+    flex: 1; /* Grow to fill available space */
+}
+
+#user-info {
+    flex: 0 0 auto; /* Don't grow, don't shrink */
+    margin-left: auto; /* Push to the right */
+}
+
+/* Adjust main content to account for fixed header */
+#main {
+    margin-top: 60px; /* 60px header + 20px spacing */
+    /* padding: 20px; */
+    /* min-height: calc(100vh - 100px); */
+}
+
+.menu-dropdown {
+    position: relative;
+    display: inline-block;
+    z-index: 100; /* Ensure dropdown trigger has proper stacking */
+}
+
+/* When inside a horizontal flex container, behave as flex item */
+.ui-container.horizontal > .menu-dropdown {
+    /* Keep inline-block but make it work with flex */
+    display: inline-block !important;
+    flex-shrink: 0; /* Don't shrink */
+    /* Don't grow to fill space */
+    flex-grow: 0;
+}
+
+.menu-dropdown-trigger {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    min-height: 38px;
+}
+
+.menu-dropdown-trigger:hover {
+    background: linear-gradient(135deg, #7c8ef0 0%, #8a5bb8 100%);
+    border-color: rgba(102, 126, 234, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.35);
+}
+
+.menu-dropdown-trigger.active {
+    background: linear-gradient(135deg, #5a6fd8 0%, #6d4490 100%);
+    border-color: rgba(102, 126, 234, 0.6);
+    transform: translateY(0);
+    box-shadow: 0 2px 12px rgba(102, 126, 234, 0.4), inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.menu-dropdown-trigger .trigger-icon {
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.menu-dropdown-trigger .trigger-label {
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+}
+
+.menu-dropdown-content {
+    position: absolute;
+    top: calc(100% + 8px);
+    /* Don't set left or right here - let position classes handle it */
+    background: white;
+    border: none;
+    border-radius: 4px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    min-width: 240px;
+    z-index: 9999; /* Very high z-index to appear above all containers */
+    display: none;
+    animation: menuSlideIn 0.3s ease-out;
+    backdrop-filter: blur(20px);
+    overflow: visible;
+}
+
+.menu-dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 20px; /* Default for bottom-left */
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-bottom: 8px solid white;
+    filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Arrow position for bottom-right dropdown */
+.position-bottom-right::before {
+    left: auto;
+    right: 20px;
+}
+
+.menu-dropdown-content.show {
+    display: block;
+}
+
+.menu-item {
+    padding: 14px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2c3e50;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    position: relative;
+}
+
+.menu-item:hover {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    color: #667eea;
+    transform: translateX(4px);
+}
+
+.menu-item:active {
+    background: linear-gradient(135deg, #667eea25, #764ba225);
+    transform: translateX(2px);
+}
+
+.menu-item .icon {
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.menu-item:hover .icon {
+    transform: scale(1.1);
+}
+
+.menu-separator {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #e0e6ed, transparent);
+    margin: 8px 16px;
+    opacity: 0.6;
+}
+
+.menu-item.has-submenu {
+    position: relative;
+}
+
+.submenu {
+    position: absolute;
+    top: 0;
+    left: 100%;
+    margin-left: 12px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    min-width: 220px;
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    overflow: visible;
+    z-index: 10000; /* Higher than menu content */
+    transition: all 0.2s ease-out;
+}
+
+.submenu::before {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: -6px;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 6px solid white;
+    z-index: 1003;
+}
+
+.menu-dropdown .menu-item.has-submenu:hover .submenu,
+.menu-dropdown .submenu:hover,
+.menu-dropdown .submenu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    z-index: 10001 !important; /* Ensure submenu is on top */
+}
+
+
+
+@keyframes menuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-12px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes submenuSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-8px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* ==================== RESPONSIVE DESIGN ==================== */
+@media (max-width: 768px) {
+    #top-menu-bar {
+        padding: 0 15px;
+        height: 50px;
+    }
+
+    #main {
+        margin-top: 70px;
+        padding: 15px;
+    }
+
+    .menu-dropdown-trigger {
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+
+    .menu-dropdown-content {
+        min-width: 200px;
+        left: -20px;
+        right: 20px;
+        width: auto;
+    }
+
+    .submenu {
+        position: fixed;
+        top: 70px;
+        left: 20px;
+        right: 20px;
+        width: auto;
+        margin: 0;
+    }
+}
+
+/* ==================== TRIGGER BUTTON STYLES ==================== */
+.trigger-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.trigger-label {
+    font-weight: 600;
+}
+
+.menu-trigger-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: white;
+}
+
+.menu-trigger-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== POSITIONING CLASSES ==================== */
+.position-bottom-left {
+    top: calc(100% + 8px);
+    left: 0 !important;
+    right: auto !important;
+}
+
+.position-bottom-right {
+    top: calc(100% + 8px);
+    right: 0 !important;
+    left: auto !important;
+}
+
+.position-top-left {
+    bottom: calc(100% + 8px);
+    left: 0;
+    top: auto;
+}
+
+.position-top-right {
+    bottom: calc(100% + 8px);
+    right: 0;
+    top: auto;
+}
+
+/* ==================== ADDITIONAL STYLING ==================== */
+.menu-item.has-submenu::after {
+    content: '›';
+    margin-left: auto;
+    font-size: 20px;
+    color: #95a5a6;
+    transition: all 0.2s ease;
+}
+
+.menu-item.has-submenu:hover::after {
+    color: #667eea;
+    transform: translateX(2px);
+}
+
+/* Scrollbar styling for long menus */
+.menu-dropdown-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.menu-dropdown-content::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.menu-dropdown-content::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.menu-dropdown-content::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Menu overlay for closing on outside click */
+.menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    display: none;
+}
+
+.menu-overlay.active {
+    display: block;
+}
+
+/* ==================== Card Styles ==================== */
+
+/* Base Card */
+.ui-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e9ecef;
+}
+
+/* Card Hover Effects */
+.ui-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.ui-card-clickable {
+    cursor: pointer;
+}
+
+.ui-card-clickable:hover {
+    transform: translateY(-2px);
+}
+
+/* Card Styles */
+.ui-card-outlined {
+    background: transparent;
+    border: 2px solid #e9ecef;
+    box-shadow: none;
+}
+
+.ui-card-elevated {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.ui-card-flat {
+    box-shadow: none;
+    border: none;
+}
+
+.ui-card-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+/* Card Sizes */
+.ui-card-small {
+    max-width: 280px;
+    font-size: 14px;
+}
+
+.ui-card-medium {
+    max-width: 350px;
+    font-size: 16px;
+}
+
+.ui-card-large {
+    max-width: 450px;
+    font-size: 18px;
+}
+
+/* Card Elevations */
+.ui-card-elevation-none {
+    box-shadow: none;
+}
+
+.ui-card-elevation-low {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.ui-card-elevation-medium {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ui-card-elevation-high {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Card Themes */
+.ui-card-theme-primary {
+    border-left: 4px solid #3498db;
+}
+
+.ui-card-theme-secondary {
+    border-left: 4px solid #6c757d;
+}
+
+.ui-card-theme-success {
+    border-left: 4px solid #2ecc71;
+}
+
+.ui-card-theme-warning {
+    border-left: 4px solid #f39c12;
+}
+
+.ui-card-theme-danger {
+    border-left: 4px solid #e74c3c;
+}
+
+.ui-card-theme-info {
+    border-left: 4px solid #17a2b8;
+}
+
+/* Card Orientations */
+.ui-card-horizontal {
+    flex-direction: row;
+    align-items: stretch;
+}
+
+.ui-card-horizontal .ui-card-image {
+    flex: 0 0 40%;
+    max-width: 40%;
+}
+
+.ui-card-horizontal .ui-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Card Components */
+.ui-card-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.ui-card-image {
+    position: relative;
+    overflow: hidden;
+}
+
+.ui-card-image img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.ui-card-small .ui-card-image img {
+    height: 150px;
+}
+
+.ui-card-large .ui-card-image img {
+    height: 250px;
+}
+
+.ui-card-header {
+    margin-bottom: 16px;
+}
+
+.ui-card-title {
+    margin: 0 0 8px 0;
+    font-size: 1.25em;
+    font-weight: 600;
+    color: #2c3e50;
+    line-height: 1.3;
+}
+
+.ui-card-subtitle {
+    margin: 0 0 12px 0;
+    font-size: 0.9em;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.ui-card-body {
+    flex: 1;
+    margin-bottom: 16px;
+}
+
+.ui-card-description {
+    margin: 0;
+    color: #34495e;
+    line-height: 1.5;
+}
+
+.ui-card-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid #f1f3f4;
+}
+
+.ui-card-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ui-card-actions .ui-button {
+    flex: 0 0 auto;
+}
+
+/* Card Badge */
+.ui-card-badge {
+    position: absolute;
+    z-index: 10;
+    background: #e74c3c;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 12px;
+    min-width: 20px;
+    text-align: center;
+    line-height: 1;
+}
+
+.ui-card-badge.top-left {
+    top: 12px;
+    left: 12px;
+}
+
+.ui-card-badge.top-right {
+    top: 12px;
+    right: 12px;
+}
+
+.ui-card-badge.bottom-left {
+    bottom: 12px;
+    left: 12px;
+}
+
+.ui-card-badge.bottom-right {
+    bottom: 12px;
+    right: 12px;
+}
+
+/* Card Variants */
+.ui-card-compact .ui-card-content {
+    padding: 12px;
+}
+
+.ui-card-compact .ui-card-title {
+    font-size: 1.1em;
+}
+
+.ui-card-compact .ui-card-image img {
+    height: 120px;
+}
+
+.ui-card-expanded .ui-card-content {
+    padding: 30px;
+}
+
+.ui-card-expanded .ui-card-title {
+    font-size: 1.4em;
+}
+
+.ui-card-expanded .ui-card-image img {
+    height: 280px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ui-card {
+        max-width: 100%;
+        margin: 0 auto 20px;
+    }
+
+    .ui-card-horizontal {
+        flex-direction: column;
+    }
+
+    .ui-card-horizontal .ui-card-image {
+        flex: none;
+        max-width: 100%;
+    }
+
+    .ui-card-actions {
+        flex-direction: column;
+    }
+
+    .ui-card-actions .ui-button {
+        flex: 1;
+    }
+}
+
+/* Card Animations */
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ui-card {
+    animation: cardSlideIn 0.4s ease-out;
+}
+
+
