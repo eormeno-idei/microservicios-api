@@ -567,14 +567,35 @@ Modificar `public/frontend/index.html` para incluir los modales de login y regis
                 </div>
 
                 <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerFirstName" class="form-label">Nombres</label>
+                            <input 
+                                type="text" 
+                                id="registerFirstName" 
+                                class="form-input" 
+                                placeholder="Juan"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="registerLastName" class="form-label">Apellidos</label>
+                            <input 
+                                type="text" 
+                                id="registerLastName" 
+                                class="form-input" 
+                                placeholder="Pérez"
+                                required
+                            >
+                        </div>
+                    </div>
                     <div class="form-group">
-                        <label for="registerName" class="form-label">Nombre Completo</label>
+                        <label for="registerMobile" class="form-label">Móvil (Opcional)</label>
                         <input 
-                            type="text" 
-                            id="registerName" 
+                            type="tel" 
+                            id="registerMobile" 
                             class="form-input" 
-                            placeholder="Juan Pérez"
-                            required
+                            placeholder="+56 9 1234 5678"
                         >
                     </div>
                     <div class="form-group">
@@ -597,6 +618,7 @@ Modificar `public/frontend/index.html` para incluir los modales de login y regis
                             required
                             minlength="8"
                         >
+                        <small class="form-hint">Mínimo 8 caracteres</small>
                     </div>
                     <div class="form-group">
                         <label for="registerPasswordConfirm" class="form-label">Confirmar Contraseña</label>
@@ -608,6 +630,16 @@ Modificar `public/frontend/index.html` para incluir los modales de login y regis
                             required
                             minlength="8"
                         >
+                    </div>
+                    <div class="form-group">
+                        <label for="registerSemanticContext" class="form-label">Contexto Semántico (Opcional)</label>
+                        <textarea 
+                            id="registerSemanticContext" 
+                            class="form-input form-textarea" 
+                            placeholder="Información adicional sobre tu perfil o contexto de uso..."
+                            rows="3"
+                        ></textarea>
+                        <small class="form-hint">Este campo agrega contexto a la IA</small>
                     </div>
                     <button type="submit" class="btn btn--primary btn--block" id="btnSubmitRegister">
                         Registrarse
@@ -755,6 +787,13 @@ Agregar los estilos para los modales y formularios en `public/frontend/css/style
     margin-bottom: 1.5rem;
 }
 
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
 .form-label {
     display: block;
     font-weight: 600;
@@ -773,13 +812,28 @@ Agregar los estilos para los modales y formularios en `public/frontend/css/style
     font-family: inherit;
 }
 
-.form-input:focus {
+.form-textarea {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.5;
+}
+
+.form-input:focus,
+.form-textarea:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.form-input::placeholder {
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--text-secondary);
+}
+
+.form-hint {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
@@ -840,6 +894,11 @@ Agregar los estilos para los modales y formularios en `public/frontend/css/style
     .modal__body {
         padding: 1.25rem;
     }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
 }
 ```
 
@@ -896,10 +955,13 @@ const elements = {
     
     // Formulario de Registro
     registerForm: document.getElementById('registerForm'),
-    registerName: document.getElementById('registerName'),
+    registerFirstName: document.getElementById('registerFirstName'),
+    registerLastName: document.getElementById('registerLastName'),
+    registerMobile: document.getElementById('registerMobile'),
     registerEmail: document.getElementById('registerEmail'),
     registerPassword: document.getElementById('registerPassword'),
     registerPasswordConfirm: document.getElementById('registerPasswordConfirm'),
+    registerSemanticContext: document.getElementById('registerSemanticContext'),
     registerError: document.getElementById('registerError'),
     registerErrorMessage: document.getElementById('registerErrorMessage'),
     btnSubmitRegister: document.getElementById('btnSubmitRegister'),
@@ -1075,20 +1137,19 @@ class AuthManager {
     /**
      * Registrar usuario
      */
-    static async register(name, email, password, passwordConfirmation) {
+    static async register(userData) {
         const data = await apiClient.post('/register', {
-            name,
-            email,
-            first_name,
-            last_name,
-            mobile,
-            semantic_context,
-            password,
-            password_confirmation: passwordConfirmation,
+            first_name: userData.firstName,
+            last_name: userData.lastName,
+            mobile: userData.mobile || null,
+            semantic_context: userData.semanticContext || null,
+            email: userData.email,
+            password: userData.password,
+            password_confirmation: userData.passwordConfirmation,
         });
 
         // Verificar que la respuesta sea exitosa
-        if (!data.success) {
+        if (!data.status || data.status !== 'success') {
             throw new Error(data.message || 'Error en el registro');
         }
 
@@ -1507,7 +1568,7 @@ class AppController {
         try {
             uiManager.disableSubmitButton(elements.btnSubmitLogin, 'Iniciando sesión...');
 
-            await AuthManager.login(email, password, remember);
+            await AuthManager.login(email, password);
 
             // Cerrar modal y actualizar UI
             uiManager.hideModal(elements.loginModal);
@@ -1532,24 +1593,29 @@ class AppController {
      * Manejar el registro
      */
     async handleRegister() {
-        const name = elements.registerName.value.trim();
+        // Obtener valores del formulario
+        const firstName = elements.registerFirstName.value.trim();
+        const lastName = elements.registerLastName.value.trim();
+        const mobile = elements.registerMobile.value.trim();
         const email = elements.registerEmail.value.trim();
         const password = elements.registerPassword.value;
         const passwordConfirm = elements.registerPasswordConfirm.value;
+        const semanticContext = elements.registerSemanticContext.value.trim();
 
         // Ocultar errores previos
         uiManager.hideFormError(elements.registerError);
 
-        // Validación básica
-        if (!name || !email || !password || !passwordConfirm) {
+        // Validación básica de campos requeridos
+        if (!firstName || !lastName || !email || !password || !passwordConfirm) {
             uiManager.showFormError(
                 elements.registerError,
                 elements.registerErrorMessage,
-                'Por favor, completa todos los campos.'
+                'Por favor, completa todos los campos obligatorios.'
             );
             return;
         }
 
+        // Validar que las contraseñas coincidan
         if (password !== passwordConfirm) {
             uiManager.showFormError(
                 elements.registerError,
@@ -1559,6 +1625,7 @@ class AppController {
             return;
         }
 
+        // Validar longitud mínima de contraseña
         if (password.length < 8) {
             uiManager.showFormError(
                 elements.registerError,
@@ -1571,7 +1638,18 @@ class AppController {
         try {
             uiManager.disableSubmitButton(elements.btnSubmitRegister, 'Registrando...');
 
-            await AuthManager.register(name, email, password, passwordConfirm);
+            // Preparar datos del usuario
+            const userData = {
+                firstName,
+                lastName,
+                mobile,
+                email,
+                password,
+                passwordConfirmation: passwordConfirm,
+                semanticContext
+            };
+
+            await AuthManager.register(userData);
 
             // Cerrar modal y actualizar UI
             uiManager.hideModal(elements.registerModal);
