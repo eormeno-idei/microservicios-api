@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservicios API - Frontend</title>
+    <link rel="stylesheet" href="./frontend/css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="header__title">Microservicios API</h1>
+            <nav class="header__nav">
+                <span id="userWelcome" class="user-welcome" style="display: none;"></span>
+                <button id="btnLogin" class="btn btn--secondary">Iniciar Sesión</button>
+                <button id="btnLogout" class="btn btn--secondary" style="display: none;">Cerrar Sesión</button>
+            </nav>
+        </header>
+
+        <main class="main">
+            <section class="landing-section">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando...</p>
+                </div>
+
+                <div class="content" id="content" style="display: none;">
+                    <h2 class="content__title">Estado de la API</h2>
+                    <div class="card">
+                        <p class="card__label">Mensaje:</p>
+                        <p class="card__value" id="apiMessage"></p>
+                    </div>
+                    <div class="card">
+                        <p class="card__label">Versión:</p>
+                        <p class="card__value" id="apiVersion"></p>
+                    </div>
+                    <div class="card">
+                        <p class="card__label">Timestamp:</p>
+                        <p class="card__value" id="apiTimestamp"></p>
+                    </div>
+                </div>
+
+                <div class="error" id="error" style="display: none;">
+                    <h3 class="error__title">Error al conectar con la API</h3>
+                    <p class="error__message" id="errorMessage"></p>
+                    <button class="btn btn--primary" onclick="location.reload()">Reintentar</button>
+                </div>
+            </section>
+
+            <!-- Sección para usuarios autenticados -->
+            <section class="protected-section" id="protectedSection" style="display: none;">
+                <div class="card card--highlight">
+                    <h3 class="card__title">Panel de Usuario</h3>
+                    <p class="card__description">Esta sección solo es visible para usuarios autenticados.</p>
+                    <button class="btn btn--primary" id="btnUserAction">Ver Perfil</button>
+                </div>
+            </section>
+
+            <!-- Sección para administradores -->
+            <section class="admin-section" id="adminSection" style="display: none;">
+                <div class="card card--admin">
+                    <h3 class="card__title">Panel de Administrador</h3>
+                    <p class="card__description">Esta sección solo es visible para administradores.</p>
+                    <button class="btn btn--danger" id="btnAdminAction">Ver Dashboard</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2025 Microservicios API. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- Modal de Login -->
+    <div id="loginModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Iniciar Sesión</h2>
+                <button class="modal__close" id="closeLoginModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <!-- Área de mensajes de error -->
+                <div class="alert alert--error" id="loginError" style="display: none;">
+                    <p id="loginErrorMessage"></p>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail" class="form-label">Email</label>
+                        <input
+                            type="email"
+                            id="loginEmail"
+                            class="form-input"
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword" class="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            class="form-input"
+                            placeholder="••••••••"
+                            required
+                        >
+                    </div>
+                    <div class="form-group form-group--checkbox">
+                        <label class="checkbox-label">
+                            <input
+                                type="checkbox"
+                                id="rememberMe"
+                                class="checkbox-input"
+                            >
+                            <span class="checkbox-text">Recordarme</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--block" id="btnSubmitLogin">
+                        Iniciar Sesión
+                    </button>
+                </form>
+                <div class="modal__footer-text">
+                    <p>¿No tienes cuenta? <a href="#" id="showRegisterModal" class="link">Regístrate aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2 class="modal__title">Crear Cuenta</h2>
+                <button class="modal__close" id="closeRegisterModal">&times;</button>
+            </div>
+            <div class="modal__body">
+                <!-- Área de mensajes de error -->
+                <div class="alert alert--error" id="registerError" style="display: none;">
+                    <p id="registerErrorMessage"></p>
+                </div>
+
+                <form id="registerForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="registerFirstName" class="form-label">Nombres</label>
+                            <input
+                                type="text"
+                                id="registerFirstName"
+                                class="form-input"
+                                placeholder="Juan"
+                                required
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="registerLastName" class="form-label">Apellidos</label>
+                            <input
+                                type="text"
+                                id="registerLastName"
+                                class="form-input"
+                                placeholder="Pérez"
+                                required
+                            >
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerMobile" class="form-label">Móvil (Opcional)</label>
+                        <input
+                            type="tel"
+                            id="registerMobile"
+                            class="form-input"
+                            placeholder="+56 9 1234 5678"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="registerEmail" class="form-label">Email</label>
+                        <input
+                            type="email"
+                            id="registerEmail"
+                            class="form-input"
+                            placeholder="tu@email.com"
+                            required
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword" class="form-label">Contraseña</label>
+                        <input
+                            type="password"
+                            id="registerPassword"
+                            class="form-input"
+                            placeholder="••••••••"
+                            required
+                            minlength="8"
+                        >
+                        <small class="form-hint">Mínimo 8 caracteres</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPasswordConfirm" class="form-label">Confirmar Contraseña</label>
+                        <input
+                            type="password"
+                            id="registerPasswordConfirm"
+                            class="form-input"
+                            placeholder="••••••••"
+                            required
+                            minlength="8"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="registerSemanticContext" class="form-label">Contexto Semántico (Opcional)</label>
+                        <textarea
+                            id="registerSemanticContext"
+                            class="form-input form-textarea"
+                            placeholder="Información adicional sobre tu perfil o contexto de uso..."
+                            rows="3"
+                        ></textarea>
+                        <small class="form-hint">Este campo agrega contexto a la IA</small>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--block" id="btnSubmitRegister">
+                        Registrarse
+                    </button>
+                </form>
+                <div class="modal__footer-text">
+                    <p>¿Ya tienes cuenta? <a href="#" id="showLoginModal" class="link">Inicia sesión aquí</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./frontend/js/app.js"></script>
+</body>
+</html>

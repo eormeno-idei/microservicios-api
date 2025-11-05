@@ -27,7 +27,6 @@ if [[ "$*" == *"-r"* ]]; then
     fi
 
     php artisan migrate --force --seed
-    php artisan games
 fi
 
 # Check if port 8000 is already in use
