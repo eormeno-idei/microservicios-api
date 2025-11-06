@@ -193,7 +193,7 @@ class AuthController extends Controller
             fn() => $request->user()->sendEmailVerificationNotification(),
             'reenvío de verificación'
         );
-        
+
         if ($sent) {
             return response()->json([
                 'success' => true,
@@ -201,7 +201,7 @@ class AuthController extends Controller
                 'message' => 'Verification email sent'
             ], 200);
         }
-        
+
         return response()->json([
             'success' => false,
             'data' => null,
@@ -348,23 +348,23 @@ class AuthController extends Controller
     {
         $mailHost = config('mail.mailers.smtp.host');
         $mailPort = config('mail.mailers.smtp.port');
-        
+
         if (!$mailHost || !$mailPort) {
             return false;
         }
 
         // Intentar conectar con timeout de 2 segundos
         $connection = @fsockopen($mailHost, $mailPort, $errno, $errstr, 2);
-        
+
         if ($connection) {
             fclose($connection);
             return true;
         }
-        
+
         Log::info("Servidor de email no disponible: {$mailHost}:{$mailPort} - {$errstr}");
         return false;
     }
-    
+
     /**
      * Intentar enviar email de forma segura
      */
@@ -374,7 +374,7 @@ class AuthController extends Controller
             Log::warning("Email no enviado ({$errorContext}): Servidor de email no disponible");
             return false;
         }
-        
+
         try {
             $callback();
             return true;

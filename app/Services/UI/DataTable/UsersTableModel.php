@@ -6,14 +6,14 @@ use App\Models\User;
 
 /**
  * Users Table Model
- * 
+ *
  * Implementation for real User model from database
  */
 class UsersTableModel extends AbstractDataTableModel
 {
     /**
      * Get all users data from database
-     * 
+     *
      * @return array
      */
     protected function getAllData(): array
@@ -23,14 +23,14 @@ class UsersTableModel extends AbstractDataTableModel
 
     /**
      * Get table columns definition
-     * 
+     *
      * @return array
      */
     public function getColumns(): array
     {
         return [
             // 'id' => ['label' => 'ID', 'width' => [60, 80]],
-            'name' => ['label' => 'Name', 'width' => [200, 300]],
+            'name' => ['label' => 'Name', 'width' => [300, 500]],
             'email' => ['label' => 'Email', 'width' => [250, 350]],
             'actions' => ['label' => 'Actions', 'width' => [100, 150]],
         ];
@@ -38,7 +38,7 @@ class UsersTableModel extends AbstractDataTableModel
 
     /**
      * Get formatted data for table display
-     * 
+     *
      * @return array
      */
     public function getFormattedPageData(int $currentPage, int $perPage): array
@@ -108,7 +108,7 @@ class UsersTableModel extends AbstractDataTableModel
 
     /**
      * Update user data in database
-     * 
+     *
      * @param int $userId
      * @param array $data
      * @return bool
@@ -123,7 +123,7 @@ class UsersTableModel extends AbstractDataTableModel
         // Only update allowed fields
         $allowedFields = ['name', 'email'];
         $updateData = array_intersect_key($data, array_flip($allowedFields));
-        
+
         if (empty($updateData)) {
             return;
         }
@@ -139,7 +139,7 @@ class UsersTableModel extends AbstractDataTableModel
 
     /**
      * Delete user from database
-     * 
+     *
      * @param int $userId
      * @return bool
      */

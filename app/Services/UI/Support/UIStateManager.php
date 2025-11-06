@@ -22,7 +22,7 @@ class UIStateManager
     /**
      * Default cache TTL (30 minutes)
      */
-    public const DEFAULT_TTL = 5; // 1800;
+    public const DEFAULT_TTL = 1800;
 
     /**
      * Generate cache key for a service
