@@ -323,7 +323,8 @@
             container.innerHTML = '<div class="loading">Cargando logs...</div>';
 
             try {
-                const response = await fetch(`/logs/content?file=${file}&lines=${lines}&search=${encodeURIComponent(search)}`, {
+                const logsApiUrl = `/logs/content?file=${file}&lines=${lines}&search=${encodeURIComponent(search)}`;
+                const response = await fetch(logsApiUrl, {
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'X-Requested-With': 'XMLHttpRequest'

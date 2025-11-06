@@ -1,29 +1,40 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UIDemoController;
 use App\Http\Controllers\UIEventController;
 use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\DocumentationController;
 
+// Log viewer routes (MUST be before dynamic demo route)
+Route::prefix('logs')->group(function () {
+    Route::get('/', [LogViewerController::class, 'index'])->name('logs.index');
+    Route::get('/content', [LogViewerController::class, 'getContent'])->name('logs.content');
+    Route::get('/download', [LogViewerController::class, 'download'])->name('logs.download');
+    Route::post('/clear', [LogViewerController::class, 'clear'])->name('logs.clear');
+});
+
 // Demo route - Default landing demo
-Route::get('/', fn() => view('demo', [
-    'demo' => 'landing-demo',
-    'reset' => false
-]));
+Route::get('/{demo}', function () {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => 'landing-demo',
+        'reset' => $reset
+    ]);
+});
 
 // Demo route - Dynamic demo viewer
-Route::get('/{demo}/{reset?}', function (string $demo, bool $reset = false) {
+Route::get('/{demo}', function (string $demo) {
+    $reset = request()->query('reset', false);
     return view('demo', [
         'demo' => $demo,
         'reset' => $reset
     ]);
-})->where('demo', 'landing-demo|demo-ui|input-demo|select-demo|checkbox-demo|form-demo|button-demo|table-demo|modal-demo|demo-menu')->name('demo');
+})->where('demo', '(?!api).*')->name('demo');
 
 // Demo UI API routes - Unified controller for all demo services
-Route::get('/api/{demo}/{reset?}', [UIDemoController::class, 'show'])
-    ->where('demo', 'landing-demo|demo-ui|input-demo|select-demo|checkbox-demo|form-demo|button-demo|table-demo|modal-demo|demo-menu')
-    ->name('api.demo');
+Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');
 
 // UI Event Handler
 Route::post('/api/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
@@ -70,12 +81,4 @@ Route::prefix('docs')->group(function () {
     // Rutas de compatibilidad con enlaces antiguos (redirects)
     Route::get('/api-client', fn() => redirect()->route('docs.api-complete'))->name('docs.api-client.redirect');
     Route::get('/css-structure', fn() => redirect()->route('docs.technical-components'))->name('docs.css-structure.redirect');
-});
-
-// Log viewer routes
-Route::prefix('logs')->group(function () {
-    Route::get('/', [LogViewerController::class, 'index'])->name('logs.index');
-    Route::get('/content', [LogViewerController::class, 'getContent'])->name('logs.content');
-    Route::get('/download', [LogViewerController::class, 'download'])->name('logs.download');
-    Route::post('/clear', [LogViewerController::class, 'clear'])->name('logs.clear');
 });

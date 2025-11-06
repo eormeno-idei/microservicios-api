@@ -298,7 +298,7 @@ abstract class AbstractUIService
                 throw new RuntimeException("Component '{$id}' has no parent defined.");
             }
 
-            if  (!$parentId || !isset($components[$parentId])) {
+            if (!$parentId || !isset($components[$parentId])) {
                 continue;
             }
 
@@ -364,6 +364,13 @@ abstract class AbstractUIService
     {
         UIStateManager::clear(static::class);
     }
+
+    /**
+     * 
+     *
+     * @return void
+     */
+    public function onResetService(): void {}
 
     /**
      * Get the service component ID

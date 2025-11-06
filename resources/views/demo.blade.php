@@ -10,6 +10,7 @@
 <body>
     <header id="top-menu-bar">
         <div id="menu"></div>
+        <button id="reset-btn" onclick="location.href='?reset=true'">Reset</button>
     </header>
     <main id="main"></main>
     <div id="modal-overlay" class="modal-overlay hidden">

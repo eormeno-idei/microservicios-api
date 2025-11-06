@@ -42,6 +42,14 @@ class DemoUiService extends AbstractUIService
         Cache::put($key, $value, now()->addHours(24));
     }
 
+    public function onResetService(): void
+    {
+        // Clear counter value on reset
+        $userId = Auth::check() ? Auth::id() : session()->getId();
+        $key = "demo_counter:{$userId}";
+        Cache::forget($key);
+    }
+
     /**
      * Build base UI structure (required by StoresUIState trait)
      * 
@@ -119,7 +127,8 @@ class DemoUiService extends AbstractUIService
         );
 
         $counterContainer = UIBuilder::container('counter_container')
-            ->layout(LayoutType::HORIZONTAL);
+            ->layout(LayoutType::HORIZONTAL)
+            ->gap("10px");
 
         $counterContainer->add(
             UIBuilder::button('btn_decrement')

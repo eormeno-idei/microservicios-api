@@ -1648,7 +1648,7 @@ class UIRenderer {
 
             // Find parent and append
             const parentElement = document.querySelector(`[data-component-id="${config.parent}"]`)
-                               || document.getElementById(config.parent);
+                || document.getElementById(config.parent);
 
             if (parentElement) {
                 parentElement.appendChild(element);
@@ -1670,12 +1670,13 @@ async function loadDemoUI(demoName = null) {
     try {
         // Use demo name from window global (set by Laravel) or parameter
         const demo = demoName || window.DEMO_NAME || 'button-demo';
+        const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        console.log(`Fetching UI data from /api/${demo}...`);
+        console.log(`Fetching UI data from /api/${demo}${resetQuery}...`);
 
-        const response = await fetch(`/api/${demo}`, {
+        const response = await fetch(`/api/${demo}${resetQuery}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -1693,6 +1694,14 @@ async function loadDemoUI(demoName = null) {
         // Create and store global renderer
         globalRenderer = new UIRenderer(uiData);
         globalRenderer.render();
+
+        // If reset flag was used, clear it after loading
+        if (window.RESET_DEMO) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.RESET_DEMO = false;
+        }
+
+        console.log('✅ Demo UI loaded successfully');
 
     } catch (error) {
         console.error('Error loading demo UI:', error);
@@ -1859,7 +1868,7 @@ function startModalCountdown(totalMs, initialValue, timeUnit, timeUnitLabel, tim
  * Get remaining value in the specified time unit
  */
 function getRemainingValue(remainingMs, timeUnit) {
-    switch(timeUnit) {
+    switch (timeUnit) {
         case 'seconds': return remainingMs / 1000;
         case 'minutes': return remainingMs / (60 * 1000);
         case 'hours': return remainingMs / (60 * 60 * 1000);
@@ -1872,7 +1881,7 @@ function getRemainingValue(remainingMs, timeUnit) {
  * Get singular label for time unit
  */
 function getSingularLabel(timeUnit) {
-    switch(timeUnit) {
+    switch (timeUnit) {
         case 'seconds': return 'segundo';
         case 'minutes': return 'minuto';
         case 'hours': return 'hora';
@@ -2184,7 +2193,8 @@ async function loadMenuUI() {
     }
 
     try {
-        const response = await fetch(`/api/${window.MENU_SERVICE}`);
+        const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
+        const response = await fetch(`/api/${window.MENU_SERVICE}${resetQuery}`);
         const uiData = await response.json();
 
         // console.log('📊 Menu UI Data received:', uiData);

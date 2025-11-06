@@ -15,8 +15,10 @@ class UIDemoController extends Controller
      * @param bool $reset Whether to reset the stored UI state
      * @return JsonResponse
      */
-    public function show(string $demo, bool $reset = false): JsonResponse
+    public function show(string $demo): JsonResponse
     {
+        $reset = request()->query('reset', false);
+
         // Convert kebab-case to PascalCase and append 'Service'
         // Example: 'demo-ui' -> 'DemoUi' -> 'DemoUiService'
         $serviceName = Str::studly($demo) . 'Service';
@@ -38,7 +40,9 @@ class UIDemoController extends Controller
 
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {
+            Log::info("Resetting stored UI for demo service: {$serviceName}");
             $service->clearStoredUI();
+            $service->onResetService();
         }
 
         $ui = $service->getUI();
