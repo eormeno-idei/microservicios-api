@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UIDemoController;
 use App\Http\Controllers\UIEventController;
@@ -16,7 +15,7 @@ Route::prefix('logs')->group(function () {
 });
 
 // Demo route - Default landing demo
-Route::get('/{demo}', function () {
+Route::get('/', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
         'demo' => 'landing-demo',
