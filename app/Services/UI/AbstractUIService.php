@@ -23,6 +23,8 @@ use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
+use App\Services\UI\Support\UIDebug;
+use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 
 /**
  * Abstract UI Service
@@ -171,7 +173,15 @@ abstract class AbstractUIService
         $this->storeUI($this->container);
 
         // Calculate and return diff in indexed format
-        return $this->buildDiffResponse();
+        $diff = $this->buildDiffResponse();
+
+        // Add to the diff response any storage variables
+        $storageVars = $this->getStorageVariables();
+        if (!empty($storageVars['storage'])) {
+            $diff['storage'] = $storageVars['storage'];
+        }
+        UIDebug::debug("Diff response generated", $diff);
+        return $diff;
     }
 
     /**
@@ -266,7 +276,7 @@ abstract class AbstractUIService
      * @param array $jsonUI JSON representation of UI
      * @return UIContainer Reconstructed container
      */
-    protected function reconstructContainerFromJson(array $jsonUI): UIContainer
+    private function reconstructContainerFromJson(array $jsonUI): UIContainer
     {
         $components = [];
         $rootContainer = null;
@@ -366,7 +376,7 @@ abstract class AbstractUIService
     }
 
     /**
-     * 
+     * Allow child classes to react when the service is reset.
      *
      * @return void
      */
@@ -395,5 +405,45 @@ abstract class AbstractUIService
             static::class,
             'service_root'
         );
+    }
+
+    /**
+     * Uses reflection to scan private and protected properties whose names start with the "store_"
+     * prefix and whose type hints are non-nullable primitive types (int, float, string, bool) or array.
+     * It then builds an associative array with the following structure:
+     *
+     * [
+     *   'storage' => [
+     *     'var_name_1' => value,
+     *     'var_name_2' => value,
+     *     ...
+     *   ]
+     * ]
+     *
+     * @return array Associative array with the variables to be stored on the frontend
+     */
+    protected function getStorageVariables(): array
+    {
+        $storage = [];
+        $reflection = new ReflectionClass($this);
+        $properties = $reflection->getProperties(
+            ReflectionProperty::IS_PRIVATE |
+            ReflectionProperty::IS_PROTECTED
+        );
+        foreach ($properties as $property) {
+            $propertyName = $property->getName();
+            if (str_starts_with($propertyName, 'store_')) {
+                $propertyType = $property->getType();
+                if ($propertyType && !$propertyType->allowsNull()) {
+                    $typeName = $propertyType->getName();
+                    $isPrimitive = in_array($typeName, ['int', 'float', 'string', 'bool', 'array']);
+                    if ($isPrimitive) {
+                        $value = $property->getValue($this);
+                        $storage[$propertyName] = $value;
+                    }
+                }
+            }
+        }
+        return ['storage' => $storage];
     }
 }

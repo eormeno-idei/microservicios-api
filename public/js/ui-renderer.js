@@ -1182,6 +1182,8 @@ class ComponentFactory {
                 return new MenuDropdownComponent(id, config);
             case 'card':
                 return new CardComponent(id, config);
+            case 'storage':
+                return new StorageComponent(id, config);
             default:
                 console.warn(`Unknown component type: ${config.type}`);
                 return null;
@@ -1371,12 +1373,40 @@ class UIRenderer {
     }
 
     /**
+     * Handle storage updates - store variables in localStorage
+     *
+     * @param {object} storageData - Storage variables object
+     */
+    handleStorageUpdate(storageData) {
+        console.log('💾 Processing storage updates:', storageData);
+
+        Object.keys(storageData).forEach(key => {
+            const value = storageData[key];
+
+            // Store the value in localStorage
+            // If it's an object/array, stringify it
+            if (typeof value === 'object' && value !== null) {
+                localStorage.setItem(key, JSON.stringify(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${JSON.stringify(value)}`);
+            } else {
+                localStorage.setItem(key, String(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${value}`);
+            }
+        });
+    }
+
+    /**
      * Handle UI updates from backend
      *
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
         // console.log('📦 Processing UI updates:', uiUpdate);
+
+        // Handle storage updates if present
+        if (uiUpdate.storage) {
+            this.handleStorageUpdate(uiUpdate.storage);
+        }
 
         // Check if there are components with parent='modal' - if so, open modal
         let hasModalComponents = false;
@@ -2180,6 +2210,43 @@ class MenuDropdownComponent extends UIComponent {
     closeMenu(content, trigger) {
         content.classList.remove('show');
         trigger.classList.remove('active');
+    }
+}
+
+// ==================== Storage Component ====================
+class StorageComponent extends UIComponent {
+    render() {
+        // This component doesn't render anything visible
+        // It just stores data in localStorage
+        this.storeData();
+        return document.createDocumentFragment(); // Return empty fragment
+    }
+
+    storeData() {
+        // Iterate over all config properties (except internal ones)
+        Object.keys(this.config).forEach(key => {
+            // Skip internal properties that start with underscore
+            if (key.startsWith('_') || key === 'type') {
+                return;
+            }
+
+            const value = this.config[key];
+
+            // Store the value in localStorage
+            // If it's an object/array, stringify it
+            if (typeof value === 'object' && value !== null) {
+                localStorage.setItem(key, JSON.stringify(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${JSON.stringify(value)}`);
+            } else {
+                localStorage.setItem(key, String(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${value}`);
+            }
+        });
+    }
+
+    updateComponent(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        this.storeData();
     }
 }
 

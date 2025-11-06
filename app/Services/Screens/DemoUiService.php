@@ -16,6 +16,13 @@ class DemoUiService extends AbstractUIService
     protected LabelBuilder $lbl_welcome;
     protected LabelBuilder $lbl_counter;
 
+    protected int $store_counter = 0;
+    private string $store_token = 'token_demo_ui_service';
+    private array $store_ui_demo_data = [
+        "example_key" => "example_value",
+        "another_key" => "another_value"
+    ];
+
     /**
      * Get counter value from cache
      * 
@@ -478,6 +485,8 @@ class DemoUiService extends AbstractUIService
         $newValue = $currentValue + 1;
         $this->setCounterValue($newValue);
 
+        $this->store_counter = $newValue;
+
         // Determinar estilo basado en el valor
         $counterStyle = 'primary';
         if ($newValue > 5) {
@@ -504,6 +513,8 @@ class DemoUiService extends AbstractUIService
         $currentValue = $this->getCounterValue();
         $newValue = $currentValue - 1;
         $this->setCounterValue($newValue);
+        
+        $this->store_counter = $newValue;
 
         $counterStyle = 'primary';
         if ($newValue > 5) {
