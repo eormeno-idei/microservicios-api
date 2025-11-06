@@ -40,7 +40,7 @@ class UIDemoController extends Controller
 
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {
-            Log::info("Resetting stored UI for demo service: {$serviceName}");
+            // Log::info("Resetting stored UI for demo service: {$serviceName}");
             $service->clearStoredUI();
             $service->onResetService();
         }
