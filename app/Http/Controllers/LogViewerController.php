@@ -26,7 +26,7 @@ class LogViewerController extends Controller
     /**
      * Get log content via API
      */
-    public function getContent(Request $request)
+    public function content(Request $request)
     {
         $fileName = $request->input('file', 'laravel.log');
         $lines = (int) $request->input('lines', self::DEFAULT_LINES);

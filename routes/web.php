@@ -9,7 +9,7 @@ use App\Http\Controllers\DocumentationController;
 // Log viewer routes (MUST be before dynamic demo route)
 Route::prefix('logs')->group(function () {
     Route::get('/', [LogViewerController::class, 'index'])->name('logs.index');
-    Route::get('/content', [LogViewerController::class, 'getContent'])->name('logs.content');
+    Route::get('/content', [LogViewerController::class, 'content'])->name('logs.content');
     Route::get('/download', [LogViewerController::class, 'download'])->name('logs.download');
     Route::post('/clear', [LogViewerController::class, 'clear'])->name('logs.clear');
 });
