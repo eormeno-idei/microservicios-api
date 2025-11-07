@@ -2,22 +2,24 @@
 
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\UIBuilder;
 use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\CheckboxBuilder;
 use App\Services\UI\Components\ButtonBuilder;
+use App\Services\UI\Components\CheckboxBuilder;
 
 class CheckboxDemoService extends AbstractUIService
 {
-    // Component references (auto-injected)
     protected LabelBuilder $lbl_instruction;
     protected CheckboxBuilder $chk_javascript;
     protected CheckboxBuilder $chk_python;
     protected ButtonBuilder $btn_submit;
     protected LabelBuilder $lbl_result;
+
+    protected bool $store_js_checked = false;
+    protected bool $store_py_checked = false;
 
     /**
      * Build the checkbox demo UI
@@ -40,14 +42,14 @@ class CheckboxDemoService extends AbstractUIService
         $container->add(
             UIBuilder::checkbox('chk_javascript')
                 ->label('JavaScript')
-                ->checked(false)
+                ->checked($this->store_js_checked)
         );
 
         // Python checkbox
         $container->add(
             UIBuilder::checkbox('chk_python')
                 ->label('Python')
-                ->checked(false)
+                ->checked($this->store_py_checked)
         );
 
         // Submit button
@@ -78,9 +80,12 @@ class CheckboxDemoService extends AbstractUIService
         $jsChecked = $params['chk_javascript'] ?? false;
         $pyChecked = $params['chk_python'] ?? false;
 
+        $this->store_js_checked = $jsChecked;
+        $this->store_py_checked = $pyChecked;
+
         // Build selections array
         $selections = [];
-        
+
         if ($jsChecked) {
             $selections[] = 'JavaScript';
         }

@@ -93,44 +93,25 @@ class UIEventController extends Controller
                 ], 404);
             }
 
-            // Check if service uses new AbstractUIService architecture
-            // $usesAbstractService = $service instanceof \App\Services\UI\AbstractUIService;
-
-            // Initialize event context for AbstractUIService
-            // if ($usesAbstractService) {
             $service->initializeEventContext($incomingStorage);
-            // }
 
-            // Invoke method
+            // Invoke handler method
             $result = $service->$method($parameters);
             if (!is_array($result)) {
                 $result = $service->finalizeEventContext();
             }
 
-            // Finalize event context for AbstractUIService
-            // if ($usesAbstractService) {
-            // $autoDetectedChanges = $service->finalizeEventContext();
+            $storageVariables = $service->getStorageVariables();
 
-            // If handler returned explicit changes, use those
-            // Otherwise, use auto-detected changes from UI comparison
-            // if (empty($result) || !is_array($result)) {
-            //     $result = $autoDetectedChanges;
-            // }
-            // If handler returned changes, keep them (don't overwrite)
-            // }
+            UIDebug::debug("Incoming front variables", $incomingStorage);
 
-            // Ensure result is an array
-            // if (!is_array($result)) {
-            //     $result = ['data' => $result];
-            // }
+            if (!empty($storageVariables)) {
+                UIDebug::debug("New storage variables", $storageVariables);
+                $mergedStorage = array_merge($incomingStorage, $storageVariables);
+                UIDebug::debug("Merged storage variables", $mergedStorage);
 
-            // $simpleName = class_basename($serviceClass);
-
-            // Log::info('UI Event: Action executed', [
-            //     'service' => $simpleName,
-            //     'method' => $method,
-            //     'component_id' => $componentId,
-            // ]);
+                $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
+            }
 
             return response()->json($result);
         } catch (\Exception $e) {

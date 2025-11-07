@@ -225,11 +225,11 @@ abstract class AbstractUIService
         $diff = $this->buildDiffResponse();
 
         // Add to the diff response any storage variables
-        $storageVars = $this->getStorageVariables();
-        if (!empty($storageVars['storage'])) {
-            $diff['storage'] = $storageVars['storage'];
-        }
-        UIDebug::debug("Diff response generated", $diff);
+        // $storageVars = $this->getStorageVariables();
+        // if (!empty($storageVars['storage'])) {
+        //     $diff['storage'] = $storageVars['storage'];
+        // }
+        // UIDebug::debug("Diff response generated", $diff);
         return $diff;
     }
 
@@ -469,7 +469,7 @@ abstract class AbstractUIService
      *
      * @return array Associative array with the variables to be stored on the frontend
      */
-    protected function getStorageVariables(): array
+    public function getStorageVariables(): array
     {
         $storage = [];
         $reflection = new ReflectionClass($this);
@@ -490,8 +490,9 @@ abstract class AbstractUIService
             }
         }
 
-        $storage = encrypt(json_encode($storage));
+        return $storage;
 
-        return ['storage' => ['usim' => $storage]];
+        // $storage = encrypt(json_encode($storage));
+        // return ['storage' => ['usim' => $storage]];
     }
 }

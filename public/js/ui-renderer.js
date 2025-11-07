@@ -78,11 +78,11 @@ class UIComponent {
             // Get CSRF token from meta tag
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
-            // Get USIM storage from localStorage
-            const usimStorage = localStorage.getItem('usim') || '';
-
             // Use internal component ID (_id), not the JSON key
             const componentId = this.config._id || parseInt(this.id);
+
+            // Get USIM storage from localStorage
+            const usimStorage = localStorage.getItem('usim') || '';
 
             // console.log('Sending event:', { component_id: componentId, action, csrfToken });
 
@@ -429,8 +429,8 @@ class SelectComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            const usimStorage = localStorage.getItem('usim') || '';
             const componentId = this.config._id || parseInt(this.id);
+            const usimStorage = localStorage.getItem('usim') || '';
 
             console.log('Sending change event:', { component_id: componentId, action, value });
 
@@ -699,6 +699,7 @@ class TableComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
             const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
@@ -711,7 +712,7 @@ class TableComponent extends UIComponent {
                     'X-USIM-Storage': usimStorage,
                 },
                 body: JSON.stringify({
-                    component_id: this.id,
+                    component_id: componentId,
                     event: 'action',
                     action: 'change_page',
                     parameters: { page }
@@ -910,6 +911,7 @@ class TableCellComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
             const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
@@ -923,7 +925,7 @@ class TableCellComponent extends UIComponent {
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
-                    component_id: this.config._id,
+                    component_id: componentId,
                     event: 'click',
                     action: action,
                     parameters: parameters,
@@ -1388,7 +1390,6 @@ class UIRenderer {
      * @param {object} storageData - Storage variables object
      */
     handleStorageUpdate(storageData) {
-        console.log('💾 Processing storage updates:', storageData);
 
         Object.keys(storageData).forEach(key => {
             const value = storageData[key];
@@ -1397,10 +1398,8 @@ class UIRenderer {
             // If it's an object/array, stringify it
             if (typeof value === 'object' && value !== null) {
                 localStorage.setItem(key, JSON.stringify(value));
-                console.log(`💾 Stored in localStorage: "${key}" = ${JSON.stringify(value)}`);
             } else {
                 localStorage.setItem(key, String(value));
-                console.log(`💾 Stored in localStorage: "${key}" = ${value}`);
             }
         });
     }
@@ -1514,8 +1513,8 @@ class UIRenderer {
                 if (changes.button.action) {
                     btn.addEventListener('click', async () => {
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-                        const usimStorage = localStorage.getItem('usim') || '';
                         const componentId = element.getAttribute('data-component-id');
+                        const usimStorage = localStorage.getItem('usim') || '';
 
                         try {
                             const response = await fetch('/api/ui-event', {
