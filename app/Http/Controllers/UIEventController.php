@@ -108,12 +108,6 @@ class UIEventController extends Controller
                 $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
             }
 
-            // UIDebug::debug('UI Event: Action executed successfully', [
-            //     'component_id' => $componentId,
-            //     'action' => $action,
-            //     'result' => $result,
-            // ]);
-
             return response()->json($result);
         } catch (\Exception $e) {
             Log::error('UI Event: Exception during action execution', [

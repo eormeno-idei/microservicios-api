@@ -4,7 +4,6 @@ namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\TimeUnit;
-use Illuminate\Support\Facades\Log;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
@@ -15,7 +14,6 @@ use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\LoginDialogService;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\Support\UIDebug;
 
 /**
  * Demo Menu Service
@@ -375,9 +373,6 @@ class DemoMenuService extends AbstractUIService
      */
     public function onSubmitLogin(array $params): array
     {
-        UIDebug::debug('Login form submitted', [
-            'params' => $params
-        ]);
         // TODO: Validate and authenticate user
         // For now, just show a success message
         $email = $params['login_email'] ?? '';

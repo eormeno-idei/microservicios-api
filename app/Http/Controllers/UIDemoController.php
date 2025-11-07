@@ -24,8 +24,6 @@ class UIDemoController extends Controller
         // Get and decrypt storage from header
         $incomingStorage = $this->getStorageFromRequest(request());
 
-        UIDebug::info("Incoming storage for demo '{$demo}':", $incomingStorage);
-
         // Convert kebab-case to PascalCase and append 'Service'
         // Example: 'demo-ui' -> 'DemoUi' -> 'DemoUiService'
         $serviceName = Str::studly($demo) . 'Service';
