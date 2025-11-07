@@ -82,18 +82,67 @@ abstract class AbstractUIService
      *
      * Called by UIEventController before invoking event handler.
      * Loads UI container and captures state for diff calculation.
-     * Also injects component references into protected properties.
+     * Also injects storage values and component references into protected properties.
      *
+     * @param array $incomingStorage Storage data from frontend (decrypted)
      * @return void
      */
-    public function initializeEventContext(): void
+    public function initializeEventContext(array $incomingStorage = []): void
     {
         $this->container = $this->getUIContainer();
         $this->oldUI = $this->container->toJson();
         $this->modified = false;
 
+        // Inject storage values into protected properties (store_* variables)
+        $this->injectStorageValues($incomingStorage);
+
         // Inject component references into protected properties
         $this->injectComponentReferences();
+    }
+
+    /**
+     * Inject storage values into protected properties
+     *
+     * Uses reflection to find protected properties whose names start with 'store_'.
+     * If a matching key exists in the incoming storage array, the value is injected.
+     *
+     * Convention: Property name must match storage key
+     * Example: protected int $store_user_id; matches storage['store_user_id']
+     *
+     * @param array $incomingStorage Storage data from frontend
+     * @return void
+     */
+    private function injectStorageValues(array $incomingStorage): void
+    {
+        if (empty($incomingStorage)) {
+            return;
+        }
+
+        $reflection = new ReflectionClass($this);
+
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PROTECTED) as $property) {
+            // Skip properties declared in AbstractUIService itself
+            if ($property->getDeclaringClass()->getName() === self::class) {
+                continue;
+            }
+
+            $propertyName = $property->getName();
+
+            // Only process properties that start with 'store_'
+            if (!str_starts_with($propertyName, 'store_')) {
+                continue;
+            }
+
+            // Check if this key exists in incoming storage
+            if (!array_key_exists($propertyName, $incomingStorage)) {
+                continue;
+            }
+
+            $value = $incomingStorage[$propertyName];
+
+            // Set the value
+            $property->setValue($this, $value);
+        }
     }
 
     /**
@@ -414,9 +463,7 @@ abstract class AbstractUIService
      *
      * [
      *   'storage' => [
-     *     'var_name_1' => value,
-     *     'var_name_2' => value,
-     *     ...
+     *      'usim' => 'encrypted_json_string',
      *   ]
      * ]
      *
@@ -426,10 +473,8 @@ abstract class AbstractUIService
     {
         $storage = [];
         $reflection = new ReflectionClass($this);
-        $properties = $reflection->getProperties(
-            ReflectionProperty::IS_PRIVATE |
-            ReflectionProperty::IS_PROTECTED
-        );
+        $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
+
         foreach ($properties as $property) {
             $propertyName = $property->getName();
             if (str_starts_with($propertyName, 'store_')) {
@@ -444,6 +489,9 @@ abstract class AbstractUIService
                 }
             }
         }
-        return ['storage' => $storage];
+
+        $storage = encrypt(json_encode($storage));
+
+        return ['storage' => ['usim' => $storage]];
     }
 }

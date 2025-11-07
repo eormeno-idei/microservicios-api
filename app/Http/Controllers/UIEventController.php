@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\UIIdGenerator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -9,11 +10,11 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * UI Event Controller
- * 
+ *
  * Handles UI component events from the frontend.
  * Uses reflection to dynamically route events to service methods
  * based on component ID and action name.
- * 
+ *
  * Flow:
  * 1. Receive event from frontend (component_id, event, action, parameters)
  * 2. Resolve service class from component ID using UIIdGenerator
@@ -25,12 +26,15 @@ class UIEventController extends Controller
 {
     /**
      * Handle UI component event
-     * 
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function handleEvent(Request $request): JsonResponse
     {
+        // Get and decrypt storage from header
+        $incomingStorage = $this->getStorageFromRequest($request);
+
         // Validate request
         $validated = $request->validate([
             'component_id' => 'required|integer',
@@ -94,7 +98,7 @@ class UIEventController extends Controller
 
             // Initialize event context for AbstractUIService
             // if ($usesAbstractService) {
-            $service->initializeEventContext();
+            $service->initializeEventContext($incomingStorage);
             // }
 
             // Invoke method
@@ -146,14 +150,14 @@ class UIEventController extends Controller
 
     /**
      * Convert action name to method name
-     * 
+     *
      * Convention: snake_case → onPascalCase
      * Examples:
      * - test_action → onTestAction
      * - submit_form → onSubmitForm
      * - cancel_form → onCancelForm
      * - open_settings → onOpenSettings
-     * 
+     *
      * @param string $action Action name in snake_case
      * @return string Method name in onPascalCase format
      */
@@ -163,5 +167,47 @@ class UIEventController extends Controller
         $pascalCase = str_replace(' ', '', ucwords(str_replace('_', ' ', $action)));
 
         return 'on' . $pascalCase;
+    }
+
+    /**
+     * Get storage from request header and decrypt it
+     *
+     * Reads the X-USIM-Storage header, decrypts it, and converts from JSON to array.
+     * If header is missing, empty, or decryption fails, returns empty array.
+     *
+     * @param Request $request
+     * @return array Decrypted storage data or empty array
+     */
+    private function getStorageFromRequest(Request $request): array
+    {
+        try {
+            // Get storage from header
+            $encryptedStorage = $request->header('X-USIM-Storage');
+
+            // Return empty array if header is missing or empty
+            if (empty($encryptedStorage)) {
+                return [];
+            }
+
+            // Decrypt the storage
+            $decryptedJson = decrypt($encryptedStorage);
+
+            // Convert JSON to array
+            $storage = json_decode($decryptedJson, true);
+
+            // Return empty array if JSON decode failed
+            if (!is_array($storage)) {
+                return [];
+            }
+
+            return $storage;
+        } catch (\Exception $e) {
+            // Log error but don't fail the request
+            Log::debug('Failed to decrypt storage from header', [
+                'error' => $e->getMessage(),
+            ]);
+
+            return [];
+        }
     }
 }

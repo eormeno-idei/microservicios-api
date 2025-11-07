@@ -78,6 +78,9 @@ class UIComponent {
             // Get CSRF token from meta tag
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
+            // Get USIM storage from localStorage
+            const usimStorage = localStorage.getItem('usim') || '';
+
             // Use internal component ID (_id), not the JSON key
             const componentId = this.config._id || parseInt(this.id);
 
@@ -90,6 +93,7 @@ class UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -425,6 +429,7 @@ class SelectComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const usimStorage = localStorage.getItem('usim') || '';
             const componentId = this.config._id || parseInt(this.id);
 
             console.log('Sending change event:', { component_id: componentId, action, value });
@@ -436,6 +441,7 @@ class SelectComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -693,6 +699,7 @@ class TableComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -701,6 +708,7 @@ class TableComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 body: JSON.stringify({
                     component_id: this.id,
@@ -902,6 +910,7 @@ class TableCellComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -910,6 +919,7 @@ class TableCellComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -1504,6 +1514,7 @@ class UIRenderer {
                 if (changes.button.action) {
                     btn.addEventListener('click', async () => {
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                        const usimStorage = localStorage.getItem('usim') || '';
                         const componentId = element.getAttribute('data-component-id');
 
                         try {
@@ -1514,6 +1525,7 @@ class UIRenderer {
                                     'Accept': 'application/json',
                                     'X-CSRF-TOKEN': csrfToken,
                                     'X-Requested-With': 'XMLHttpRequest',
+                                    'X-USIM-Storage': usimStorage,
                                 },
                                 credentials: 'same-origin',
                                 body: JSON.stringify({
@@ -1930,6 +1942,7 @@ async function executeTimeoutAction(action, callerServiceId) {
         // Execute custom action via backend
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -1938,6 +1951,7 @@ async function executeTimeoutAction(action, callerServiceId) {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
