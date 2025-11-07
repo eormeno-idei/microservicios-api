@@ -22,9 +22,11 @@ class LoginDialogService
      * @return array UI components for the modal
      */
     public function getUI(
+        ?int $callerServiceId = null,
         string $submitAction = 'submit_login',
         ?string $cancelAction = 'close_login_dialog',
-        ?int $callerServiceId = null
+        string $defaultEmail = '',
+        string $defaultPassword = ''
     ): array {
         // Main container for the modal
         $loginContainer = UIBuilder::container('login_dialog')
@@ -37,6 +39,7 @@ class LoginDialogService
             UIBuilder::input('login_email')
                 ->label('Email')
                 ->placeholder('Enter your email')
+                ->value($defaultEmail)
                 ->required(true)
         );
 
@@ -46,6 +49,7 @@ class LoginDialogService
                 ->label('Password')
                 ->type('password')
                 ->placeholder('Enter your password')
+                ->value($defaultPassword)
                 ->required(true)
         );
 

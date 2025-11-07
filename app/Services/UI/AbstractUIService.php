@@ -202,12 +202,8 @@ abstract class AbstractUIService
      */
     public function finalizeEventContext(): array
     {
-        // Log::debug("Old UI:\n" . json_encode($this->oldUI, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-
         // Get current UI state
         $this->newUI = $this->container->toJson();
-
-        // Log::debug("New UI:\n" . json_encode($this->newUI, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
 
         // Auto-detect if UI was modified by comparing states
         if ($this->oldUI === $this->newUI) {
@@ -218,15 +214,8 @@ abstract class AbstractUIService
         // Store updated UI
         $this->storeUI($this->container);
 
-        // Calculate and return diff in indexed format
         $diff = $this->buildDiffResponse();
 
-        // Add to the diff response any storage variables
-        // $storageVars = $this->getStorageVariables();
-        // if (!empty($storageVars['storage'])) {
-        //     $diff['storage'] = $storageVars['storage'];
-        // }
-        // UIDebug::debug("Diff response generated", $diff);
         return $diff;
     }
 

@@ -103,15 +103,16 @@ class UIEventController extends Controller
 
             $storageVariables = $service->getStorageVariables();
 
-            // UIDebug::debug("Incoming front variables", $incomingStorage);
-
             if (!empty($storageVariables)) {
-                UIDebug::debug("New storage variables", $storageVariables);
                 $mergedStorage = array_merge($incomingStorage, $storageVariables);
-                UIDebug::debug("Merged storage variables", $mergedStorage);
-
                 $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
             }
+
+            // UIDebug::debug('UI Event: Action executed successfully', [
+            //     'component_id' => $componentId,
+            //     'action' => $action,
+            //     'result' => $result,
+            // ]);
 
             return response()->json($result);
         } catch (\Exception $e) {

@@ -4,15 +4,18 @@ namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\TimeUnit;
+use Illuminate\Support\Facades\Log;
+use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Contracts\UIElement;
+use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Modals\LoginDialogService;
 use App\Services\UI\Modals\ConfirmDialogService;
-use Illuminate\Support\Facades\Log;
+use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\UI\Support\UIDebug;
 
 /**
  * Demo Menu Service
@@ -118,57 +121,6 @@ class DemoMenuService extends AbstractUIService
         return $userMenu;
     }
 
-    // public function getUI(...$params): array
-    // {
-    //     // Get service ID to receive callbacks
-    //     $serviceId = $this->getServiceComponentId();
-
-    //     // Build menu using UIBuilder with modern design
-    //     $menu = UIBuilder::menuDropdown('main_menu')
-    //         ->parent('menu') // Render in #menu div
-    //         ->callerServiceId($serviceId) // Set service for action callbacks
-    //         ->trigger() // Custom trigger
-    //         ->position('bottom-left')
-    //         ->width(100);
-
-    //     // Home link
-    //     $menu->link('Home', '/', '🏠');
-
-    //     $menu->separator();
-
-    //     // Demos submenu
-    //     $menu->submenu('Demos', '🎮', function ($submenu) {
-    //         $submenu->link('Demo UI', '/demo-ui', '🎨');
-    //         $submenu->link('Table Demo', '/table-demo', '📊');
-    //         $submenu->link('Modal Demo', '/modal-demo', '🪟');
-    //         $submenu->link('Form Demo', '/form-demo', '📝');
-    //         $submenu->link('Button Demo', '/button-demo', '🔘');
-    //         $submenu->link('Input Demo', '/input-demo', '⌨️');
-    //         $submenu->link('Select Demo', '/select-demo', '📋');
-    //         $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
-    //     });
-
-    //     $menu->separator();
-
-    //     // UI Components submenu (future components)
-    //     $menu->submenu('Components', '🧩', function ($submenu) {
-    //         $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
-    //         $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
-    //         $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');
-    //         $submenu->item('Test Timeout (no button)', 'show_timeout_no_button', [], '⏱️');
-    //     });
-
-    //     $menu->separator();
-
-    //     // Settings (with WARNING dialog)
-    //     $menu->item('Settings', 'show_settings_confirm', [], '⚙️');
-
-    //     // About (with INFO dialog)
-    //     $menu->item('About', 'show_about_info', [], 'ℹ️');
-
-    //     return $menu->build();
-    // }
-
     /**
      * Handler for Settings confirmation dialog
      */
@@ -248,7 +200,9 @@ class DemoMenuService extends AbstractUIService
         $modalUI = $confirmService->getUI(
             type: DialogType::INFO,
             title: "Acerca de USIM Framework",
-            message: "Sistema de componentes UI v1.0\nDesarrollado con Laravel y componentes modulares.\nSoporta: Tables, Modals, Forms, Menus y más.",
+            message: "Sistema de componentes UI v1.0\n
+            Desarrollado con Laravel y componentes modulares.\n
+            Soporta: Tables, Modals, Forms, Menus y más.",
             confirmAction: 'close_about_dialog',
             callerServiceId: $serviceId
         );
@@ -280,7 +234,8 @@ class DemoMenuService extends AbstractUIService
         $modalUI = $confirmService->getUI(
             type: DialogType::ERROR,
             title: "Error de conexión",
-            message: "No se pudo conectar con el servidor.\nPor favor, verifica tu conexión a internet e intenta nuevamente.",
+            message: "No se pudo conectar con el servidor.\n
+            Por favor, verifica tu conexión a internet e intenta nuevamente.",
             confirmAction: 'close_error_dialog',
             callerServiceId: $serviceId
         );
@@ -382,6 +337,9 @@ class DemoMenuService extends AbstractUIService
 
     // ==================== USER MENU HANDLERS ====================
 
+    protected string $store_email = 'admin@email.com';
+    protected string $store_password = '2444';
+
     /**
      * Handler for Login form
      */
@@ -389,11 +347,13 @@ class DemoMenuService extends AbstractUIService
     {
         $serviceId = $this->getServiceComponentId();
 
-        $loginService = app(\App\Services\UI\Modals\LoginDialogService::class);
+        $loginService = app(LoginDialogService::class);
         $modalUI = $loginService->getUI(
+            callerServiceId: $serviceId,
             submitAction: 'submit_login',
             cancelAction: 'close_login_dialog',
-            callerServiceId: $serviceId
+            defaultEmail: $this->store_email,
+            defaultPassword: $this->store_password
         );
 
         return $modalUI;
@@ -415,10 +375,16 @@ class DemoMenuService extends AbstractUIService
      */
     public function onSubmitLogin(array $params): array
     {
+        UIDebug::debug('Login form submitted', [
+            'params' => $params
+        ]);
         // TODO: Validate and authenticate user
         // For now, just show a success message
         $email = $params['login_email'] ?? '';
         $password = $params['login_password'] ?? '';
+
+        $this->store_email = $email;
+        $this->store_password = $password;
 
         // Here you would call the API /api/login with email and password
         // For now, just close the modal
@@ -435,7 +401,7 @@ class DemoMenuService extends AbstractUIService
     {
         $serviceId = $this->getServiceComponentId();
 
-        $registerService = app(\App\Services\UI\Modals\RegisterDialogService::class);
+        $registerService = app(RegisterDialogService::class);
         $modalUI = $registerService->getUI(
             submitAction: 'submit_register',
             cancelAction: 'close_register_dialog',
