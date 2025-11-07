@@ -18,8 +18,8 @@ class CheckboxDemoService extends AbstractUIService
     protected ButtonBuilder $btn_submit;
     protected LabelBuilder $lbl_result;
 
-    protected bool $store_js_checked = false;
-    protected bool $store_py_checked = false;
+    // protected bool $store_js_checked = false;
+    // protected bool $store_py_checked = false;
 
     /**
      * Build the checkbox demo UI
@@ -38,18 +38,20 @@ class CheckboxDemoService extends AbstractUIService
                 ->style('info')
         );
 
-        // JavaScript checkbox
+        // JavaScript checkbox with onChange handler
         $container->add(
             UIBuilder::checkbox('chk_javascript')
                 ->label('JavaScript')
-                ->checked($this->store_js_checked)
+                ->checked(false)
+                ->onChange('try_change_javascript') // ← Handler for validation
         );
 
-        // Python checkbox
+        // Python checkbox with onChange handler
         $container->add(
             UIBuilder::checkbox('chk_python')
                 ->label('Python')
-                ->checked($this->store_py_checked)
+                ->checked(false)
+                ->onChange('try_change_python') // ← Handler for validation
         );
 
         // Submit button
@@ -71,6 +73,68 @@ class CheckboxDemoService extends AbstractUIService
     }
 
     /**
+     * Handle JavaScript checkbox change attempt
+     * Backend validates and confirms or rejects the change
+     */
+    public function onTryChangeJavascript(array $params): void
+    {
+        $wantsChecked = $params['checked'] ?? false;
+
+        // // Example validation: you could check any condition here
+        // // For now, we'll allow the change
+        // $this->store_js_checked = $wantsChecked;
+        
+        // Update the checkbox with the confirmed state
+        $this->chk_javascript->checked($wantsChecked);
+
+        // Show feedback
+        if ($wantsChecked) {
+            $this->lbl_result
+                ->text('✅ JavaScript selected!')
+                ->style('success');
+        } else {
+            $this->lbl_result
+                ->text('ℹ️ JavaScript deselected')
+                ->style('info');
+        }
+    }
+
+    /**
+     * Handle Python checkbox change attempt
+     * Backend validates and confirms or rejects the change
+     */
+    public function onTryChangePython(array $params): void
+    {
+        $wantsChecked = $params['checked'] ?? false;
+        $jsChecked = $this->chk_javascript->isChecked();
+
+        // Example validation: only allow Python if JavaScript is also selected
+        // if ($wantsChecked && !$this->store_js_checked) {
+        if ($wantsChecked && !$jsChecked) {
+            // ❌ REJECT: Don't allow Python without JavaScript
+            $this->chk_python->checked(false); // Keep it unchecked
+            $this->lbl_result
+                ->text('❌ You must select JavaScript first before selecting Python!')
+                ->style('danger');
+            return;
+        }
+
+        // ✅ APPROVE: Allow the change
+        // $this->store_py_checked = $wantsChecked;
+        $this->chk_python->checked($wantsChecked);
+
+        if ($wantsChecked) {
+            $this->lbl_result
+                ->text('✅ Python selected!')
+                ->style('success');
+        } else {
+            $this->lbl_result
+                ->text('ℹ️ Python deselected')
+                ->style('info');
+        }
+    }
+
+    /**
      * Handle form submission
      * Reads checkbox states from frontend parameters
      */
@@ -80,8 +144,8 @@ class CheckboxDemoService extends AbstractUIService
         $jsChecked = $params['chk_javascript'] ?? false;
         $pyChecked = $params['chk_python'] ?? false;
 
-        $this->store_js_checked = $jsChecked;
-        $this->store_py_checked = $pyChecked;
+        // $this->store_js_checked = $jsChecked;
+        // $this->store_py_checked = $pyChecked;
 
         // Build selections array
         $selections = [];

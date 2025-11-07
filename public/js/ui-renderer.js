@@ -496,6 +496,20 @@ class CheckboxComponent extends UIComponent {
             checkbox.value = this.config.value;
         }
 
+        // Add change event listener if on_change action is defined
+        if (this.config.on_change) {
+            checkbox.addEventListener('change', async (e) => {
+                // Prevent default to control the checked state from backend
+                const newCheckedState = e.target.checked;
+                
+                // Revert immediately - backend will confirm the actual state
+                e.target.checked = this.config.checked || false;
+                
+                // Send to backend with the attempted new state
+                await this.handleChange(this.config.on_change, newCheckedState);
+            });
+        }
+
         group.appendChild(checkbox);
 
         if (this.config.label) {
@@ -512,6 +526,73 @@ class CheckboxComponent extends UIComponent {
         }
 
         return this.applyCommonAttributes(group);
+    }
+
+    /**
+     * Handle checkbox change event
+     * Sends the attempted new state to backend for validation
+     * 
+     * @param {string} action - The action name (snake_case)
+     * @param {boolean} checked - The new checked state the user attempted
+     */
+    async handleChange(action, checked) {
+        console.log('Checkbox change attempt:', action, checked);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+
+            const response = await fetch('/api/ui-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    component_id: componentId,
+                    event: 'change',
+                    action: action,
+                    parameters: {
+                        checked: checked,
+                        name: this.config.name
+                    }
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log('✅ Checkbox change processed:', result);
+
+                // Update UI with backend response (backend controls final state)
+                if (result && Object.keys(result).length > 0) {
+                    if (globalRenderer) {
+                        globalRenderer.handleUIUpdate(result);
+                    } else {
+                        console.error('❌ Global renderer not initialized');
+                    }
+                }
+            } else {
+                console.error('❌ Checkbox change failed:', response.status, result);
+                
+                // Ensure checkbox reverts to original state on error
+                const checkbox = document.querySelector(`[data-component-id="${componentId}"] input[type="checkbox"]`);
+                if (checkbox) {
+                    checkbox.checked = this.config.checked || false;
+                }
+            }
+        } catch (error) {
+            console.error('❌ Network error on checkbox change:', error);
+            
+            // Revert to original state on error
+            const checkbox = document.querySelector(`[data-component-id="${this.config._id}"] input[type="checkbox"]`);
+            if (checkbox) {
+                checkbox.checked = this.config.checked || false;
+            }
+        }
     }
 }
 
