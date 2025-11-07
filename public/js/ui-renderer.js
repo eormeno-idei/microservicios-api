@@ -217,21 +217,27 @@ class ButtonComponent extends UIComponent {
         // Find the button element in the DOM
         const buttonElement = document.querySelector(`[data-component-id="${this.config._id}"]`);
         if (!buttonElement) {
-            console.log('⚠️ Button element not found for collectContextValues');
             return values;
         }
 
-        // Find the parent container (or fallback to document)
-        let container = buttonElement.closest('.ui-container');
-        if (!container) {
-            console.log('⚠️ No .ui-container found, using document');
-            container = document;
+        // Check if we're inside a modal first
+        const modalElement = buttonElement.closest('#modal');
+        let container;
+        
+        if (modalElement) {
+            // If inside modal, use the modal as the container to collect all inputs from the entire modal
+            container = modalElement;
+        } else {
+            // Otherwise, find the nearest parent container
+            container = buttonElement.closest('.ui-container');
+            if (!container) {
+                container = document;
+            }
         }
 
         // Collect values from text inputs
         const inputs = container.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea');
         inputs.forEach(input => {
-            console.log(`  - Input: type="${input.type}", name="${input.name}", value="${input.value}"`);
             if (input.name) {
                 values[input.name] = input.value;
             }
@@ -1301,6 +1307,12 @@ class UIRenderer {
 
         for (const key of componentIds) {
             const config = this.data[key];
+            
+            // Skip special keys that are not UI components
+            if (key === 'storage' || key === 'action') {
+                continue;
+            }
+            
             if (config._id !== undefined) {
                 internalIdToKey.set(config._id, key);
                 // console.log(`  🔗 Mapped _id ${config._id} -> JSON key "${key}"`);
@@ -1309,6 +1321,11 @@ class UIRenderer {
 
         // Step 2: Create all component instances
         for (const id of componentIds) {
+            // Skip special keys that are not UI components
+            if (id === 'storage' || id === 'action') {
+                continue;
+            }
+            
             const config = this.data[id];
             // console.log(`  🏗️ Creating component type="${config.type}" id="${id}"`, config);
             const component = ComponentFactory.create(id, config);
@@ -1325,6 +1342,11 @@ class UIRenderer {
         // Step 3: Group components by parent and sort by _order
         const childrenByParent = new Map();
         for (const id of componentIds) {
+            // Skip special keys that are not UI components
+            if (id === 'storage' || id === 'action') {
+                continue;
+            }
+            
             const component = this.components.get(id);
             if (!component) continue;
 
@@ -1864,6 +1886,12 @@ function openModal(uiData) {
     if (window.modalTimeoutId) {
         clearInterval(window.modalTimeoutId);
         window.modalTimeoutId = null;
+    }
+
+    // Add ui-container class to modal container so collectContextValues() can find inputs
+    // This ensures that buttons inside modals can collect form values correctly
+    if (!modalContainer.classList.contains('ui-container')) {
+        modalContainer.classList.add('ui-container');
     }
 
     // Render modal content using UIRenderer
