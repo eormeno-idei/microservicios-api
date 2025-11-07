@@ -22,7 +22,6 @@ class DemoUiService extends AbstractUIService
             ->layout(LayoutType::VERTICAL)
             ->title('Demo UI Components');
 
-        // Build UI elements
         $this->buildUIElements($container);
 
         return $container;
@@ -73,7 +72,7 @@ class DemoUiService extends AbstractUIService
         );
 
         $counterContainer->add(
-            $this->updateCounterDisplay(UIBuilder::label('lbl_counter'))
+            $this->updateCounterLabel(UIBuilder::label('lbl_counter'), $this->store_counter)
         );
 
         $counterContainer->add(
@@ -102,27 +101,25 @@ class DemoUiService extends AbstractUIService
 
     public function onIncrementCounter(array $params): void
     {
-        $this->store_counter++;
-        $this->updateCounterDisplay($this->lbl_counter);
+        $this->updateCounterLabel($this->lbl_counter, $this->store_counter++);
     }
 
     public function onDecrementCounter(array $params): void
     {
-        $this->store_counter--;
-        $this->updateCounterDisplay($this->lbl_counter);
+        $this->updateCounterLabel($this->lbl_counter, $this->store_counter);
     }
 
-    private function updateCounterDisplay(LabelBuilder $labelBuilder): LabelBuilder
+    private function updateCounterLabel(LabelBuilder $labelBuilder, int $counterValue): LabelBuilder
     {
         $counterStyle = 'primary';
-        if ($this->store_counter > 5) {
+        if ($counterValue > 5) {
             $counterStyle = 'success';
-        } elseif ($this->store_counter < 0) {
+        } elseif ($counterValue < 0) {
             $counterStyle = 'danger';
         }
 
         $labelBuilder
-            ->text((string) $this->store_counter)
+            ->text((string) $counterValue)
             ->style($counterStyle);
 
         return $labelBuilder;
