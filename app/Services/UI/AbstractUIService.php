@@ -5,7 +5,6 @@ namespace App\Services\UI;
 use ReflectionClass;
 use RuntimeException;
 use ReflectionProperty;
-use Illuminate\Support\Facades\Log;
 use App\Services\UI\Support\UIDiffer;
 use App\Services\UI\Support\UIIdGenerator;
 use App\Services\UI\Components\CardBuilder;
@@ -23,8 +22,6 @@ use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
-use App\Services\UI\Support\UIDebug;
-use Symfony\Component\HttpKernel\Controller\ArgumentResolver\UidValueResolver;
 
 /**
  * Abstract UI Service
@@ -112,7 +109,7 @@ abstract class AbstractUIService
      * @param array $incomingStorage Storage data from frontend
      * @return void
      */
-    private function injectStorageValues(array $incomingStorage): void
+    public function injectStorageValues(array $incomingStorage): void
     {
         if (empty($incomingStorage)) {
             return;

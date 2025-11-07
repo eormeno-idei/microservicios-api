@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\UIIdGenerator;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 /**
  * UI Event Controller
@@ -103,7 +103,7 @@ class UIEventController extends Controller
 
             $storageVariables = $service->getStorageVariables();
 
-            UIDebug::debug("Incoming front variables", $incomingStorage);
+            // UIDebug::debug("Incoming front variables", $incomingStorage);
 
             if (!empty($storageVariables)) {
                 UIDebug::debug("New storage variables", $storageVariables);

@@ -101,12 +101,12 @@ class DemoUiService extends AbstractUIService
 
     public function onIncrementCounter(array $params): void
     {
-        $this->updateCounterLabel($this->lbl_counter, $this->store_counter++);
+        $this->updateCounterLabel($this->lbl_counter, ++$this->store_counter);
     }
 
     public function onDecrementCounter(array $params): void
     {
-        $this->updateCounterLabel($this->lbl_counter, $this->store_counter);
+        $this->updateCounterLabel($this->lbl_counter, --$this->store_counter);
     }
 
     private function updateCounterLabel(LabelBuilder $labelBuilder, int $counterValue): LabelBuilder

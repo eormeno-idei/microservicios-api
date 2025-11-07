@@ -432,8 +432,6 @@ class SelectComponent extends UIComponent {
             const componentId = this.config._id || parseInt(this.id);
             const usimStorage = localStorage.getItem('usim') || '';
 
-            console.log('Sending change event:', { component_id: componentId, action, value });
-
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
                 headers: {
@@ -501,10 +499,10 @@ class CheckboxComponent extends UIComponent {
             checkbox.addEventListener('change', async (e) => {
                 // Prevent default to control the checked state from backend
                 const newCheckedState = e.target.checked;
-                
+
                 // Revert immediately - backend will confirm the actual state
                 e.target.checked = this.config.checked || false;
-                
+
                 // Send to backend with the attempted new state
                 await this.handleChange(this.config.on_change, newCheckedState);
             });
@@ -577,7 +575,7 @@ class CheckboxComponent extends UIComponent {
                 }
             } else {
                 console.error('❌ Checkbox change failed:', response.status, result);
-                
+
                 // Ensure checkbox reverts to original state on error
                 const checkbox = document.querySelector(`[data-component-id="${componentId}"] input[type="checkbox"]`);
                 if (checkbox) {
@@ -586,7 +584,7 @@ class CheckboxComponent extends UIComponent {
             }
         } catch (error) {
             console.error('❌ Network error on checkbox change:', error);
-            
+
             // Revert to original state on error
             const checkbox = document.querySelector(`[data-component-id="${this.config._id}"] input[type="checkbox"]`);
             if (checkbox) {
@@ -1794,6 +1792,7 @@ async function loadDemoUI(demoName = null) {
         const demo = demoName || window.DEMO_NAME || 'button-demo';
         const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
 
+        const usimStorage = localStorage.getItem('usim') || '';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         console.log(`Fetching UI data from /api/${demo}${resetQuery}...`);
@@ -1803,7 +1802,8 @@ async function loadDemoUI(demoName = null) {
             headers: {
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-USIM-Storage': usimStorage,
             }
         });
 
@@ -2355,7 +2355,18 @@ async function loadMenuUI() {
 
     try {
         const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
-        const response = await fetch(`/api/${window.MENU_SERVICE}${resetQuery}`);
+        const usimStorage = localStorage.getItem('usim') || '';
+
+        const response = await fetch(`/api/${window.MENU_SERVICE}${resetQuery}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
+                }
+            }
+        );
         const uiData = await response.json();
 
         // console.log('📊 Menu UI Data received:', uiData);
