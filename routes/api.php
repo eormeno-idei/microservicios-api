@@ -50,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
                 ]
             ]
         ]);
-    })->middleware('permission:acceder-panel-admin');
+    })->middleware('permission:access-admin-panel');
 
     // Ejemplo de ruta para usuarios autenticados
     Route::get('/user/profile', function () {

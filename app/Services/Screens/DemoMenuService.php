@@ -67,14 +67,14 @@ class DemoMenuService extends AbstractUIService
 
         // // Demos submenu
         $menu->submenu('Demos', '🎮', function ($submenu) {
-            $submenu->link('Demo UI', '/demo-ui', '🎨');
-            $submenu->link('Table Demo', '/table-demo', '📊');
-            $submenu->link('Modal Demo', '/modal-demo', '🪟');
-            $submenu->link('Form Demo', '/form-demo', '📝');
-            $submenu->link('Button Demo', '/button-demo', '🔘');
-            $submenu->link('Input Demo', '/input-demo', '⌨️');
-            $submenu->link('Select Demo', '/select-demo', '📋');
-            $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
+            $submenu->link('Demo UI', '/demo/demo-ui', '🎨');
+            $submenu->link('Table Demo', '/demo/table-demo', '📊');
+            $submenu->link('Modal Demo', '/demo/modal-demo', '🪟');
+            $submenu->link('Form Demo', '/demo/form-demo', '📝');
+            $submenu->link('Button Demo', '/demo/button-demo', '🔘');
+            $submenu->link('Input Demo', '/demo/input-demo', '⌨️');
+            $submenu->link('Select Demo', '/demo/select-demo', '📋');
+            $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
         });
 
         $menu->separator();
@@ -331,62 +331,6 @@ class DemoMenuService extends AbstractUIService
         );
 
         return $modalUI;
-    }
-
-    // ==================== USER MENU HANDLERS ====================
-
-    protected string $store_email = 'admin@email.com';
-    protected string $store_password = '2444';
-
-    /**
-     * Handler for Login form
-     */
-    public function onShowLoginForm(array $params): array
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        $loginService = app(LoginDialogService::class);
-        $modalUI = $loginService->getUI(
-            callerServiceId: $serviceId,
-            submitAction: 'submit_login',
-            cancelAction: 'close_login_dialog',
-            defaultEmail: $this->store_email,
-            defaultPassword: $this->store_password
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler to close login dialog
-     */
-    public function onCloseLoginDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler to submit login (receives email and password from form)
-     */
-    public function onSubmitLogin(array $params): array
-    {
-        // TODO: Validate and authenticate user
-        // For now, just show a success message
-        $email = $params['login_email'] ?? '';
-        $password = $params['login_password'] ?? '';
-
-        $this->store_email = $email;
-        $this->store_password = $password;
-
-        // Here you would call the API /api/login with email and password
-        // For now, just close the modal
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
     }
 
     /**

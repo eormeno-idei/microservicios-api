@@ -27,6 +27,7 @@ class RoleSeeder extends Seeder
             'edit-content',
             'remove-content',
             'view-reports',
+            'view-logs'
         ];
 
         foreach ($permissions as $permission) {

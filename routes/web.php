@@ -23,14 +23,34 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/login', function () {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => 'login',
+        'reset' => $reset
+    ]);
+})->name('login');
+
 // Demo route - Dynamic demo viewer
-Route::get('/{demo}', function (string $demo) {
+Route::get('/demo/{demo}', function (string $demo) {
     $reset = request()->query('reset', false);
     return view('demo', [
         'demo' => $demo,
         'reset' => $reset
     ]);
-})->where('demo', '(?!api).*')->name('demo');
+})->name('demo');
+
+Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/admin/dashboard', function () {
+        $reset = request()->query('reset', false);
+        return view('demo', [
+            'demo' => 'admin-dashboard',
+            'reset' => $reset
+        ]);
+    })->name('admin.dashboard');
+
+});
 
 // Demo UI API routes - Unified controller for all demo services
 Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');
