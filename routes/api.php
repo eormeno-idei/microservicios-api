@@ -1,4 +1,5 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
@@ -34,6 +35,36 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [FileController::class, 'index']);
         Route::get('/download/{filename}', [FileController::class, 'download']);
         Route::delete('/{filename}', [FileController::class, 'delete']);
+    });
+
+    // Ejemplo de ruta con permiso específico
+    Route::get('/admin/dashboard', function () {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Bienvenido al panel de administración',
+            'data' => [
+                'stats' => [
+                    'users' => 150,
+                    'posts' => 320,
+                    'comments' => 1240,
+                ]
+            ]
+        ]);
+    })->middleware('permission:acceder-panel-admin');
+
+    // Ejemplo de ruta para usuarios autenticados
+    Route::get('/user/profile', function () {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Perfil de usuario',
+            'data' => [
+                'profile' => [
+                    'bio' => 'Usuario activo del sistema',
+                    'posts_count' => 15,
+                    'followers' => 42,
+                ]
+            ]
+        ]);
     });
 });
 
