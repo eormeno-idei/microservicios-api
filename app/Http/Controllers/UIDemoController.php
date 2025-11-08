@@ -3,10 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
-use App\Services\UI\Support\UIDebug;
 
 class UIDemoController extends Controller
 {
@@ -20,9 +17,7 @@ class UIDemoController extends Controller
     public function show(string $demo): JsonResponse
     {
         $reset = request()->query('reset', false);
-
-        // Get and decrypt storage from header
-        $incomingStorage = $this->getStorageFromRequest(request());
+        $incomingStorage = request()->storage;
 
         // Convert kebab-case to PascalCase and append 'Service'
         // Example: 'demo-ui' -> 'DemoUi' -> 'DemoUiService'
@@ -61,47 +56,5 @@ class UIDemoController extends Controller
 
         // Return UI JSON
         return response()->json($ui);
-    }
-
-    /**
-     * Get storage from request header and decrypt it
-     *
-     * Reads the X-USIM-Storage header, decrypts it, and converts from JSON to array.
-     * If header is missing, empty, or decryption fails, returns empty array.
-     *
-     * @param Request $request
-     * @return array Decrypted storage data or empty array
-     */
-    private function getStorageFromRequest(Request $request): array
-    {
-        try {
-            // Get storage from header
-            $encryptedStorage = $request->header('X-USIM-Storage');
-
-            // Return empty array if header is missing or empty
-            if (empty($encryptedStorage)) {
-                return [];
-            }
-
-            // Decrypt the storage
-            $decryptedJson = decrypt($encryptedStorage);
-
-            // Convert JSON to array
-            $storage = json_decode($decryptedJson, true);
-
-            // Return empty array if JSON decode failed
-            if (!is_array($storage)) {
-                return [];
-            }
-
-            return $storage;
-        } catch (\Exception $e) {
-            // Log error but don't fail the request
-            Log::debug('Failed to decrypt storage from header', [
-                'error' => $e->getMessage(),
-            ]);
-
-            return [];
-        }
     }
 }

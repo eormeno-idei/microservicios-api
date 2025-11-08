@@ -112,13 +112,12 @@ class DemoMenuService extends AbstractUIService
 
         $userMenu = UIBuilder::menuDropdown('user_menu')
             ->trigger("👤 $username")
-            // Otras opciones: '●' '◉' '≡' '👤'
             ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
             ->width(180);  // Ancho fijo para el dropdown
 
         // Authentication options
         if (!$authenticated) {
-            $userMenu->item('Login', 'show_login_form', [], '🔑');
+            $userMenu->link('Login', '/login', '🔑');
             $userMenu->item('Register', 'show_register_form', [], '📝');
         } else {
             $userMenu->item('Profile', 'show_profile', [], '👤');
