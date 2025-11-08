@@ -7,7 +7,8 @@ use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Components\UIContainer;
-
+use App\Services\UI\Support\UIDebug;
+use Illuminate\Support\Facades\Auth;
 class LoginService extends AbstractUIService
 {
     protected string $store_email = 'admin@email.com';
@@ -16,7 +17,7 @@ class LoginService extends AbstractUIService
     protected function buildBaseUI(...$params): UIContainer
     {
         // Main container for the modal
-        $loginContainer = UIBuilder::container('login_dialog')
+        $loginContainer = UIBuilder::container('main')
             ->parent('main')
             ->padding('30px');
 
@@ -26,6 +27,7 @@ class LoginService extends AbstractUIService
                 ->label('Email')
                 ->placeholder('Enter your email')
                 ->value($this->store_email)
+                ->type('email')
                 ->required(true)
         );
 
@@ -50,14 +52,14 @@ class LoginService extends AbstractUIService
             UIBuilder::button('btn_cancel_login')
                 ->label('Cancel')
                 ->style('secondary')
-                ->action('submit_login')
+                ->action('close_login_dialog')
         );
 
         $buttonsContainer->add(
             UIBuilder::button('btn_submit_login')
                 ->label('Login')
                 ->style('primary')
-                ->action('close_login_dialog')
+                ->action('submit_login')
         );
 
         $loginContainer->add($buttonsContainer);
@@ -70,13 +72,22 @@ class LoginService extends AbstractUIService
      */
     public function onSubmitLogin(array $params): void
     {
+        UIDebug::info('LoginService:onSubmitLogin', $params);
         $email = $params['login_email'] ?? '';
         $password = $params['login_password'] ?? '';
 
         $this->store_email = $email;
         $this->store_password = $password;
 
+        // Authenticate user
+        Auth::attempt(['email' => $email, 'password' => $password]);
+
         // Here you would call the API /api/login with email and password
         // For now, just close the modal
+    }
+
+    public function onCloseLoginDialog(array $params): void
+    {
+        // Logic to handle when the login dialog is closed
     }
 }

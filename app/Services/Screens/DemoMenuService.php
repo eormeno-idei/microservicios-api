@@ -107,7 +107,8 @@ class DemoMenuService extends AbstractUIService
             ->width(180);  // Ancho fijo para el dropdown
 
         // Authentication options
-        $userMenu->item('Login', 'show_login_form', [], '🔑');
+        //$userMenu->item('Login', 'show_login_form', [], '🔑');
+        $userMenu->link('Login', '/login', '🔑');
         $userMenu->item('Register', 'show_register_form', [], '📝');
 
         $userMenu->separator();

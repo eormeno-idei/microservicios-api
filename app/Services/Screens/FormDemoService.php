@@ -2,12 +2,12 @@
 
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\InputBuilder;
+use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\ButtonBuilder;
 
 class FormDemoService extends AbstractUIService
