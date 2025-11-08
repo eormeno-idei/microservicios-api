@@ -228,10 +228,29 @@ class ButtonComponent extends UIComponent {
             // If inside modal, use the modal as the container to collect all inputs from the entire modal
             container = modalElement;
         } else {
-            // Otherwise, find the nearest parent container
-            container = buttonElement.closest('.ui-container');
+            // For non-modal contexts, find all parent containers from closest to furthest
+            const allContainers = [];
+            let currentElement = buttonElement.parentElement;
+            
+            while (currentElement && currentElement !== document.body) {
+                if (currentElement.classList.contains('ui-container')) {
+                    allContainers.push(currentElement);
+                }
+                currentElement = currentElement.parentElement;
+            }
+            
+            // Try each container from closest to furthest until we find one with inputs
+            for (const potentialContainer of allContainers) {
+                const hasInputs = potentialContainer.querySelectorAll('input, textarea, select').length > 0;
+                if (hasInputs) {
+                    container = potentialContainer;
+                    break;
+                }
+            }
+            
+            // If no container with inputs found, use the furthest container or document
             if (!container) {
-                container = document;
+                container = allContainers[allContainers.length - 1] || document;
             }
         }
 

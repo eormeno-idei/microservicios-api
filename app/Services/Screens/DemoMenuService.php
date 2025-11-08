@@ -4,6 +4,7 @@ namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\TimeUnit;
+use Illuminate\Support\Facades\Auth;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
@@ -100,22 +101,29 @@ class DemoMenuService extends AbstractUIService
 
     private function buildUserMenu(): UIElement
     {
+        $username = 'Guest';
+        $authenticated = false;
+        // si el usuario está autenticado, mostrar opciones de perfil y logout
+        if (Auth::check()) {
+            $user = Auth::user();
+            $username = $user->name ?? 'User';
+            $authenticated = true;
+        }
+
         $userMenu = UIBuilder::menuDropdown('user_menu')
-            ->trigger('⚙')  // Ícono de engranaje/settings - más minimalista
+            ->trigger("👤 $username")
             // Otras opciones: '●' '◉' '≡' '👤'
             ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
             ->width(180);  // Ancho fijo para el dropdown
 
         // Authentication options
-        //$userMenu->item('Login', 'show_login_form', [], '🔑');
-        $userMenu->link('Login', '/login', '🔑');
-        $userMenu->item('Register', 'show_register_form', [], '📝');
-
-        $userMenu->separator();
-
-        // User profile options
-        $userMenu->item('Profile', 'show_profile', [], '👤');
-        $userMenu->item('Logout', 'logout_user', [], '🚪');
+        if (!$authenticated) {
+            $userMenu->item('Login', 'show_login_form', [], '🔑');
+            $userMenu->item('Register', 'show_register_form', [], '📝');
+        } else {
+            $userMenu->item('Profile', 'show_profile', [], '👤');
+            $userMenu->item('Logout', 'logout_user', [], '🚪');
+        }
 
         return $userMenu;
     }
@@ -422,7 +430,7 @@ class DemoMenuService extends AbstractUIService
         $confirmService = app(ConfirmDialogService::class);
         $modalUI = $confirmService->getUI(
             type: DialogType::WARNING,
-            title: "Logout",
+            title: "Cerrar Sesión",
             message: "¿Estás seguro que deseas cerrar sesión?",
             confirmAction: 'confirm_logout',
             cancelAction: 'cancel_logout',
@@ -438,6 +446,8 @@ class DemoMenuService extends AbstractUIService
     public function onConfirmLogout(array $params): array
     {
         // TODO: Clear token from localStorage
+        Auth::logout();
+        
         $serviceId = $this->getServiceComponentId();
 
         $confirmService = app(ConfirmDialogService::class);

@@ -117,7 +117,7 @@ class ConfirmDialogService
             ->shadow(0) // No shadow on buttons container
             ->rounded(0) // No border radius on buttons container
             ->padding(0) // No padding
-            ->gap(8) // Space between buttons
+            ->gap("15px") // Space between buttons
             ->centerContent(); // Center buttons horizontally
 
         // Build buttons based on dialog type or custom buttons
