@@ -9,12 +9,6 @@ Route::get('/ping', fn() => response()->json([
     'message' => 'API is running correctly'
 ]));
 
-// Endpoint de prueba para archivos (sin autenticación para testing)
-Route::post('/test-files', [FileController::class, 'upload']);
-Route::get('/test-files', [FileController::class, 'index']);
-Route::get('/test-files/download/{filename}', [FileController::class, 'download']);
-Route::delete('/test-files/{filename}', [FileController::class, 'delete']);
-
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -22,7 +16,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
 Route::post('/password/reset', [AuthController::class, 'resetPassword']);
 
-// Ruta para verificar email (no requiere autenticación)
+// Ruta para verificar email
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
     ->middleware('signed')
     ->name('verification.verify');
@@ -42,3 +36,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{filename}', [FileController::class, 'delete']);
     });
 });
+
+// Endpoint de prueba para archivos (sin autenticación para testing)
+Route::post('/test-files', [FileController::class, 'upload']);
+Route::get('/test-files', [FileController::class, 'index']);
+Route::get('/test-files/download/{filename}', [FileController::class, 'download']);
+Route::delete('/test-files/{filename}', [FileController::class, 'delete']);
