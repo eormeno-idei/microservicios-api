@@ -1563,46 +1563,48 @@ class UIRenderer {
 
                 case 'close_modal':
                     closeModal();
-                    break; // Continue to process ui_updates if any
+                    // Process UI updates directly from root object
+                    for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
+                        // Skip special keys
+                        if (jsonKey === 'action' || jsonKey === 'modal' || jsonKey === 'storage') {
+                            continue;
+                        }
+
+                        const componentId = changes._id;
+                        if (!componentId) continue;
+
+                        const element = document.querySelector(`[data-component-id="${componentId}"]`);
+
+                        if (element) {
+                            console.log(`✏️ Updating component ${componentId}`, changes);
+                            this.updateComponent(element, changes);
+                        } else {
+                            console.log(`➕ Creating new component ${componentId}`, changes);
+                            this.addComponent(jsonKey, changes);
+                        }
+                    }
+                    return; // Don't continue processing
             }
         }
 
-        // Handle UI updates if present
-        if (uiUpdate.ui_updates) {
-            for (const [jsonKey, changes] of Object.entries(uiUpdate.ui_updates)) {
-                const componentId = changes._id;
-                const element = document.querySelector(`[data-component-id="${componentId}"]`);
-
-                if (element) {
-                    // Component exists in DOM → UPDATE
-                    console.log(`✏️ Updating component ${componentId}`, changes);
-                    this.updateComponent(element, changes);
-                } else {
-                    // Component doesn't exist → CREATE (rare in events, more common in initial render)
-                    console.log(`➕ Creating new component ${componentId}`, changes);
-                    this.addComponent(jsonKey, changes);
-                }
+        // Handle UI updates (for non-modal actions)
+        for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
+            // Skip special keys
+            if (jsonKey === 'action' || jsonKey === 'modal' || jsonKey === 'storage') {
+                continue;
             }
-        } else if (!hasModalComponents && !uiUpdate.action) {
-            // Fallback: if no ui_updates key and no modal, treat entire object as updates (backward compatibility)
-            for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
-                // Skip special keys
-                if (jsonKey === 'action' || jsonKey === 'modal') {
-                    continue;
-                }
 
-                const componentId = changes._id;
-                if (!componentId) continue;
+            const componentId = changes._id;
+            if (!componentId) continue;
 
-                const element = document.querySelector(`[data-component-id="${componentId}"]`);
+            const element = document.querySelector(`[data-component-id="${componentId}"]`);
 
-                if (element) {
-                    // console.log(`✏️ Updating ${componentId}`, changes);
-                    this.updateComponent(element, changes);
-                } else {
-                    console.log(`➕ Creating new component ${componentId}`, changes);
-                    this.addComponent(jsonKey, changes);
-                }
+            if (element) {
+                console.log(`✏️ Updating component ${componentId}`, changes);
+                this.updateComponent(element, changes);
+            } else {
+                console.log(`➕ Creating new component ${componentId}`, changes);
+                this.addComponent(jsonKey, changes);
             }
         }
     }
