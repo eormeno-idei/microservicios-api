@@ -15,6 +15,7 @@ use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\LoginDialogService;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\UI\Support\UIDebug;
 
 /**
  * Demo Menu Service
@@ -125,6 +126,11 @@ class DemoMenuService extends AbstractUIService
         }
 
         return $userMenu;
+    }
+
+    public function onLoggedUser(array $params): void
+    {
+        UIDebug::info("Usuario logueado: ", $params);
     }
 
     /**

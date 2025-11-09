@@ -2,6 +2,7 @@
 
 namespace App\Services\Screens;
 
+use App\Events\UsimEvent;
 use App\Services\UI\UIBuilder;
 use Illuminate\Support\Facades\Auth;
 use App\Services\UI\Enums\LayoutType;
@@ -92,6 +93,12 @@ class LoginService extends AbstractUIService
             $this->lbl_login_result
                 ->text("Login successful!\nWelcome, " . $user->name . "!")
                 ->style('success');
+
+            // Disparar evento - TODOS los servicios en ui-services.php lo recibirán
+            event(new UsimEvent('logged_user', [
+                'user' => $user,
+                'timestamp' => now(),
+            ]));
         } else {
             // Authentication failed
             $this->lbl_login_result
