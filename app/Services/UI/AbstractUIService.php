@@ -22,6 +22,7 @@ use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
+use App\Services\UI\Support\UIDebug;
 
 /**
  * Abstract UI Service
@@ -278,13 +279,9 @@ abstract class AbstractUIService
 
         // Generate and cache new UI
         $ui = $this->buildBaseUI(...$params)->toJson();
-        // $formatted = json_encode(
-        //     $ui,
-        //     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-        // );
-        // Log::debug("Generated new UI for " . static::class . ":\n" . $formatted);
-        $ttl = env('UI_CACHE_TTL', UIStateManager::DEFAULT_TTL);
-        UIStateManager::store(static::class, $ui, $ttl);
+        // UIDebug::debug("Generated new UI for " . static::class, $ui);
+        
+        UIStateManager::store(static::class, $ui);
 
         return $ui;
     }

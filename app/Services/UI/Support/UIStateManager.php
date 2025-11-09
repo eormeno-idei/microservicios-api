@@ -47,8 +47,9 @@ class UIStateManager
      * @param int $ttl Time to live in seconds
      * @return bool Success
      */
-    public static function store(string $serviceClass, array $uiState, int $ttl = self::DEFAULT_TTL): bool
+    public static function store(string $serviceClass, array $uiState): bool
     {
+        $ttl = env('UI_CACHE_TTL', UIStateManager::DEFAULT_TTL);
         $cacheKey = self::getCacheKey($serviceClass);
         return Cache::put($cacheKey, $uiState, $ttl);
     }
@@ -91,8 +92,7 @@ class UIStateManager
     public static function updateComponent(
         string $serviceClass,
         int|string $componentId,
-        array $updates,
-        int $ttl = self::DEFAULT_TTL
+        array $updates
     ): bool {
         $uiState = self::get($serviceClass);
 
@@ -103,7 +103,7 @@ class UIStateManager
         // Merge updates into component
         $uiState[$componentId] = array_merge($uiState[$componentId], $updates);
 
-        return self::store($serviceClass, $uiState, $ttl);
+        return self::store($serviceClass, $uiState);
     }
 
     /**
@@ -201,8 +201,7 @@ class UIStateManager
         string $componentType,
         string $componentName,
         string $property,
-        mixed $value,
-        int $ttl = self::DEFAULT_TTL
+        mixed $value
     ): bool {
         $component = self::findComponent($serviceClass, $componentType, $componentName);
 
@@ -212,7 +211,7 @@ class UIStateManager
 
         return self::updateComponent($serviceClass, $component['_id'], [
             $property => $value
-        ], $ttl);
+        ]);
     }
 
     /**

@@ -18,7 +18,7 @@ class DecryptUsimStorage
 {
     public function handle(Request $request, Closure $next)
     {
-        $storage = null;
+        $storage = [];
 
         if ($request->hasHeader('X-USIM-Storage')) {
             $encrypted = $request->header('X-USIM-Storage');
@@ -28,8 +28,6 @@ class DecryptUsimStorage
                 $decrypted = decrypt($encrypted);
                 $storage = json_decode($decrypted, true);
             } catch (DecryptException $e) {
-                // Si falla la desencriptación, continuar sin modificar el request
-                $storage = null;
             }
         }
 
