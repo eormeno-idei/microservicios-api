@@ -3,11 +3,13 @@
 namespace App\Services\Screens;
 
 use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\UIBuilder;
+use PhpParser\Node\Stmt\Label;
 
 /**
  * Modal Demo Service
@@ -19,6 +21,9 @@ use App\Services\UI\UIBuilder;
  */
 class ModalDemoService extends AbstractUIService
 {
+    protected LabelBuilder $lbl_result;
+    protected LabelBuilder $lbl_instruction;
+
     /**
      * Build the modal demo UI
      */
@@ -95,31 +100,39 @@ class ModalDemoService extends AbstractUIService
         $actionType = $params['action_type'] ?? 'unknown';
 
         // Get stored UI to find the result label
-        $storedUI = $this->getStoredUI();
-        $resultLabelId = null;
+        // $storedUI = $this->getStoredUI();
+        // $resultLabelId = null;
 
-        foreach ($storedUI as $id => $component) {
-            if ($component['type'] === 'label' && 
-                isset($component['name']) && 
-                $component['name'] === 'lbl_result') {
-                $resultLabelId = $id;
-                break;
-            }
-        }
+        // foreach ($storedUI as $id => $component) {
+        //     if ($component['type'] === 'label' && 
+        //         isset($component['name']) && 
+        //         $component['name'] === 'lbl_result') {
+        //         $resultLabelId = $id;
+        //         break;
+        //     }
+        // }
 
-        $updates = [];
-        if ($resultLabelId) {
-            $updates[$resultLabelId] = [
-                'type' => 'label',
-                'text' => "✅ Action confirmed! Type: {$actionType}",
-                'style' => 'success',
-                '_id' => $resultLabelId,
-            ];
-        }
+        $this->lbl_result
+            ->text("✅ Action confirmed! Type: {$actionType}")
+            ->style('success');
+        
+        $this->lbl_instruction
+            ->text("🔔 You confirmed the action of type: {$actionType}")
+            ->style('info');
+
+        // $updates = [];
+        // if ($resultLabelId) {
+        //     $updates[$resultLabelId] = [
+        //         'type' => 'label',
+        //         'text' => "✅ Action confirmed! Type: {$actionType}",
+        //         'style' => 'success',
+        //         '_id' => $resultLabelId,
+        //     ];
+        // }
 
         return [
             'action' => 'close_modal',
-            'ui_updates' => $updates
+            // 'ui_updates' => $updates
         ];
     }
 
@@ -136,9 +149,11 @@ class ModalDemoService extends AbstractUIService
         $resultLabelId = null;
 
         foreach ($storedUI as $id => $component) {
-            if ($component['type'] === 'label' && 
-                isset($component['name']) && 
-                $component['name'] === 'lbl_result') {
+            if (
+                $component['type'] === 'label' &&
+                isset($component['name']) &&
+                $component['name'] === 'lbl_result'
+            ) {
                 $resultLabelId = $id;
                 break;
             }

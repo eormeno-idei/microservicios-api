@@ -94,10 +94,19 @@ class UIEventController extends Controller
 
             $service->initializeEventContext($incomingStorage);
 
+            $result = [];
+
             // Invoke handler method
-            $result = $service->$method($parameters);
-            if (!is_array($result)) {
-                $result = $service->finalizeEventContext();
+            $methodResult = $service->$method($parameters);
+
+            if (is_array($methodResult)) {
+                $result = $methodResult;
+            }
+
+            $finalizedResult = $service->finalizeEventContext();
+
+            if (is_array($finalizedResult)) {
+                $result += $finalizedResult;
             }
 
             $storageVariables = $service->getStorageVariables();
@@ -106,6 +115,8 @@ class UIEventController extends Controller
                 $mergedStorage = array_merge($incomingStorage, $storageVariables);
                 $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
             }
+
+            UIDebug::info('Result of action execution', $result);
 
             return response()->json($result);
         } catch (\Exception $e) {

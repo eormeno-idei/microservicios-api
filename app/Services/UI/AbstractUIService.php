@@ -60,11 +60,6 @@ abstract class AbstractUIService
     protected ?array $newUI = null;
 
     /**
-     * Whether the UI has been modified during event handling
-     */
-    protected bool $modified = false;
-
-    /**
      * Build base UI structure
      *
      * Override this method in your service to define the base UI.
@@ -89,7 +84,6 @@ abstract class AbstractUIService
     {
         $this->container = $this->getUIContainer();
         $this->oldUI = $this->container->toJson();
-        $this->modified = false;
 
         // Inject storage values into protected properties (store_* variables)
         $this->injectStorageValues($incomingStorage);
@@ -280,7 +274,7 @@ abstract class AbstractUIService
         // Generate and cache new UI
         $ui = $this->buildBaseUI(...$params)->toJson();
         // UIDebug::debug("Generated new UI for " . static::class, $ui);
-        
+
         UIStateManager::store(static::class, $ui);
 
         return $ui;
@@ -474,8 +468,5 @@ abstract class AbstractUIService
         }
 
         return $storage;
-
-        // $storage = encrypt(json_encode($storage));
-        // return ['storage' => ['usim' => $storage]];
     }
 }
