@@ -287,8 +287,6 @@ abstract class AbstractUIService
             ->parent($parent)
             ->toJson();
 
-        // UIDebug::debug("Generated new UI for " . static::class, $ui);
-
         UIStateManager::store(static::class, $ui);
 
         return $ui;
