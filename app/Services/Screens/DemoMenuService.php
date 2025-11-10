@@ -2,6 +2,7 @@
 
 namespace App\Services\Screens;
 
+use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\TimeUnit;
 use Illuminate\Support\Facades\Auth;
@@ -24,6 +25,8 @@ use App\Services\UI\Support\UIDebug;
  */
 class DemoMenuService extends AbstractUIService
 {
+    protected MenuDropdownBuilder $user_menu;
+
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         // OPCIÓN 1: Items juntos al inicio (por defecto)
@@ -102,35 +105,27 @@ class DemoMenuService extends AbstractUIService
 
     private function buildUserMenu(): UIElement
     {
-        $username = 'Guest';
-        $authenticated = false;
-        // si el usuario está autenticado, mostrar opciones de perfil y logout
-        if (Auth::check()) {
-            $user = Auth::user();
-            $username = $user->name ?? 'User';
-            $authenticated = true;
-        }
-
-        $userMenu = UIBuilder::menuDropdown('user_menu')
-            ->trigger("👤 $username")
-            ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
-            ->width(180);  // Ancho fijo para el dropdown
+        $this->user_menu = UIBuilder::menuDropdown('user_menu')
+            ->trigger("⚙️") // Otros emojis podrían ser: 👥,👤
+            ->position('bottom-right')
+            ->width(180);
 
         // Authentication options
-        if (!$authenticated) {
-            $userMenu->link('Login', '/login', '🔑');
-            $userMenu->item('Register', 'show_register_form', [], '📝');
+        if (!Auth::check()) {
+            $this->user_menu->link('Login', '/login', '🔑');
+            $this->user_menu->item('Register', 'show_register_form', [], '📝');
         } else {
-            $userMenu->item('Profile', 'show_profile', [], '👤');
-            $userMenu->item('Logout', 'logout_user', [], '🚪');
+            $this->user_menu->item('Profile', 'show_profile', [], '👤');
+            $this->user_menu->item('Logout', 'logout_user', [], '🚪');
         }
 
-        return $userMenu;
+        return $this->user_menu;
     }
 
     public function onLoggedUser(array $params): void
     {
-        UIDebug::info("Usuario logueado: ", $params);
+        $userName = $params['user']['name'] ?? 'User';
+        $this->user_menu->trigger("👤 " . $userName);
     }
 
     /**
@@ -335,7 +330,7 @@ class DemoMenuService extends AbstractUIService
         $confirmService = app(ConfirmDialogService::class);
         $modalUI = $confirmService->getUI(
             type: DialogType::TIMEOUT,
-            title: "Auto-cierre",
+            title: "Auto cierre",
             message: "Este diálogo se cerrará automáticamente en:",
             timeout: 5,
             timeUnit: TimeUnit::SECONDS,
@@ -453,25 +448,6 @@ class DemoMenuService extends AbstractUIService
         // TODO: Clear token from localStorage
         Auth::logout();
 
-        $serviceId = $this->getServiceComponentId();
-
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::SUCCESS,
-            title: "Logout Exitoso",
-            message: "Has cerrado sesión correctamente.",
-            confirmAction: 'close_logout_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler to cancel logout
-     */
-    public function onCancelLogout(array $params): array
-    {
         return [
             'action' => 'close_modal',
             'modal_id' => 'confirm_dialog'
@@ -479,9 +455,9 @@ class DemoMenuService extends AbstractUIService
     }
 
     /**
-     * Handler to close logout success dialog
+     * Handler to cancel logout
      */
-    public function onCloseLogoutDialog(array $params): array
+    public function onCancelLogout(array $params): array
     {
         return [
             'action' => 'close_modal',

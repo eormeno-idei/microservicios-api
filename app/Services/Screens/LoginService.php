@@ -2,6 +2,7 @@
 
 namespace App\Services\Screens;
 
+use App\Models\User;
 use App\Events\UsimEvent;
 use App\Services\UI\UIBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,7 @@ class LoginService extends AbstractUIService
 {
     protected string $store_email = 'admin@email.com';
     protected string $store_password = '2444';
+    protected string $store_token = '';
     protected LabelBuilder $lbl_login_result;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
@@ -76,8 +78,12 @@ class LoginService extends AbstractUIService
         // Here I use the Auth facade for authentication
         if (Auth::attempt(['email' => $email, 'password' => $password])) {
             // Authentication passed
-            // You can set user session or token here as needed
-            $user = Auth::user();
+            $user = User::where('email', $email)->first();
+
+            // Token con duración estándar (24 horas)
+            $token = $user->createToken('auth_token', ['*'], now()->addDay())->plainTextToken;
+
+            $this->store_token = $token;
             $this->store_email = $email;
             $this->store_password = $password;
             $this->lbl_login_result

@@ -35,8 +35,8 @@ class DecryptUsimStorage
         if (is_array($storage)) {
             $request->merge(['storage' => $storage]);
 
-            if (!empty($storage['token'])) {
-                $request->headers->set('Authorization', 'Bearer ' . $storage['token']);
+            if (!empty($storage['store_token'])) {
+                $request->headers->set('Authorization', 'Bearer ' . $storage['store_token']);
             }
         }
 
