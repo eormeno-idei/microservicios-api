@@ -1600,10 +1600,10 @@ class UIRenderer {
             const element = document.querySelector(`[data-component-id="${componentId}"]`);
 
             if (element) {
-                console.log(`✏️ Updating component ${componentId}`, changes);
+                // console.log(`✏️ Updating component ${componentId}`, changes);
                 this.updateComponent(element, changes);
             } else {
-                console.log(`➕ Creating new component ${componentId}`, changes);
+                // console.log(`➕ Creating new component ${componentId}`, changes);
                 this.addComponent(jsonKey, changes);
             }
         }

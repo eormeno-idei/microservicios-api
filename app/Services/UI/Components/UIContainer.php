@@ -2,12 +2,10 @@
 
 namespace App\Services\UI\Components;
 
-use Illuminate\Support\Facades\Log;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\AlignItems;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Contracts\UIElement;
-use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Support\UIIdGenerator;
 
 /**
@@ -39,8 +37,6 @@ class UIContainer implements UIElement
             // Detectar automáticamente el contexto desde la clase que invoca
             $context = $this->detectCallingContext();
         }
-
-        UIDebug::debug("Creating UIContainer in context '{$context}' with name '{$this->name}'");
 
         // Generar ID según si tiene nombre o no
         if ($this->name !== null) {

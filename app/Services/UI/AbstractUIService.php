@@ -280,6 +280,8 @@ abstract class AbstractUIService
             ->justifyContent('center')
             ->alignItems('center');
 
+        UIDebug::info('Container with ID ' . $container->getId());
+
         // Generate and cache new UI
         $this->buildBaseUI($container, ...$params);
 
@@ -436,12 +438,9 @@ abstract class AbstractUIService
         // Find the first container (main container that represents the service)
         foreach ($ui as $id => $component) {
             if ($component['type'] === 'container') {
-                UIDebug::debug("Service component ID for " . static::class . " is {$id}");
                 return (int)$id;
             }
         }
-
-        UIDebug::debug("No container found for service " . static::class);
 
         // Fallback: generate deterministic ID from service class name
         return UIIdGenerator::generateFromName(
