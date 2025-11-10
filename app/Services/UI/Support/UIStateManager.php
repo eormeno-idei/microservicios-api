@@ -31,27 +31,77 @@ class UIStateManager
      * @param string|null $userId Optional user ID (defaults to current user)
      * @return string Cache key
      */
-    public static function getCacheKey(string $serviceClass, ?string $userId = null): string
+    public static function getCacheKey(?string $serviceClass = null, ?string $userId = null, string $prefix = 'ui_state'): string
     {
-        $serviceBaseName = class_basename($serviceClass);
+        $serviceBaseName = $serviceClass ? class_basename($serviceClass) : '';
         $userId = $userId ?? (Auth::check() ? Auth::id() : session()->getId());
 
-        return "ui_state:{$serviceBaseName}:{$userId}";
+        return "{$prefix}:{$serviceBaseName}:{$userId}";
+    }
+
+    /**
+     * Store root component ID and its parent container in cache
+     *
+     * @param string $serviceClass Service class name
+     * @param string $parent Parent container name (e.g., 'main', 'modal')
+     * @param string $rootComponentId Root component ID
+     * @return bool Success
+     */
+    private static function storeRootComponentId(string $parent, string $rootComponentId): bool
+    {
+        $cacheKey = self::getCacheKey(prefix: 'ui_parents');
+
+        UIDebug::info('Storing root component:', [
+            'cacheKey' => $cacheKey,
+            'parent' => $parent,
+            'rootComponentId' => $rootComponentId
+        ]);
+
+        $parents = Cache::get($cacheKey, []);
+
+        $parents[$parent] = $rootComponentId;
+
+        return Cache::put($cacheKey, $parents, self::DEFAULT_TTL);
+    }
+
+    public static function getRootComponents(): array
+    {
+        $cacheKey = self::getCacheKey(prefix: 'ui_parents');
+        $parents = Cache::get($cacheKey, []);
+
+        return is_array($parents) ? $parents : [];
     }
 
     /**
      * Store UI state in cache
      *
      * @param string $serviceClass Service class name
-     * @param array $uiState UI state array
-     * @param int $ttl Time to live in seconds
+     * @param array $uiState UI state array (indexed by component ID)
      * @return bool Success
      */
     public static function store(string $serviceClass, array $uiState): bool
     {
-        $ttl = env('UI_CACHE_TTL', UIStateManager::DEFAULT_TTL);
+        if (empty($uiState)) {
+            return false;
+        }
+
+        // Get TTL from environment or use default
+        $ttl = env('UI_CACHE_TTL', self::DEFAULT_TTL);
+
+        // Store main UI state
         $cacheKey = self::getCacheKey($serviceClass);
-        return Cache::put($cacheKey, $uiState, $ttl);
+        $result = Cache::put($cacheKey, $uiState, $ttl);
+
+        // Store root component ID and its parent container
+        $firstKey = array_key_first($uiState);
+        if (isset($uiState[$firstKey]['parent'])) {
+            self::storeRootComponentId(
+                $uiState[$firstKey]['parent'],
+                (string)$firstKey
+            );
+        }
+
+        return $result;
     }
 
     /**
@@ -151,8 +201,10 @@ class UIStateManager
         }
 
         foreach ($uiState as $componentId => $component) {
-            if (isset($component['type']) && $component['type'] === $componentType &&
-                isset($component['name']) && $component['name'] === $componentName) {
+            if (
+                isset($component['type']) && $component['type'] === $componentType &&
+                isset($component['name']) && $component['name'] === $componentName
+            ) {
                 $component['_id'] = $componentId;
                 return $component;
             }

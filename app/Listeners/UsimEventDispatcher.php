@@ -3,11 +3,17 @@
 namespace App\Listeners;
 
 use App\Events\UsimEvent;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Support\UIStateManager;
 
 class UsimEventDispatcher
 {
     public function handle(UsimEvent $event): void
     {
+        $rootComponents = UIStateManager::getRootComponents();
+
+        UIDebug::info('Root Components:', $rootComponents);
+        
         // Leer servicios desde la configuración
         $services = config('ui-services', []);
         

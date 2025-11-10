@@ -21,17 +21,17 @@ class UIDebug
         self::log(self::LEVEL_INFO, $message, $context);
     }
 
-    public static function debug(string $message, array $context = []): void
+    public static function debug(string $message, array | string $context = []): void
     {
         self::log(self::LEVEL_DEBUG, $message, $context);
     }
 
-    public static function error(string $message, array $context = []): void
+    public static function error(string $message, array | string $context = []): void
     {
         self::log(self::LEVEL_ERROR, $message, $context);
     }
 
-    public static function warning(string $message, array $context = []): void
+    public static function warning(string $message, array | string $context = []): void
     {
         self::log(self::LEVEL_WARNING, $message, $context);
     }
@@ -42,8 +42,13 @@ class UIDebug
      * @param array $context Additional context data
      * @return void
      */
-    private static function log(string $level,string $message, array $context = []): void
+    private static function log(string $level,string $message, array | string $context = []): void
     {
+        if (is_string($context)) {
+            Log::$level("$message: " . $context);
+            return;
+        }
+
         $formatted = json_encode(
             $context,
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
