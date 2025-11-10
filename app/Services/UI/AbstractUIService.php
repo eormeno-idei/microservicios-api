@@ -280,8 +280,6 @@ abstract class AbstractUIService
             ->justifyContent('center')
             ->alignItems('center');
 
-        UIDebug::info('Container with ID ' . $container->getId());
-
         // Generate and cache new UI
         $this->buildBaseUI($container, ...$params);
 
