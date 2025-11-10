@@ -40,36 +40,27 @@ class UIStateManager
     }
 
     /**
-     * Store root component ID and its parent container in cache
+     * Store root component ID and its parent container in session
      *
-     * @param string $serviceClass Service class name
      * @param string $parent Parent container name (e.g., 'main', 'modal')
      * @param string $rootComponentId Root component ID
-     * @return bool Success
+     * @return void
      */
-    private static function storeRootComponentId(string $parent, string $rootComponentId): bool
+    private static function storeRootComponentId(string $parent, string $rootComponentId): void
     {
-        $cacheKey = self::getCacheKey(prefix: 'ui_parents');
-
-        UIDebug::info('Storing root component:', [
-            'cacheKey' => $cacheKey,
-            'parent' => $parent,
-            'rootComponentId' => $rootComponentId
-        ]);
-
-        $parents = Cache::get($cacheKey, []);
-
+        $parents = session()->get('ui_parents', []);
         $parents[$parent] = $rootComponentId;
-
-        return Cache::put($cacheKey, $parents, self::DEFAULT_TTL);
+        session()->put('ui_parents', $parents);
     }
 
+    /**
+     * Get root components from session
+     *
+     * @return array Root components array
+     */
     public static function getRootComponents(): array
     {
-        $cacheKey = self::getCacheKey(prefix: 'ui_parents');
-        $parents = Cache::get($cacheKey, []);
-
-        return is_array($parents) ? $parents : [];
+        return session()->get('ui_parents', []);
     }
 
     /**
