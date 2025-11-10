@@ -24,12 +24,9 @@ class CheckboxDemoService extends AbstractUIService
     /**
      * Build the checkbox demo UI
      */
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Checkbox Component Demo');
+        $container->title('Checkbox Component Demo');
 
         // Instruction label
         $container->add(
@@ -68,8 +65,6 @@ class CheckboxDemoService extends AbstractUIService
                 ->text('Make your selection above')
                 ->style('secondary')
         );
-
-        return $container;
     }
 
     /**

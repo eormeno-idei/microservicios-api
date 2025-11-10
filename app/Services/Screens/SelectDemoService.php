@@ -112,12 +112,9 @@ class SelectDemoService extends AbstractUIService
         ['value' => 'zh', 'label' => 'Chinese'],
     ];
 
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Select Component Demo');
+        $container->title('Select Component Demo');
 
         // Instruction label
         $container->add(
@@ -186,8 +183,6 @@ class SelectDemoService extends AbstractUIService
                 ->icon('refresh')
                 ->style('secondary')
         );
-
-        return $container;
     }
 
     /**

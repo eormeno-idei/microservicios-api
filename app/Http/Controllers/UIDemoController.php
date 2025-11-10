@@ -17,6 +17,8 @@ class UIDemoController extends Controller
     public function show(string $demo): JsonResponse
     {
         $reset = request()->query('reset', false);
+        $parent = request()->query('parent', "main");
+
         $incomingStorage = request()->storage;
 
         // Convert kebab-case to PascalCase and append 'Service'
@@ -47,7 +49,7 @@ class UIDemoController extends Controller
             $service->onResetService();
         }
 
-        $ui = $service->getUI();
+        $ui = $service->getUI($parent);
 
         $firstElementType = $ui[array_keys($ui)[0]]['type'] ?? null;
         if ($firstElementType !== 'menu_dropdown') {

@@ -24,7 +24,7 @@ use App\Services\UI\Support\UIDebug;
  */
 class DemoMenuService extends AbstractUIService
 {
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         // OPCIÓN 1: Items juntos al inicio (por defecto)
         // No se especifica justifyContent, usa flex-start por defecto
@@ -36,8 +36,8 @@ class DemoMenuService extends AbstractUIService
         // ->justifyContent(JustifyContent::CENTER)
         // ->gap('20px')
 
-        $menu_placeholder = UIBuilder::container('_menu_placeholder')
-            ->parent('menu')
+        $container // = UIBuilder::container('_menu_placeholder')
+            //->parent('menu')
             ->shadow(0)
             ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
@@ -46,13 +46,13 @@ class DemoMenuService extends AbstractUIService
             ->gap('20px')  // Espacio entre items (opcional)
             ->padding(0);
 
-        $menu_placeholder->add(
+        $container->add(
             $this->buildMenu()
         )->add(
             $this->buildUserMenu()
         );
 
-        return $menu_placeholder;
+        // return $container;
     }
 
     private function buildMenu(): UIElement
@@ -452,7 +452,7 @@ class DemoMenuService extends AbstractUIService
     {
         // TODO: Clear token from localStorage
         Auth::logout();
-        
+
         $serviceId = $this->getServiceComponentId();
 
         $confirmService = app(ConfirmDialogService::class);

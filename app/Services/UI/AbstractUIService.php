@@ -5,6 +5,8 @@ namespace App\Services\UI;
 use ReflectionClass;
 use RuntimeException;
 use ReflectionProperty;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Support\UIDiffer;
 use App\Services\UI\Support\UIIdGenerator;
 use App\Services\UI\Components\CardBuilder;
@@ -22,7 +24,6 @@ use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
-use App\Services\UI\Support\UIDebug;
 
 /**
  * Abstract UI Service
@@ -68,7 +69,7 @@ abstract class AbstractUIService
      * @param mixed ...$params Optional parameters for UI construction
      * @return UIContainer Base UI structure
      */
-    abstract protected function buildBaseUI(...$params): UIContainer;
+    abstract protected function buildBaseUI(UIContainer $container, ...$params): void;
 
     /**
      * Initialize event context
@@ -251,9 +252,9 @@ abstract class AbstractUIService
      * @param mixed ...$params Optional parameters that can be used by child classes
      * @return array UI structure in JSON format
      */
-    public function getUI(...$params): array
+    public function getUI(string $parent = 'main', ...$params): array
     {
-        return $this->getStoredUI(...$params);
+        return $this->getStoredUI($parent, ...$params);
     }
 
     /**
@@ -262,7 +263,7 @@ abstract class AbstractUIService
      * @param mixed ...$params Optional parameters passed to buildBaseUI
      * @return array UI structure in JSON format
      */
-    protected function getStoredUI(...$params): array
+    protected function getStoredUI(string $parent = 'main', ...$params): array
     {
         // Check if UI exists in cache
         $cachedUI = UIStateManager::get(static::class);
@@ -271,8 +272,21 @@ abstract class AbstractUIService
             return $cachedUI;
         }
 
+        $current_class = static::class;
+        $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
+        $container = UIBuilder::container($current_class_slug, $current_class)
+            ->padding(30)
+            ->layout(LayoutType::VERTICAL)
+            ->justifyContent('center')
+            ->alignItems('center');
+
         // Generate and cache new UI
-        $ui = $this->buildBaseUI(...$params)->toJson();
+        $this->buildBaseUI($container, ...$params);
+
+        $ui = $container
+            ->parent($parent)
+            ->toJson();
+
         // UIDebug::debug("Generated new UI for " . static::class, $ui);
 
         UIStateManager::store(static::class, $ui);
@@ -422,9 +436,12 @@ abstract class AbstractUIService
         // Find the first container (main container that represents the service)
         foreach ($ui as $id => $component) {
             if ($component['type'] === 'container') {
+                UIDebug::debug("Service component ID for " . static::class . " is {$id}");
                 return (int)$id;
             }
         }
+
+        UIDebug::debug("No container found for service " . static::class);
 
         // Fallback: generate deterministic ID from service class name
         return UIIdGenerator::generateFromName(

@@ -17,15 +17,9 @@ class LoginService extends AbstractUIService
     protected string $store_password = '2444';
     protected LabelBuilder $lbl_login_result;
 
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        // Main container for the modal
-        $loginContainer = UIBuilder::container('main')
-            ->parent('main')
-            ->padding('30px');
-
-        // Email input
-        $loginContainer->add(
+        $container->add(
             UIBuilder::input('login_email')
                 ->label('Email')
                 ->placeholder('Enter your email')
@@ -34,8 +28,7 @@ class LoginService extends AbstractUIService
                 ->required(true)
         );
 
-        // Password input
-        $loginContainer->add(
+        $container->add(
             UIBuilder::input('login_password')
                 ->label('Password')
                 ->type('password')
@@ -44,8 +37,7 @@ class LoginService extends AbstractUIService
                 ->required(true)
         );
 
-        // Login result label
-        $loginContainer->add(
+        $container->add(
             UIBuilder::label('lbl_login_result')->text('')
         );
 
@@ -70,9 +62,7 @@ class LoginService extends AbstractUIService
                 ->action('submit_login')
         );
 
-        $loginContainer->add($buttonsContainer);
-
-        return $loginContainer;
+        $container->add($buttonsContainer);
     }
 
     /**

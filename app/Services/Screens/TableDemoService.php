@@ -4,8 +4,6 @@ namespace App\Services\Screens;
 
 use App\Models\User;
 use App\Services\UI\UIBuilder;
-use Illuminate\Support\Facades\Log;
-use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\TableBuilder;
@@ -29,12 +27,9 @@ class TableDemoService extends AbstractUIService
     /**
      * Build the table demo UI
      */
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Table Component Demo');
+        $container->title('Table Component Demo');
 
         $table = UIBuilder::table('users_table')
             ->title('Users Table')
@@ -44,8 +39,6 @@ class TableDemoService extends AbstractUIService
             ->rowMinHeight(40);
 
         $container->add($table);
-
-        return $container;
     }
 
     public function onEditUser(array $params): void

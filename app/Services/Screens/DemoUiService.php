@@ -15,16 +15,10 @@ class DemoUiService extends AbstractUIService
     protected int $store_counter = 1000;
 
 
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Demo UI Components');
-
+        $container->title('Demo UI Components');
         $this->buildUIElements($container);
-
-        return $container;
     }
 
     private function buildUIElements($container): void
@@ -61,6 +55,7 @@ class DemoUiService extends AbstractUIService
 
         $counterContainer = UIBuilder::container('counter_container')
             ->layout(LayoutType::HORIZONTAL)
+            ->centerContent()
             ->gap("10px");
 
         $counterContainer->add(

@@ -2403,10 +2403,11 @@ async function loadMenuUI() {
     }
 
     try {
-        const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
+        const resetQuery = window.RESET_DEMO ? 'reset=true' : '';
         const usimStorage = localStorage.getItem('usim') || '';
+        const parentElement = 'parent=menu';
 
-        const response = await fetch(`/api/${window.MENU_SERVICE}${resetQuery}`,
+        const response = await fetch(`/api/${window.MENU_SERVICE}?${parentElement}&${resetQuery}`,
             {
                 method: 'GET',
                 headers: {

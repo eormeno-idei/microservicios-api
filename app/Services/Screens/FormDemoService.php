@@ -12,31 +12,22 @@ use App\Services\UI\Components\ButtonBuilder;
 
 class FormDemoService extends AbstractUIService
 {
-    // Component references (auto-injected)
     protected LabelBuilder $lbl_instruction;
     protected InputBuilder $input_name;
     protected InputBuilder $input_email;
     protected ButtonBuilder $btn_submit;
     protected LabelBuilder $lbl_result;
 
-    /**
-     * Build the form demo UI
-     */
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Form Component Demo');
+        $container->title('Form Component Demo');
 
-        // Instruction label
         $container->add(
             UIBuilder::label('lbl_instruction')
                 ->text('Fill out the form below (all fields are required):')
                 ->style('info')
         );
 
-        // Name input
         $container->add(
             UIBuilder::input('input_name')
                 ->label('Name')
@@ -46,7 +37,6 @@ class FormDemoService extends AbstractUIService
                 ->type('text')
         );
 
-        // Email input
         $container->add(
             UIBuilder::input('input_email')
                 ->label('Email')
@@ -56,7 +46,6 @@ class FormDemoService extends AbstractUIService
                 ->type('email')
         );
 
-        // Submit button
         $container->add(
             UIBuilder::button('btn_submit')
                 ->label('Submit Form')
@@ -64,14 +53,11 @@ class FormDemoService extends AbstractUIService
                 ->style('primary')
         );
 
-        // Result label
         $container->add(
             UIBuilder::label('lbl_result')
                 ->text('Fill the form to continue')
                 ->style('secondary')
         );
-
-        return $container;
     }
 
     /**

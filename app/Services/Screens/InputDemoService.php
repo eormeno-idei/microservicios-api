@@ -24,12 +24,9 @@ class InputDemoService extends AbstractUIService
 {
     protected LabelBuilder $lbl_result;
 
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Input Component Demo');
+        $container->title('Input Component Demo');
 
         $container->add(
             UIBuilder::label('lbl_instruction')
@@ -56,8 +53,6 @@ class InputDemoService extends AbstractUIService
                 ->text('Result will appear here')
                 ->style('default')
         );
-
-        return $container;
     }
 
     /**

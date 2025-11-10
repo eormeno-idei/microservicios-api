@@ -23,39 +23,28 @@ class ModalDemoService extends AbstractUIService
     protected LabelBuilder $lbl_result;
     protected LabelBuilder $lbl_instruction;
 
-    /**
-     * Build the modal demo UI
-     */
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Modal Component Demo');
+        $container->title('Modal Component Demo');
 
-        // Instruction label
         $container->add(
             UIBuilder::label('lbl_instruction')
                 ->text("🔔 Click the button below to open a confirmation dialog:")
                 ->style('info')
         );
 
-        // Result label (initially empty)
         $container->add(
             UIBuilder::label('lbl_result')
                 ->text('')
                 ->style('default')
         );
 
-        // Button to open confirmation modal
         $container->add(
             UIBuilder::button('btn_open_modal')
                 ->label('Open Confirmation Dialog')
                 ->style('primary')
                 ->action('open_confirmation', [])
         );
-
-        return $container;
     }
 
     /**
@@ -99,7 +88,7 @@ class ModalDemoService extends AbstractUIService
 
         $this->lbl_result
             ->text("✅ Action confirmed! Type: {$actionType}")
-            ->style('success');     
+            ->style('success');
 
         return [
             'action' => 'close_modal',
