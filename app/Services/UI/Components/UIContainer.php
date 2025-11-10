@@ -54,6 +54,7 @@ class UIContainer implements UIElement
             'layout' => LayoutType::VERTICAL->value,
             'parent' => null,
             'title' => null,
+            'root' => false,
 
             // Flexbox properties
             'flex_direction' => null,
@@ -147,6 +148,14 @@ class UIContainer implements UIElement
     /**
      * {@inheritDoc}
      */
+    public function isContainer(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public static function deserialize(int $id, array $data): UIContainer
     {
         $container = new self();
@@ -228,6 +237,28 @@ class UIContainer implements UIElement
     public function visible(bool $visible = true): self
     {
         return $this->setVisible($visible);
+    }
+
+    /**
+     * Set the root flag for this container
+     *
+     * @param bool $root True if this is the root container, false otherwise
+     * @return self For method chaining
+     */
+    public function root(bool $root = true): self
+    {
+        $this->config['root'] = $root;
+        return $this;
+    }
+
+    /**
+     * Check if this container is marked as root
+     *
+     * @return bool True if root, false otherwise
+     */
+    public function isRoot(): bool
+    {
+        return $this->config['root'] ?? false;
     }
 
     /**

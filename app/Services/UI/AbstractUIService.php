@@ -275,6 +275,7 @@ abstract class AbstractUIService
         $current_class = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
         $container = UIBuilder::container($current_class_slug, $current_class)
+            ->root(true)
             ->padding(30)
             ->layout(LayoutType::VERTICAL)
             ->justifyContent('center')
@@ -319,11 +320,7 @@ abstract class AbstractUIService
         $components = [];
         $rootContainer = null;
 
-        // $formatted = json_encode(
-        //     $jsonUI,
-        //     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-        // );
-        // Log::debug("Reconstructing UI Container from JSON:\n" . $formatted);
+        // UIDebug::debug("Reconstructing UI Container from JSON", $jsonUI);
 
         // First pass: instantiate all components
         foreach ($jsonUI as $id => $component) {
@@ -338,10 +335,11 @@ abstract class AbstractUIService
         // Second pass: set up parent-child relationships
         foreach ($components as $id => $component) {
             $parentId = $jsonUI[$id]['parent'] ?? null;
-            if ($parentId === 'main' || $parentId === 'menu') {
-                // TODO: Esto está mal. Hay que buscar otra forma de identificar el root container
+
+            if ($component->isContainer() && $component->isRoot()) {
                 $rootContainer = $component;
             }
+          
             if (!$parentId) {
                 throw new RuntimeException("Component '{$id}' has no parent defined.");
             }
@@ -362,11 +360,7 @@ abstract class AbstractUIService
             throw new RuntimeException("No root container found in UI JSON.");
         }
 
-        // $formatted = json_encode(
-        //     $rootContainer->toJson(),
-        //     JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-        // );
-        // Log::debug("Reconstructed UI Container:\n" . $formatted);
+        // UIDebug::debug("Reconstructed UI Container:\n", $rootContainer);
 
         return $rootContainer;
     }

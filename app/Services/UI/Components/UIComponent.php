@@ -49,6 +49,11 @@ abstract class UIComponent implements UIElement
         }
     }
 
+    public function isContainer(): bool
+    {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */

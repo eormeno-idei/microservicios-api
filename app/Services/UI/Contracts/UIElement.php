@@ -25,6 +25,13 @@ interface UIElement
     public function getType(): string;
 
     /**
+     * Check if this element is a container
+     *
+     * @return bool True if container, false otherwise
+     */
+    public function isContainer(): bool;
+
+    /**
      * Convert the UI element to its JSON representation
      * 
      * For leaf elements (Button, Label), this returns their configuration.
