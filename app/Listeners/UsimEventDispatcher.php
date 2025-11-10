@@ -48,7 +48,7 @@ class UsimEventDispatcher
                     $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
                 }
 
-                UIDebug::info('UI Event dispatched', $result);
+                //UIDebug::info('UI Event dispatched', $result);
             }
         }
 

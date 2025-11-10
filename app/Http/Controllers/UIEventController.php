@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UI\Support\UIDebug;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use App\Services\UI\Support\UIIdGenerator;
+use App\Services\UI\UIChangesCollector;
 
 /**
  * UI Event Controller
@@ -23,6 +25,9 @@ use App\Services\UI\Support\UIIdGenerator;
  */
 class UIEventController extends Controller
 {
+
+    public function __construct(protected UIChangesCollector $uiChanges) {}
+
     /**
      * Handle UI component event
      *
@@ -115,8 +120,12 @@ class UIEventController extends Controller
                 $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
             }
 
+            // $changes = $this->uiChanges->all();
+            // if (!empty($changes)) {
+            //     UIDebug::info('UI Event: Adding collected UI changes', $changes);
+            // }
+
             return response()->json($result);
-            
         } catch (\Exception $e) {
             Log::error('UI Event: Exception during action execution', [
                 'component_id' => $componentId,

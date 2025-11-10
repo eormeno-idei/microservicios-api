@@ -60,6 +60,11 @@ abstract class AbstractUIService
      */
     protected ?array $newUI = null;
 
+    protected function uiChanges(): UIChangesCollector
+    {
+        return app(UIChangesCollector::class);
+    }
+
     /**
      * Build base UI structure
      *
@@ -211,6 +216,8 @@ abstract class AbstractUIService
         $this->storeUI($this->container);
 
         $diff = $this->buildDiffResponse();
+
+        $this->uiChanges()->add($diff);
 
         return $diff;
     }
