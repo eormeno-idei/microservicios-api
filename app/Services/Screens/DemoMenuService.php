@@ -134,14 +134,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Settings confirmation dialog
      */
-    public function onShowSettingsConfirm(array $params): array
+    public function onShowSettingsConfirm(array $params): void
     {
         // Get this service ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // Build warning dialog using ConfirmDialogService with DialogType
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::WARNING,
             title: "Configuración",
             message: "¿Quieres resetear la configuración?\nEsta acción no se puede deshacer.",
@@ -151,7 +149,17 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build warning dialog using ConfirmDialogService with DialogType
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::WARNING,
+        //     title: "Configuración",
+        //     message: "¿Quieres resetear la configuración?\nEsta acción no se puede deshacer.",
+        //     confirmAction: 'reset_settings',
+        //     confirmParams: [],
+        //     cancelAction: 'cancel_settings',
+        //     callerServiceId: $serviceId
+        // );
     }
 
     /**
@@ -165,14 +173,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for reset button - shows success dialog
      */
-    public function onResetSettings(array $params): array
+    public function onResetSettings(array $params): void
     {
         // Get this service ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // First close the warning dialog, then show success dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::SUCCESS,
             title: "¡Completado!",
             message: "La configuración ha sido reseteada correctamente.",
@@ -180,7 +186,17 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // First close the warning dialog, then show success dialog
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::SUCCESS,
+        //     title: "¡Completado!",
+        //     message: "La configuración ha sido reseteada correctamente.",
+        //     confirmAction: 'close_success_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -194,14 +210,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for About info dialog
      */
-    public function onShowAboutInfo(array $params): array
+    public function onShowAboutInfo(array $params): void
     {
         // Get this service ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // Build info dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::INFO,
             title: "Acerca de USIM Framework",
             message: "Sistema de componentes UI v1.0\n
@@ -211,7 +225,19 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build info dialog
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::INFO,
+        //     title: "Acerca de USIM Framework",
+        //     message: "Sistema de componentes UI v1.0\n
+        //     Desarrollado con Laravel y componentes modulares.\n
+        //     Soporta: Tables, Modals, Forms, Menus y más.",
+        //     confirmAction: 'close_about_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -225,14 +251,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Error dialog demo
      */
-    public function onShowErrorDialog(array $params): array
+    public function onShowErrorDialog(array $params): void
     {
         // Get this service ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // Build error dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::ERROR,
             title: "Error de conexión",
             message: "No se pudo conectar con el servidor.\n
@@ -241,7 +265,18 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build error dialog
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::ERROR,
+        //     title: "Error de conexión",
+        //     message: "No se pudo conectar con el servidor.\n
+        //     Por favor, verifica tu conexión a internet e intenta nuevamente.",
+        //     confirmAction: 'close_error_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -255,14 +290,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Timeout dialog (10 seconds)
      */
-    public function onShowTimeoutDialog(array $params): array
+    public function onShowTimeoutDialog(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
         $duration = $params['duration'] ?? 10;
 
-        // Build timeout dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::TIMEOUT,
             title: "Notificación Temporal",
             message: "Este mensaje se autodestruirá en:",
@@ -273,19 +306,30 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build timeout dialog
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::TIMEOUT,
+        //     title: "Notificación Temporal",
+        //     message: "Este mensaje se autodestruirá en:",
+        //     timeout: $duration,
+        //     timeUnit: TimeUnit::SECONDS,
+        //     showCountdown: true,
+        //     confirmAction: 'close_timeout_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
      * Handler for Timeout dialog (5 minutes)
      */
-    public function onShowTimeoutMinutes(array $params): array
+    public function onShowTimeoutMinutes(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
 
-        // Build timeout dialog with minutes
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::TIMEOUT,
             title: "Sesión Temporal",
             message: "Tu sesión de prueba expirará en:",
@@ -296,7 +340,20 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build timeout dialog with minutes
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::TIMEOUT,
+        //     title: "Sesión Temporal",
+        //     message: "Tu sesión de prueba expirará en:",
+        //     timeout: 5,
+        //     timeUnit: TimeUnit::MINUTES,
+        //     showCountdown: true,
+        //     confirmAction: 'close_timeout_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -310,13 +367,11 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Timeout dialog without close button (5 seconds)
      */
-    public function onShowTimeoutNoButton(array $params): array
+    public function onShowTimeoutNoButton(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
 
-        // Build timeout dialog without close button
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::TIMEOUT,
             title: "Auto cierre",
             message: "Este diálogo se cerrará automáticamente en:",
@@ -327,7 +382,20 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // Build timeout dialog without close button
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::TIMEOUT,
+        //     title: "Auto cierre",
+        //     message: "Este diálogo se cerrará automáticamente en:",
+        //     timeout: 5,
+        //     timeUnit: TimeUnit::SECONDS,
+        //     showCountdown: true,
+        //     showCloseButton: false, // No mostrar botón de cerrar
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -375,12 +443,11 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Profile view
      */
-    public function onShowProfile(array $params): array
+    public function onShowProfile(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
 
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::INFO,
             title: "User Profile",
             message: "Aquí se mostrará el perfil del usuario.\n(Por implementar)",
@@ -388,7 +455,16 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::INFO,
+        //     title: "User Profile",
+        //     message: "Aquí se mostrará el perfil del usuario.\n(Por implementar)",
+        //     confirmAction: 'close_profile_dialog',
+        //     callerServiceId: $serviceId
+        // );
+
+        // return $modalUI;
     }
 
     /**
@@ -402,13 +478,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Logout
      */
-    public function onLogoutUser(array $params): array
+    public function onLogoutUser(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
-
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::WARNING,
+        
+        ConfirmDialogService::open(
+            type: DialogType::CONFIRM,
             title: "Cerrar Sesión",
             message: "¿Estás seguro que deseas cerrar sesión?",
             confirmAction: 'confirm_logout',
@@ -416,9 +491,19 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        // TODO: Los eventos de los modales no persisten los cambios
+        // $confirmService = app(ConfirmDialogService::class);
+        // $modalUI = $confirmService->getUI(
+        //     type: DialogType::WARNING,
+        //     title: "Cerrar Sesión",
+        //     message: "¿Estás seguro que deseas cerrar sesión?",
+        //     confirmAction: 'confirm_logout',
+        //     cancelAction: 'cancel_logout',
+        //     callerServiceId: $serviceId
+        // );
 
-        return $modalUI;
+        // // TODO: Los eventos de los modales no persisten los cambios
+
+        // return $modalUI;
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\UI\Support\UIDebug;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
@@ -105,10 +104,10 @@ class UIEventController extends Controller
             // Invoke handler method
             $methodResult = $service->$method($parameters);
 
-            if (is_array($methodResult)) {
-                // $result = $methodResult;
-                $this->uiChanges->add($methodResult);
-            }
+            // if (is_array($methodResult)) {
+            //     // $result = $methodResult;
+            //     $this->uiChanges->add($methodResult);
+            // }
 
             $finalizedResult = $service->finalizeEventContext();
 

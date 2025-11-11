@@ -1,25 +1,34 @@
 <?php
-
 namespace App\Services\UI\Modals;
 
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\Contracts\UIModal;
 use App\Services\UI\Enums\DialogType;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Enums\TimeUnit;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 
 /**
  * Dialog Service
- * 
+ *
  * Helper service to generate different types of modal dialogs.
  * Supports: info, confirm, warning, error, success, choice, and timeout dialogs.
  * Does not inherit from AbstractUIService as it's a utility service.
  */
-class ConfirmDialogService
+class ConfirmDialogService implements UIModal
 {
+
+    public static function open(...$params): void
+    {
+        $dialog = new self();
+        $format = $dialog->getUI(...$params);
+        $uiChanges = app('App\Services\UI\UIChangesCollector');
+        $uiChanges->add($format);
+    }
+
     /**
      * Build a dialog UI
-     * 
+     *
      * @param mixed ...$params Parameters:
      *   - type: DialogType enum (INFO, CONFIRM, WARNING, ERROR, SUCCESS, CHOICE, TIMEOUT)
      *   - title: Modal title
@@ -32,17 +41,17 @@ class ConfirmDialogService
      *   - cancelLabel: Label for cancel button (optional, uses default from DialogType)
      *   - callerServiceId: ID of the service that opened the modal
      *   - buttons: Array of custom buttons for CHOICE type (each: ['label', 'action', 'params', 'style'])
-     *   
+     *
      *   TIMEOUT specific parameters:
      *   - timeout: Time value (int, required for TIMEOUT)
      *   - timeUnit: TimeUnit enum (SECONDS, MINUTES, HOURS, DAYS) - default: SECONDS
      *   - showCountdown: bool - Show countdown timer (default: true)
      *   - showCloseButton: bool - Show manual close button (default: true)
      *   - timeoutAction: Action to execute when timeout completes (default: 'close_modal')
-     * 
+     *
      * @return array UI configuration array
      */
-    public function getUI(...$params): array
+    private function getUI(...$params): array
     {
         // Extract dialog type (default to CONFIRM for backward compatibility)
         $type = $params['type'] ?? DialogType::CONFIRM;
@@ -51,35 +60,35 @@ class ConfirmDialogService
         }
 
         // Extract parameters with defaults from DialogType
-        $title = $params['title'] ?? 'Diálogo';
-        $message = $params['message'] ?? '¿Está seguro?';
-        $icon = $params['icon'] ?? $type->getDefaultIcon();
-        $confirmAction = $params['confirmAction'] ?? 'confirm';
-        $confirmParams = $params['confirmParams'] ?? [];
-        $confirmLabel = $params['confirmLabel'] ?? $type->getDefaultConfirmLabel();
-        $cancelAction = $params['cancelAction'] ?? 'close_modal';
-        $cancelLabel = $params['cancelLabel'] ?? $type->getDefaultCancelLabel();
+        $title           = $params['title'] ?? 'Diálogo';
+        $message         = $params['message'] ?? '¿Está seguro?';
+        $icon            = $params['icon'] ?? $type->getDefaultIcon();
+        $confirmAction   = $params['confirmAction'] ?? 'confirm';
+        $confirmParams   = $params['confirmParams'] ?? [];
+        $confirmLabel    = $params['confirmLabel'] ?? $type->getDefaultConfirmLabel();
+        $cancelAction    = $params['cancelAction'] ?? 'close_modal';
+        $cancelLabel     = $params['cancelLabel'] ?? $type->getDefaultCancelLabel();
         $callerServiceId = $params['callerServiceId'] ?? null;
-        $customButtons = $params['buttons'] ?? null;
+        $customButtons   = $params['buttons'] ?? null;
 
         // TIMEOUT specific parameters
-        $timeout = $params['timeout'] ?? null;
+        $timeout  = $params['timeout'] ?? null;
         $timeUnit = $params['timeUnit'] ?? TimeUnit::SECONDS;
         if (is_string($timeUnit)) {
             $timeUnit = TimeUnit::from($timeUnit);
         }
-        $showCountdown = $params['showCountdown'] ?? true;
+        $showCountdown   = $params['showCountdown'] ?? true;
         $showCloseButton = $params['showCloseButton'] ?? true;
-        $timeoutAction = $params['timeoutAction'] ?? 'close_modal';
+        $timeoutAction   = $params['timeoutAction'] ?? 'close_modal';
 
         // Build container - use 'modal' as parent to indicate it should be rendered in the modal overlay
         $container = UIBuilder::container('confirm_dialog')
             ->parent('modal')
             ->layout(LayoutType::VERTICAL)
-            ->shadow(0) // No shadow since modal already has shadow
-            ->rounded(4) // Subtle 4px border radius
-            ->padding(0) // No padding
-            ->gap(8) // Space between elements
+            ->shadow(0)        // No shadow since modal already has shadow
+            ->rounded(4)       // Subtle 4px border radius
+            ->padding(0)       // No padding
+            ->gap(8)           // Space between elements
             ->centerContent(); // Center content horizontally
 
         // Icon
@@ -114,10 +123,10 @@ class ConfirmDialogService
         // Buttons container (horizontal layout)
         $buttonsContainer = UIBuilder::container('buttons')
             ->layout(LayoutType::HORIZONTAL)
-            ->shadow(0) // No shadow on buttons container
-            ->rounded(0) // No border radius on buttons container
-            ->padding(0) // No padding
-            ->gap("15px") // Space between buttons
+            ->shadow(0)        // No shadow on buttons container
+            ->rounded(0)       // No border radius on buttons container
+            ->padding(0)       // No padding
+            ->gap("15px")      // Space between buttons
             ->centerContent(); // Center buttons horizontally
 
         // Build buttons based on dialog type or custom buttons
@@ -129,16 +138,16 @@ class ConfirmDialogService
                         ->label($button['label'])
                         ->style($button['style'] ?? 'secondary')
                         ->action($button['action'], array_merge($button['params'] ?? [], [
-                            '_caller_service_id' => $callerServiceId
+                            '_caller_service_id' => $callerServiceId,
                         ]))
                 );
             }
-        } elseif ($type === DialogType::TIMEOUT && !$showCloseButton) {
+        } elseif ($type === DialogType::TIMEOUT && ! $showCloseButton) {
             // TIMEOUT type without close button - no buttons at all
             // Don't add any buttons, just the countdown
         } else {
             // Standard buttons based on DialogType
-            
+
             // Cancel button (if type requires it)
             if ($type->hasCancelButton()) {
                 $buttonsContainer->add(
@@ -146,7 +155,7 @@ class ConfirmDialogService
                         ->label($cancelLabel)
                         ->style('secondary')
                         ->action($cancelAction, [
-                            '_caller_service_id' => $callerServiceId
+                            '_caller_service_id' => $callerServiceId,
                         ])
                 );
             }
@@ -157,36 +166,36 @@ class ConfirmDialogService
                     ->label($confirmLabel)
                     ->style($type->getConfirmButtonStyle())
                     ->action($confirmAction, array_merge($confirmParams, [
-                        '_caller_service_id' => $callerServiceId
+                        '_caller_service_id' => $callerServiceId,
                     ]))
             );
         }
 
         // Only add buttons container if it has buttons (not empty for TIMEOUT without close button)
-        if (!($type === DialogType::TIMEOUT && !$showCloseButton)) {
+        if (! ($type === DialogType::TIMEOUT && ! $showCloseButton)) {
             $container->add($buttonsContainer);
         }
 
         // Add timeout metadata if TIMEOUT type
         if ($type === DialogType::TIMEOUT && $timeout !== null) {
             $builtContainer = $container->build();
-            
+
             // Get the container ID from the built structure
             $containerId = array_key_first($builtContainer);
-            
+
             // Add timeout configuration to the container
-            $builtContainer[$containerId]['_timeout'] = $timeout;
-            $builtContainer[$containerId]['_time_unit'] = $timeUnit->value;
-            $builtContainer[$containerId]['_time_unit_label'] = $timeUnit->getPluralLabel();
-            $builtContainer[$containerId]['_show_countdown'] = $showCountdown;
-            $builtContainer[$containerId]['_timeout_action'] = $timeoutAction;
-            $builtContainer[$containerId]['_timeout_ms'] = $timeUnit->toMilliseconds($timeout);
+            $builtContainer[$containerId]['_timeout']           = $timeout;
+            $builtContainer[$containerId]['_time_unit']         = $timeUnit->value;
+            $builtContainer[$containerId]['_time_unit_label']   = $timeUnit->getPluralLabel();
+            $builtContainer[$containerId]['_show_countdown']    = $showCountdown;
+            $builtContainer[$containerId]['_timeout_action']    = $timeoutAction;
+            $builtContainer[$containerId]['_timeout_ms']        = $timeUnit->toMilliseconds($timeout);
             $builtContainer[$containerId]['_caller_service_id'] = $callerServiceId;
-            
+
             return $builtContainer;
         }
 
-        return $container->build();
+        return $container->toJson();
     }
 
     /**
@@ -199,18 +208,18 @@ class ConfirmDialogService
 
     /**
      * Get emoji character for the specified icon type (legacy support)
-     * 
+     *
      * @deprecated Use DialogType->getDefaultIcon() instead
      */
     private function getIconEmoji(string $icon): string
     {
-        return match($icon) {
+        return match ($icon) {
             'question' => '❓',
-            'info' => 'ℹ️',
-            'warning' => '⚠️',
-            'error' => '❌',
-            'success' => '✅',
-            default => '❓'
+            'info'     => 'ℹ️',
+            'warning'  => '⚠️',
+            'error'    => '❌',
+            'success'  => '✅',
+            default    => '❓'
         };
     }
 }

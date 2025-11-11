@@ -53,14 +53,12 @@ class ModalDemoService extends AbstractUIService
      * @param array $params
      * @return array Response with modal UI
      */
-    public function onOpenConfirmation(array $params): array
+    public function onOpenConfirmation(array $params): void
     {
         // Get this service's ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // Build confirmation dialog using DialogType
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::CONFIRM,
             title: "Confirm Action",
             message: "Are you sure you want to proceed with this action?",
@@ -71,8 +69,6 @@ class ModalDemoService extends AbstractUIService
             cancelLabel: 'No, Cancel',
             callerServiceId: $serviceId
         );
-
-        return $modalUI;
     }
 
     /**
