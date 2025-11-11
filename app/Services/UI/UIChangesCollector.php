@@ -8,7 +8,7 @@ class UIChangesCollector
 
     public function add(array $change = []): void
     {
-        $this->changes[] = $change;
+        $this->changes += $change;
     }
 
     public function all(): array

@@ -106,15 +106,16 @@ class DemoMenuService extends AbstractUIService
     private function buildUserMenu(): UIElement
     {
         $this->user_menu = UIBuilder::menuDropdown('user_menu')
-            ->trigger("⚙️") // Otros emojis podrían ser: 👥,👤
             ->position('bottom-right')
             ->width(180);
 
-        // Authentication options
         if (!Auth::check()) {
+            $this->user_menu->trigger("⚙️");
             $this->user_menu->link('Login', '/login', '🔑');
             $this->user_menu->item('Register', 'show_register_form', [], '📝');
         } else {
+            $userName = Auth::user()->name ?? 'User';
+            $this->user_menu->trigger("👤 " . $userName);
             $this->user_menu->item('Profile', 'show_profile', [], '👤');
             $this->user_menu->item('Logout', 'logout_user', [], '🚪');
         }
@@ -125,7 +126,9 @@ class DemoMenuService extends AbstractUIService
     public function onLoggedUser(array $params): void
     {
         $userName = $params['user']['name'] ?? 'User';
-        $this->user_menu->trigger("👤 " . $userName);
+        $this->user_menu->trigger("👤  " . $userName);
+        $this->user_menu->item('Profile', 'show_profile', [], '👤');
+        $this->user_menu->item('Logout', 'logout_user', [], '🚪');
     }
 
     /**
@@ -447,6 +450,9 @@ class DemoMenuService extends AbstractUIService
     {
         // TODO: Clear token from localStorage
         Auth::logout();
+        $this->user_menu->trigger("⚙️");
+        $this->user_menu->link('Login', '/login', '🔑');
+        $this->user_menu->item('Register', 'show_register_form', [], '📝');
 
         return [
             'action' => 'close_modal',

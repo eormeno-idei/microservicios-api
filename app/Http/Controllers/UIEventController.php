@@ -110,7 +110,9 @@ class UIEventController extends Controller
             $finalizedResult = $service->finalizeEventContext();
 
             if (is_array($finalizedResult)) {
-                $result += $finalizedResult;
+                $changes = $this->uiChanges->all();
+                //$result += $finalizedResult;
+                $result += $changes;
             }
 
             $storageVariables = $service->getStorageVariables();
@@ -124,6 +126,8 @@ class UIEventController extends Controller
             // if (!empty($changes)) {
             //     UIDebug::info('UI Event: Adding collected UI changes', $changes);
             // }
+
+            UIDebug::info('UI Event: ', $result);
 
             return response()->json($result);
         } catch (\Exception $e) {

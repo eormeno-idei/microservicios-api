@@ -1689,6 +1689,118 @@ class UIRenderer {
                 element.textContent = changes.label;
             }
 
+            // Trigger (menu_dropdown)
+            if (changes.trigger !== undefined) {
+                const triggerButton = element.querySelector('.menu-dropdown-trigger');
+                if (triggerButton) {
+                    const triggerConfig = changes.trigger;
+                    const triggerLabel = triggerConfig.label || '☰ Menu';
+                    const triggerIcon = triggerConfig.icon;
+                    const triggerStyle = triggerConfig.style || 'default';
+
+                    // Update trigger style classes
+                    triggerButton.className = 'menu-dropdown-trigger';
+                    triggerButton.className += ` menu-trigger-${triggerStyle}`;
+
+                    // Build trigger content
+                    let triggerContent = '';
+                    if (triggerIcon) {
+                        triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+                    }
+                    triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
+
+                    triggerButton.innerHTML = triggerContent;
+                }
+            }
+
+            // Items (menu_dropdown)
+            if (changes.items !== undefined) {
+                const menuContent = element.querySelector('.menu-dropdown-content');
+                if (menuContent) {
+                    // Clear existing items
+                    menuContent.innerHTML = '';
+
+                    // Get the component instance to use its renderMenuItem method
+                    const componentId = changes._id;
+                    const component = globalRenderer?.components?.get(String(componentId));
+
+                    if (component && typeof component.renderMenuItem === 'function') {
+                        // Re-render all menu items
+                        changes.items.forEach(item => {
+                            menuContent.appendChild(component.renderMenuItem(item));
+                        });
+                    } else {
+                        // Fallback: simple rendering without component instance
+                        changes.items.forEach(item => {
+                            if (item.type === 'separator') {
+                                const separator = document.createElement('div');
+                                separator.className = 'menu-separator';
+                                menuContent.appendChild(separator);
+                            } else {
+                                const menuItem = document.createElement('button');
+                                menuItem.className = 'menu-item';
+
+                                if (item.icon) {
+                                    const icon = document.createElement('span');
+                                    icon.className = 'icon';
+                                    icon.textContent = item.icon;
+                                    menuItem.appendChild(icon);
+                                }
+
+                                const label = document.createElement('span');
+                                label.textContent = item.label;
+                                menuItem.appendChild(label);
+
+                                // Handle action
+                                if (item.action) {
+                                    menuItem.addEventListener('click', async (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+
+                                        // Close menu
+                                        menuContent.classList.remove('show');
+
+                                        // Send action to backend
+                                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+                                        const usimStorage = localStorage.getItem('usim') || '';
+
+                                        try {
+                                            const response = await fetch('/api/ui-event', {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'Accept': 'application/json',
+                                                    'X-CSRF-TOKEN': csrfToken,
+                                                    'X-Requested-With': 'XMLHttpRequest',
+                                                    'X-USIM-Storage': usimStorage,
+                                                },
+                                                credentials: 'same-origin',
+                                                body: JSON.stringify({
+                                                    component_id: componentId,
+                                                    event: 'click',
+                                                    action: item.action,
+                                                    parameters: item.params || {},
+                                                }),
+                                            });
+
+                                            const result = await response.json();
+
+                                            if (response.ok && result && globalRenderer) {
+                                                globalRenderer.handleUIUpdate(result);
+                                            }
+                                        } catch (error) {
+                                            console.error('Menu item click error:', error);
+                                        }
+                                    });
+                                }
+
+                                menuContent.appendChild(menuItem);
+                            }
+                        });
+                    }
+                }
+            }
+
             // Style/classes
             if (changes.style !== undefined) {
                 element.classList.remove('default', 'primary', 'secondary', 'success', 'warning', 'danger', 'info');

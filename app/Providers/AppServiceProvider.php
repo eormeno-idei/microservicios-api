@@ -14,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Registrar como singleton para que sea la misma instancia en toda la request
         // TODO: Analizar si es mejor singleton o scoped
-        $this->app->singleton(UIChangesCollector::class, function ($app) {
+        $this->app->scoped(UIChangesCollector::class, function ($app) {
             return new UIChangesCollector();
         });
     }
