@@ -117,7 +117,7 @@ class DemoMenuService extends AbstractUIService
             $userName = Auth::user()->name ?? 'User';
             $this->user_menu->trigger("👤 " . $userName);
             $this->user_menu->item('Profile', 'show_profile', [], '👤');
-            $this->user_menu->item('Logout', 'logout_user', [], '🚪');
+            $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
         }
 
         return $this->user_menu;
@@ -128,7 +128,7 @@ class DemoMenuService extends AbstractUIService
         $userName = $params['user']['name'] ?? 'User';
         $this->user_menu->trigger("👤  " . $userName);
         $this->user_menu->item('Profile', 'show_profile', [], '👤');
-        $this->user_menu->item('Logout', 'logout_user', [], '🚪');
+        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
     }
 
     /**
@@ -439,6 +439,8 @@ class DemoMenuService extends AbstractUIService
             cancelAction: 'cancel_logout',
             callerServiceId: $serviceId
         );
+
+        // TODO: Los eventos de los modales no persisten los cambios
 
         return $modalUI;
     }
