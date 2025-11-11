@@ -144,7 +144,7 @@ class DemoMenuService extends AbstractUIService
         $modalUI = $confirmService->getUI(
             type: DialogType::WARNING,
             title: "Configuración",
-            message: "¿Quieres resetear la configuración? Esta acción no se puede deshacer.",
+            message: "¿Quieres resetear la configuración?\nEsta acción no se puede deshacer.",
             confirmAction: 'reset_settings',
             confirmParams: [],
             cancelAction: 'cancel_settings',
@@ -157,12 +157,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for cancel button (closes modal)
      */
-    public function onCancelSettings(array $params): array
+    public function onCancelSettings(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -189,12 +186,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close success dialog
      */
-    public function onCloseSuccessDialog(array $params): array
+    public function onCloseSuccessDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -223,12 +217,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close about dialog
      */
-    public function onCloseAboutDialog(array $params): array
+    public function onCloseAboutDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -256,12 +247,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close error dialog
      */
-    public function onCloseErrorDialog(array $params): array
+    public function onCloseErrorDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -314,12 +302,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close timeout dialog
      */
-    public function onCloseTimeoutDialog(array $params): array
+    public function onCloseTimeoutDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -365,18 +350,15 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close register dialog
      */
-    public function onCloseRegisterDialog(array $params): array
+    public function onCloseRegisterDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
      * Handler to submit register (receives form data)
      */
-    public function onSubmitRegister(array $params): array
+    public function onSubmitRegister(array $params): void
     {
         // TODO: Validate and create user
         // For now, just show a success message
@@ -387,10 +369,7 @@ class DemoMenuService extends AbstractUIService
 
         // Here you would call the API /api/register with the data
         // For now, just close the modal
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -415,12 +394,9 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close profile dialog
      */
-    public function onCloseProfileDialog(array $params): array
+    public function onCloseProfileDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -448,7 +424,7 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to confirm logout
      */
-    public function onConfirmLogout(array $params): array
+    public function onConfirmLogout(array $params): void
     {
         // TODO: Clear token from localStorage
         Auth::logout();
@@ -456,20 +432,14 @@ class DemoMenuService extends AbstractUIService
         $this->user_menu->link('Login', '/login', '🔑');
         $this->user_menu->item('Register', 'show_register_form', [], '📝');
 
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
      * Handler to cancel logout
      */
-    public function onCancelLogout(array $params): array
+    public function onCancelLogout(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 }

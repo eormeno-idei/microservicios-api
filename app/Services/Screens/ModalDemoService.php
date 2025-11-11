@@ -81,7 +81,7 @@ class ModalDemoService extends AbstractUIService
      * @param array $params
      * @return array Response to close modal and update UI
      */
-    public function onHandleConfirm(array $params): array
+    public function onHandleConfirm(array $params): void
     {
         $actionType = $params['action_type'] ?? 'unknown';
 
@@ -89,9 +89,7 @@ class ModalDemoService extends AbstractUIService
             ->text("✅ Action confirmed! Type: {$actionType}")
             ->style('success');
 
-        return [
-            'action' => 'close_modal',
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -100,14 +98,12 @@ class ModalDemoService extends AbstractUIService
      * @param array $params
      * @return array Response to close modal and update UI
      */
-    public function onHandleCancel(array $params): array
+    public function onHandleCancel(array $params): void
     {
         $this->lbl_result
             ->text("❌ Action cancelled by user")
             ->style('warning');
 
-        return [
-            'action' => 'close_modal',
-        ];
+        $this->closeModal();
     }
 }

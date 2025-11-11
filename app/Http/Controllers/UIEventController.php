@@ -96,40 +96,45 @@ class UIEventController extends Controller
                 ], 404);
             }
 
+            $this->uiChanges->setStorage($incomingStorage);
+
             $service->initializeEventContext($incomingStorage);
 
-            $result = [];
+            // $result = [];
 
             // Invoke handler method
             $methodResult = $service->$method($parameters);
 
             if (is_array($methodResult)) {
-                $result = $methodResult;
+                // $result = $methodResult;
+                $this->uiChanges->add($methodResult);
             }
 
             $finalizedResult = $service->finalizeEventContext();
 
-            if (is_array($finalizedResult)) {
-                $changes = $this->uiChanges->all();
-                //$result += $finalizedResult;
-                $result += $changes;
-            }
+            // if (is_array($finalizedResult)) {
+            //     //$changes = $this->uiChanges->all();
+            //     $result += $finalizedResult;
+            //     //$result += $changes;
+            // }
 
-            $storageVariables = $service->getStorageVariables();
+            // $storageVariables = $service->getStorageVariables();
 
-            if (!empty($storageVariables)) {
-                $mergedStorage = array_merge($incomingStorage, $storageVariables);
-                $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
-            }
+            // if (!empty($storageVariables)) {
+            //     $mergedStorage = array_merge($incomingStorage, $storageVariables);
+            //     $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
+            // }
 
             // $changes = $this->uiChanges->all();
             // if (!empty($changes)) {
             //     UIDebug::info('UI Event: Adding collected UI changes', $changes);
             // }
 
-            UIDebug::info('UI Event: ', $result);
+            // UIDebug::info('Current', $result);
+            // UIDebug::info('NewCalc', $this->uiChanges->all());
 
-            return response()->json($result);
+            // return response()->json($result);
+            return response()->json($this->uiChanges->all());
         } catch (\Exception $e) {
             Log::error('UI Event: Exception during action execution', [
                 'component_id' => $componentId,

@@ -217,7 +217,10 @@ abstract class AbstractUIService
 
         $diff = $this->buildDiffResponse();
 
+        $storageVariables = $this->getStorageVariables();
+
         $this->uiChanges()->add($diff);
+        $this->uiChanges()->setStorage($storageVariables);
 
         return $diff;
     }
@@ -481,5 +484,17 @@ abstract class AbstractUIService
         }
 
         return $storage;
+    }
+
+    /**
+     * Sends 'close_modal' action to front.
+     *
+     * @return void
+     */
+    protected function closeModal(): void
+    {
+        $this->uiChanges()->add([
+            'action' => 'close_modal',
+        ]);
     }
 }
