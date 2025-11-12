@@ -26,23 +26,13 @@ class DemoMenuService extends AbstractUIService
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        // OPCIÓN 1: Items juntos al inicio (por defecto)
-        // No se especifica justifyContent, usa flex-start por defecto
-
-        // OPCIÓN 2: Primer item a la izquierda, último a la derecha (JUSTIFICADO)
-        // ->justifyContent(JustifyContent::SPACE_BETWEEN)
-
-        // OPCIÓN 3: Ambos items centrados con espacio entre ellos
-        // ->justifyContent(JustifyContent::CENTER)
-        // ->gap('20px')
-
+        // Usar SPACE_BETWEEN para separar el menú principal (izquierda) del menú de usuario (derecha)
         $container
             ->shadow(0)
             ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
-            ->justifyContent(JustifyContent::SPACE_BETWEEN) // 👈 Cambiar aquí según necesites
-            ->alignItems(AlignItems::CENTER)                // Alinear verticalmente al centro
-            ->gap('20px')                                   // Espacio entre items (opcional)
+            ->justifyContent(JustifyContent::SPACE_BETWEEN)  // Separar items: primero a la izquierda, último a la derecha
+            ->alignItems(AlignItems::CENTER)                 // Alinear verticalmente al centro
             ->padding(0);
 
         $container->add(
@@ -95,8 +85,7 @@ class DemoMenuService extends AbstractUIService
     {
         $this->user_menu = UIBuilder::menuDropdown('user_menu')
             ->position('bottom-right')
-            ->width(180)
-            ->marginLeft('auto');  // Empuja el menú a la derecha
+            ->width(180);
 
         if (! Auth::check()) {
             $this->user_menu->trigger("⚙️");

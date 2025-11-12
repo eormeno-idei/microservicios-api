@@ -33,7 +33,7 @@ body {
     /* Remove default gap and align-items - let inline styles or defaults handle it */
     /* gap: 15px; */
     /* align-items: stretch; */
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Don't wrap - keep items in one line */
     /* Ensure container takes full width of parent */
     width: 100%;
 }
@@ -698,11 +698,17 @@ body.modal-open #menu {
     height: 60px;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space between menu and user-info */
+    /* Removed justify-content to allow children to control their own spacing */
 }
 
 #menu {
     flex: 1; /* Grow to fill available space */
+    display: flex; /* Make it a flex container so margin-left: auto works on children */
+}
+
+/* Ensure the UI container inside #menu takes full width */
+#menu > .ui-container {
+    width: 100%;
 }
 
 #user-info {
@@ -725,11 +731,14 @@ body.modal-open #menu {
 
 /* When inside a horizontal flex container, behave as flex item */
 .ui-container.horizontal > .menu-dropdown {
-    /* Keep inline-block but make it work with flex */
-    display: inline-block !important;
+    /* Use inline-flex to allow margin: auto to work while keeping natural width */
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start; /* Don't stretch children horizontally */
     flex-shrink: 0; /* Don't shrink */
-    /* Don't grow to fill space */
-    flex-grow: 0;
+    flex-grow: 0; /* Don't grow by default */
+    width: auto; /* Keep natural width based on content */
+    min-width: 0; /* Allow shrinking if needed */
 }
 
 .menu-dropdown-trigger {

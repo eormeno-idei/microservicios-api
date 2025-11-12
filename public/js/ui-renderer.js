@@ -63,7 +63,7 @@ class UIComponent {
             element.style.margin = this.config.margin;
         }
         if (this.config.margin_left !== undefined) {
-            element.style.marginLeft = this.config.margin_left;
+            element.style.setProperty('margin-left', this.config.margin_left, 'important');
         }
         if (this.config.margin_right !== undefined) {
             element.style.marginRight = this.config.margin_right;
@@ -2359,7 +2359,19 @@ class MenuDropdownComponent extends UIComponent {
         menuContainer.appendChild(trigger);
         menuContainer.appendChild(content);
 
-        return this.applyCommonAttributes(menuContainer);
+        // Remove width from config before applying common attributes
+        // because width is already applied to the dropdown content
+        const originalWidth = this.config.width;
+        delete this.config.width;
+        
+        const result = this.applyCommonAttributes(menuContainer);
+        
+        // Restore width to config for future use
+        if (originalWidth) {
+            this.config.width = originalWidth;
+        }
+        
+        return result;
     }
 
     renderMenuItem(item) {
