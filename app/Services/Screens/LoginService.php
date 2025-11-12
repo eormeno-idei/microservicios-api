@@ -1,26 +1,31 @@
 <?php
-
 namespace App\Services\Screens;
 
-use App\Models\User;
 use App\Events\UsimEvent;
+use App\Models\User;
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\UIBuilder;
 use Illuminate\Support\Facades\Auth;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\LabelBuilder;
 
 class LoginService extends AbstractUIService
 {
-    protected string $store_email = 'admin@email.com';
+    protected string $store_email    = 'admin@email.com';
     protected string $store_password = '2444';
-    protected string $store_token = '';
+    protected string $store_token    = '';
     protected LabelBuilder $lbl_login_result;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
+        $container
+            ->title('User Login')
+            ->maxWidth('450px')
+            ->centerHorizontal()
+            ->padding('30px');
+
         $container->add(
             UIBuilder::input('login_email')
                 ->label('Email')
@@ -28,6 +33,7 @@ class LoginService extends AbstractUIService
                 ->value($this->store_email)
                 ->type('email')
                 ->required(true)
+                ->width('100%')
         );
 
         $container->add(
@@ -37,6 +43,7 @@ class LoginService extends AbstractUIService
                 ->placeholder('Enter your password')
                 ->value($this->store_password)
                 ->required(true)
+                ->width('100%')
         );
 
         $container->add(
@@ -72,7 +79,7 @@ class LoginService extends AbstractUIService
      */
     public function onSubmitLogin(array $params): void
     {
-        $email = $params['login_email'] ?? '';
+        $email    = $params['login_email'] ?? '';
         $password = $params['login_password'] ?? '';
 
         // Here I use the Auth facade for authentication
@@ -83,8 +90,8 @@ class LoginService extends AbstractUIService
             // Token con duración estándar (24 horas)
             $token = $user->createToken('auth_token', ['*'], now()->addDay())->plainTextToken;
 
-            $this->store_token = $token;
-            $this->store_email = $email;
+            $this->store_token    = $token;
+            $this->store_email    = $email;
             $this->store_password = $password;
             $this->lbl_login_result
                 ->text("Login successful!\nWelcome, " . $user->name . "!")
@@ -92,7 +99,7 @@ class LoginService extends AbstractUIService
 
             // Disparar evento - TODOS los servicios en ui-services.php lo recibirán
             event(new UsimEvent('logged_user', [
-                'user' => $user,
+                'user'      => $user,
                 'timestamp' => now(),
             ]));
         } else {

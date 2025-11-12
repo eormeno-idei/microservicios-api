@@ -380,4 +380,133 @@ abstract class UIComponent implements UIElement
     {
         return UIIdGenerator::getContextInfo($context);
     }
+
+    // ========================================================================
+    // MARGIN METHODS
+    // ========================================================================
+
+    /**
+     * Set margin (all sides)
+     *
+     * @param string $margin Margin value
+     * @return static For method chaining
+     */
+    public function margin(string $margin): static
+    {
+        return $this->setConfig('margin', $margin);
+    }
+
+    /**
+     * Set left margin
+     *
+     * @param string $margin Margin value
+     * @return static For method chaining
+     */
+    public function marginLeft(string $margin): static
+    {
+        return $this->setConfig('margin_left', $margin);
+    }
+
+    /**
+     * Set right margin
+     *
+     * @param string $margin Margin value
+     * @return static For method chaining
+     */
+    public function marginRight(string $margin): static
+    {
+        return $this->setConfig('margin_right', $margin);
+    }
+
+    /**
+     * Set top margin
+     *
+     * @param string $margin Margin value
+     * @return static For method chaining
+     */
+    public function marginTop(string $margin): static
+    {
+        return $this->setConfig('margin_top', $margin);
+    }
+
+    /**
+     * Set bottom margin
+     *
+     * @param string $margin Margin value
+     * @return static For method chaining
+     */
+    public function marginBottom(string $margin): static
+    {
+        return $this->setConfig('margin_bottom', $margin);
+    }
+
+    // ========================================================================
+    // SIZING METHODS
+    // ========================================================================
+
+    /**
+     * Set width
+     *
+     * @param string $width Width value (px, %, vh, auto, etc)
+     * @return static For method chaining
+     */
+    public function width(string $width): static
+    {
+        return $this->setConfig('width', $width);
+    }
+
+    /**
+     * Set height
+     *
+     * @param string $height Height value
+     * @return static For method chaining
+     */
+    public function height(string $height): static
+    {
+        return $this->setConfig('height', $height);
+    }
+
+    /**
+     * Set maximum width
+     *
+     * @param string $width Max width value
+     * @return static For method chaining
+     */
+    public function maxWidth(string $width): static
+    {
+        return $this->setConfig('max_width', $width);
+    }
+
+    /**
+     * Set maximum height
+     *
+     * @param string $height Max height value
+     * @return static For method chaining
+     */
+    public function maxHeight(string $height): static
+    {
+        return $this->setConfig('max_height', $height);
+    }
+
+    /**
+     * Set minimum width
+     *
+     * @param string $width Min width value
+     * @return static For method chaining
+     */
+    public function minWidth(string $width): static
+    {
+        return $this->setConfig('min_width', $width);
+    }
+
+    /**
+     * Set minimum height
+     *
+     * @param string $height Min height value
+     * @return static For method chaining
+     */
+    public function minHeight(string $height): static
+    {
+        return $this->setConfig('min_height', $height);
+    }
 }

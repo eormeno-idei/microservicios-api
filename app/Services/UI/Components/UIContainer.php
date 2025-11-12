@@ -881,7 +881,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function margin(string $margin): self
+    public function margin(string $margin): static
     {
         $this->config['margin'] = $margin;
         return $this;
@@ -896,7 +896,7 @@ class UIContainer implements UIElement
      * @param string|null $left Left margin
      * @return self For method chaining
      */
-    public function marginEach(?string $top = null, ?string $right = null, ?string $bottom = null, ?string $left = null): self
+    public function marginEach(?string $top = null, ?string $right = null, ?string $bottom = null, ?string $left = null): static
     {
         if ($top !== null) $this->config['margin_top'] = $top;
         if ($right !== null) $this->config['margin_right'] = $right;
@@ -911,7 +911,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginTop(string $margin): self
+    public function marginTop(string $margin): static
     {
         $this->config['margin_top'] = $margin;
         return $this;
@@ -923,7 +923,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginRight(string $margin): self
+    public function marginRight(string $margin): static
     {
         $this->config['margin_right'] = $margin;
         return $this;
@@ -935,7 +935,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginBottom(string $margin): self
+    public function marginBottom(string $margin): static
     {
         $this->config['margin_bottom'] = $margin;
         return $this;
@@ -947,7 +947,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginLeft(string $margin): self
+    public function marginLeft(string $margin): static
     {
         $this->config['margin_left'] = $margin;
         return $this;
@@ -963,7 +963,7 @@ class UIContainer implements UIElement
      * @param string $width Width value (px, %, vh, auto, etc)
      * @return self For method chaining
      */
-    public function width(string $width): self
+    public function width(string $width): static
     {
         $this->config['width'] = $width;
         return $this;
@@ -975,7 +975,7 @@ class UIContainer implements UIElement
      * @param string $height Height value
      * @return self For method chaining
      */
-    public function height(string $height): self
+    public function height(string $height): static
     {
         $this->config['height'] = $height;
         return $this;
@@ -987,7 +987,7 @@ class UIContainer implements UIElement
      * @param string $width Min width value
      * @return self For method chaining
      */
-    public function minWidth(string $width): self
+    public function minWidth(string $width): static
     {
         $this->config['min_width'] = $width;
         return $this;
@@ -999,7 +999,7 @@ class UIContainer implements UIElement
      * @param string $height Min height value
      * @return self For method chaining
      */
-    public function minHeight(string $height): self
+    public function minHeight(string $height): static
     {
         $this->config['min_height'] = $height;
         return $this;
@@ -1011,7 +1011,7 @@ class UIContainer implements UIElement
      * @param string $width Max width value
      * @return self For method chaining
      */
-    public function maxWidth(string $width): self
+    public function maxWidth(string $width): static
     {
         $this->config['max_width'] = $width;
         return $this;
@@ -1023,7 +1023,7 @@ class UIContainer implements UIElement
      * @param string $height Max height value
      * @return self For method chaining
      */
-    public function maxHeight(string $height): self
+    public function maxHeight(string $height): static
     {
         $this->config['max_height'] = $height;
         return $this;

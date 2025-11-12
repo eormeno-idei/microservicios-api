@@ -58,6 +58,43 @@ class UIComponent {
             }
         }
 
+        // Apply margin
+        if (this.config.margin !== undefined) {
+            element.style.margin = this.config.margin;
+        }
+        if (this.config.margin_left !== undefined) {
+            element.style.marginLeft = this.config.margin_left;
+        }
+        if (this.config.margin_right !== undefined) {
+            element.style.marginRight = this.config.margin_right;
+        }
+        if (this.config.margin_top !== undefined) {
+            element.style.marginTop = this.config.margin_top;
+        }
+        if (this.config.margin_bottom !== undefined) {
+            element.style.marginBottom = this.config.margin_bottom;
+        }
+
+        // Apply sizing
+        if (this.config.width !== undefined) {
+            element.style.width = this.config.width;
+        }
+        if (this.config.height !== undefined) {
+            element.style.height = this.config.height;
+        }
+        if (this.config.max_width !== undefined) {
+            element.style.maxWidth = this.config.max_width;
+        }
+        if (this.config.max_height !== undefined) {
+            element.style.maxHeight = this.config.max_height;
+        }
+        if (this.config.min_width !== undefined) {
+            element.style.minWidth = this.config.min_width;
+        }
+        if (this.config.min_height !== undefined) {
+            element.style.minHeight = this.config.min_height;
+        }
+
         // Apply font size
         if (this.config.font_size) {
             element.style.fontSize = this.config.font_size + 'px';

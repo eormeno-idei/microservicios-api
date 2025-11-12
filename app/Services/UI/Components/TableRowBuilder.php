@@ -65,12 +65,12 @@ class TableRowBuilder extends UIComponent
     /**
      * Set minimum height for the row
      * 
-     * @param int $height Minimum height in pixels
+     * @param int|string $height Minimum height in pixels or with units
      * @return self
      */
-    public function minHeight(int $height): self
+    public function minHeight(int|string $height): static
     {
-        $this->setConfig('min_height', $height);
+        $this->setConfig('min_height', is_int($height) ? $height : $height);
         return $this;
     }
 

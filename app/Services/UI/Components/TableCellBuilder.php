@@ -82,7 +82,7 @@ class TableCellBuilder extends UIComponent
      * @param int|null $maxWidth Maximum width in pixels
      * @return self
      */
-    public function width(?int $minWidth = null, ?int $maxWidth = null): self
+    public function widthConstraints(?int $minWidth = null, ?int $maxWidth = null): static
     {
         if ($minWidth !== null) {
             $this->setConfig('min_width', $minWidth);

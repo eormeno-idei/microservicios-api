@@ -186,14 +186,18 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
-     * Set menu width
+     * Set menu width (overrides parent to accept int or string)
      *
-     * @param int $width Width in pixels
-     * @return self
+     * @param int|string $width Width in pixels (int) or with units (string)
+     * @return static
      */
-    public function width(int $width = 240): self
+    public function width(int|string $width): static
     {
-        $this->config['width'] = $width . 'px';
+        if (is_int($width)) {
+            $this->config['width'] = $width . 'px';
+        } else {
+            $this->config['width'] = $width;
+        }
         return $this;
     }
 

@@ -346,7 +346,7 @@ class SelectBuilder extends UIComponent
      * @param string $width The width
      * @return $this For method chaining
      */
-    public function width(string $width): self
+    public function width(string $width): static
     {
         return $this->setConfig('width', $width);
     }
@@ -357,7 +357,7 @@ class SelectBuilder extends UIComponent
      * @param string $maxWidth The max width
      * @return $this For method chaining
      */
-    public function maxWidth(string $maxWidth): self
+    public function maxWidth(string $maxWidth): static
     {
         return $this->setConfig('max_width', $maxWidth);
     }
@@ -368,7 +368,7 @@ class SelectBuilder extends UIComponent
      * @param string $height The max height
      * @return $this For method chaining
      */
-    public function maxHeight(string $height): self
+    public function maxHeight(string $height): static
     {
         return $this->setConfig('max_height', $height);
     }

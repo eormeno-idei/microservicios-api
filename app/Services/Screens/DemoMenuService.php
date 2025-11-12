@@ -88,13 +88,15 @@ class DemoMenuService extends AbstractUIService
             $submenu->link('Select Demo', '/demo/select-demo', '📋');
             $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
         });
+        $menu->separator();
     }
 
     private function buildUserMenu(): UIElement
     {
         $this->user_menu = UIBuilder::menuDropdown('user_menu')
             ->position('bottom-right')
-            ->width(180);
+            ->width(180)
+            ->marginLeft('auto');  // Empuja el menú a la derecha
 
         if (! Auth::check()) {
             $this->user_menu->trigger("⚙️");
