@@ -24,6 +24,7 @@ class LoginService extends AbstractUIService
             ->title('User Login')
             ->maxWidth('450px')
             ->centerHorizontal()
+            ->shadow(3)
             ->padding('30px');
 
         $container->add(
