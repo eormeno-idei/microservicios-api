@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use App\Services\UI\Support\UIIdGenerator;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIChangesCollector;
+use App\Services\UI\Support\UIIdGenerator;
 
 /**
  * UI Event Controller
@@ -131,9 +132,10 @@ class UIEventController extends Controller
 
             // UIDebug::info('Current', $result);
             // UIDebug::info('NewCalc', $this->uiChanges->all());
+            $result = $this->uiChanges->all();
+            // UIDebug::info('UI Event: Final collected UI changes', $result);
 
-            // return response()->json($result);
-            return response()->json($this->uiChanges->all());
+            return response()->json($result);
         } catch (\Exception $e) {
             Log::error('UI Event: Exception during action execution', [
                 'component_id' => $componentId,

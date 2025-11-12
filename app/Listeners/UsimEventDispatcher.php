@@ -34,7 +34,7 @@ class UsimEventDispatcher
                 //     $result = $methodResult;
                 // }
 
-                $finalizedResult = $service->finalizeEventContext();
+                $finalizedResult = $service->finalizeEventContext(true);
 
                 // if (is_array($finalizedResult)) {
                 //     $result += $finalizedResult;

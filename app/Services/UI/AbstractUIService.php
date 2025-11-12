@@ -86,9 +86,9 @@ abstract class AbstractUIService
      * @param array $incomingStorage Storage data from frontend (decrypted)
      * @return void
      */
-    public function initializeEventContext(array $incomingStorage = []): void
+    public function initializeEventContext(array $incomingStorage = [], bool $debug = false): void
     {
-        $this->container = $this->getUIContainer();
+        $this->container = $this->getUIContainer($debug);
         $this->oldUI = $this->container->toJson();
 
         // Inject storage values into protected properties (store_* variables)
@@ -201,7 +201,7 @@ abstract class AbstractUIService
      *
      * @return array Indexed diff response
      */
-    public function finalizeEventContext(): array
+    public function finalizeEventContext(bool $debug = false): array
     {
         // Get current UI state
         $this->newUI = $this->container->toJson();
@@ -210,6 +210,15 @@ abstract class AbstractUIService
         if ($this->oldUI === $this->newUI) {
             // No changes detected, return empty response
             return [];
+        }
+
+        if ($debug) {
+            UIDebug::info("Finalizing Event Context for " . static::class,
+                [
+                    'oldUI' => $this->oldUI,
+                    'newUI' => $this->newUI,
+                ]
+            );
         }
 
         // Store updated UI
@@ -285,7 +294,7 @@ abstract class AbstractUIService
         $current_class = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
         $container = UIBuilder::container($current_class_slug, $current_class)
-            ->root(true)
+            ->parent($parent)
             ->padding(30)
             ->layout(LayoutType::VERTICAL)
             ->justifyContent('center')
@@ -295,7 +304,8 @@ abstract class AbstractUIService
         $this->buildBaseUI($container, ...$params);
 
         $ui = $container
-            ->parent($parent)
+        ->root(true)
+            // ->parent($parent)   // TODO: Acá está el problema.
             ->toJson();
 
         UIStateManager::store(static::class, $ui);
@@ -308,11 +318,11 @@ abstract class AbstractUIService
      *
      * @return UIContainer UI container instance
      */
-    protected function getUIContainer(): UIContainer
+    protected function getUIContainer(bool $debug = false): UIContainer
     {
         // Always get JSON from cache and reconstruct container
         // This ensures we get the latest state after events modify it
-        $jsonUI = $this->getStoredUI();
+        $jsonUI = $this->getStoredUI($debug);
         // Log::info(json_encode($jsonUI));
 
         // Reconstruct container from JSON

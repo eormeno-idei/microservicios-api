@@ -1,19 +1,18 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\TimeUnit;
-use Illuminate\Support\Facades\Auth;
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\MenuDropdownBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\Components\MenuDropdownBuilder;
+use App\Services\UI\UIBuilder;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Demo Menu Service
@@ -27,6 +26,7 @@ class DemoMenuService extends AbstractUIService
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
+            ->parent('menu')    // Important to set parent!
             ->shadow(0)
             ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
@@ -100,9 +100,23 @@ class DemoMenuService extends AbstractUIService
     public function onLoggedUser(array $params): void
     {
         $userName = $params['user']['name'] ?? 'User';
-        // $this->user_menu->trigger("👤  " . $userName);
-        // $this->user_menu->item('Profile', 'show_profile', [], '👤');
-        // $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
+        $this->user_menu->trigger("👤  " . $userName);
+        $this->user_menu->item('Profile', 'show_profile', [], '👤');
+        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
+    }
+
+    /**
+     * Handler to confirm logout
+     */
+    public function onConfirmLogout(array $params): void
+    {
+        // TODO: Clear token from localStorage
+        Auth::logout();
+        $this->user_menu->trigger("⚙️");
+        $this->user_menu->link('Login', '/login', '🔑');
+        $this->user_menu->item('Register', 'show_register_form', [], '📝');
+
+        // $this->closeModal();
     }
 
     /**
@@ -215,20 +229,6 @@ class DemoMenuService extends AbstractUIService
         );
 
         // TODO: Los eventos de los modales no persisten los cambios
-    }
-
-    /**
-     * Handler to confirm logout
-     */
-    public function onConfirmLogout(array $params): void
-    {
-        // TODO: Clear token from localStorage
-        Auth::logout();
-        // $this->user_menu->trigger("⚙️");
-        // $this->user_menu->link('Login', '/login', '🔑');
-        // $this->user_menu->item('Register', 'show_register_form', [], '📝');
-
-        // $this->closeModal();
     }
 
     /**
