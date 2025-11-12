@@ -1,19 +1,19 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\MenuDropdownBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Contracts\UIElement;
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\TimeUnit;
+use Illuminate\Support\Facades\Auth;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\TimeUnit;
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Contracts\UIElement;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\UIBuilder;
-use Illuminate\Support\Facades\Auth;
+use App\Services\UI\Components\MenuDropdownBuilder;
 
 /**
  * Demo Menu Service
@@ -26,23 +26,22 @@ class DemoMenuService extends AbstractUIService
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        // Usar SPACE_BETWEEN para separar el menú principal (izquierda) del menú de usuario (derecha)
         $container
             ->shadow(0)
             ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
-            ->justifyContent(JustifyContent::SPACE_BETWEEN)  // Separar items: primero a la izquierda, último a la derecha
-            ->alignItems(AlignItems::CENTER)                 // Alinear verticalmente al centro
+            ->justifyContent(JustifyContent::SPACE_BETWEEN)
+            ->alignItems(AlignItems::CENTER)
             ->padding(0);
 
         $container->add(
-            $this->buildMenu()
+            $this->buildLeftMenu()
         )->add(
             $this->buildUserMenu()
         );
     }
 
-    private function buildMenu(): UIElement
+    private function buildLeftMenu(): UIElement
     {
         $menu = UIBuilder::menuDropdown('main_menu')
             ->trigger()
@@ -50,11 +49,8 @@ class DemoMenuService extends AbstractUIService
             ->width(200);
 
         $menu->link('Home', '/', '🏠');
-
         $this->buildDemosMenu($menu);
-
         $menu->link('Admin Dashboard', '/admin/dashboard', '🛠️');
-        
         $menu->separator();
         $menu->item('About', 'show_about_info', [], 'ℹ️');
 
@@ -104,9 +100,9 @@ class DemoMenuService extends AbstractUIService
     public function onLoggedUser(array $params): void
     {
         $userName = $params['user']['name'] ?? 'User';
-        $this->user_menu->trigger("👤  " . $userName);
-        $this->user_menu->item('Profile', 'show_profile', [], '👤');
-        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
+        // $this->user_menu->trigger("👤  " . $userName);
+        // $this->user_menu->item('Profile', 'show_profile', [], '👤');
+        // $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
     }
 
     /**
@@ -134,25 +130,6 @@ class DemoMenuService extends AbstractUIService
     public function onCloseAboutDialog(array $params): void
     {
         $this->closeModal();
-    }
-
-    /**
-     * Handler for Timeout dialog (5 minutes)
-     */
-    public function onShowTimeoutMinutes(array $params): void
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        ConfirmDialogService::open(
-            type: DialogType::TIMEOUT,
-            title: "Sesión Temporal",
-            message: "Tu sesión de prueba expirará en:",
-            timeout: 5,
-            timeUnit: TimeUnit::MINUTES,
-            showCountdown: true,
-            confirmAction: 'close_timeout_dialog',
-            callerServiceId: $serviceId
-        );
     }
 
     /**
@@ -237,19 +214,7 @@ class DemoMenuService extends AbstractUIService
             callerServiceId: $serviceId
         );
 
-        // $confirmService = app(ConfirmDialogService::class);
-        // $modalUI = $confirmService->getUI(
-        //     type: DialogType::WARNING,
-        //     title: "Cerrar Sesión",
-        //     message: "¿Estás seguro que deseas cerrar sesión?",
-        //     confirmAction: 'confirm_logout',
-        //     cancelAction: 'cancel_logout',
-        //     callerServiceId: $serviceId
-        // );
-
-        // // TODO: Los eventos de los modales no persisten los cambios
-
-        // return $modalUI;
+        // TODO: Los eventos de los modales no persisten los cambios
     }
 
     /**
@@ -259,11 +224,11 @@ class DemoMenuService extends AbstractUIService
     {
         // TODO: Clear token from localStorage
         Auth::logout();
-        $this->user_menu->trigger("⚙️");
-        $this->user_menu->link('Login', '/login', '🔑');
-        $this->user_menu->item('Register', 'show_register_form', [], '📝');
+        // $this->user_menu->trigger("⚙️");
+        // $this->user_menu->link('Login', '/login', '🔑');
+        // $this->user_menu->item('Register', 'show_register_form', [], '📝');
 
-        $this->closeModal();
+        // $this->closeModal();
     }
 
     /**

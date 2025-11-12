@@ -31,15 +31,6 @@ Route::get('/login', function () {
     ]);
 })->name('login');
 
-// Demo route - Dynamic demo viewer
-Route::get('/demo/{demo}', function (string $demo) {
-    $reset = request()->query('reset', false);
-    return view('demo', [
-        'demo' => $demo,
-        'reset' => $reset
-    ]);
-})->name('demo');
-
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/admin/dashboard', function () {
@@ -52,36 +43,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
+// Demo route - Dynamic demo viewer
+Route::get('/demo/{demo}', function (string $demo) {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => $demo,
+        'reset' => $reset
+    ]);
+})->name('demo');
+
+
+
 // Demo UI API routes - Unified controller for all demo services
 Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');
 
 // UI Event Handler
 Route::post('/api/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
-
-// Ruta para previsualizar emails (solo para desarrollo)
-if (app()->environment('local')) {
-    Route::get('/email-preview/reset-password', function () {
-        $user = App\Models\User::first() ?? App\Models\User::factory()->make([
-            'name' => 'Usuario Demo',
-            'email' => 'demo@ejemplo.com'
-        ]);
-
-        $notification = new App\Notifications\ResetPasswordNotification('demo-token-123456');
-
-        return $notification->toMail($user);
-    })->name('email.preview.reset');
-
-    Route::get('/email-preview/verify-email', function () {
-        $user = App\Models\User::first() ?? App\Models\User::factory()->make([
-            'name' => 'Usuario Demo',
-            'email' => 'demo@ejemplo.com'
-        ]);
-
-        $notification = new App\Notifications\CustomVerifyEmailNotification();
-
-        return $notification->toMail($user);
-    })->name('email.preview.verify');
-}
 
 // Rutas para documentación
 Route::prefix('docs')->group(function () {
