@@ -57,12 +57,13 @@ class DemoMenuService extends AbstractUIService
         $menu = UIBuilder::menuDropdown('main_menu')
             ->trigger()
             ->position('bottom-left')
-            ->width(100);
+            ->width(200);
 
-        // Home link
         $menu->link('Home', '/', '🏠');
 
         $this->buildDemosMenu($menu);
+
+        $menu->link('Admin Dashboard', '/admin/dashboard', '🛠️');
         
         $menu->separator();
         $menu->item('About', 'show_about_info', [], 'ℹ️');
