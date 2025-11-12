@@ -118,6 +118,7 @@ class UIStateManager
     public static function clear(string $serviceClass): bool
     {
         $cacheKey = self::getCacheKey($serviceClass);
+        Cache::clear(); // TODO: Remove this line after testing
         return Cache::forget($cacheKey);
     }
 

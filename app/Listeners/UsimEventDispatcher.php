@@ -23,7 +23,7 @@ class UsimEventDispatcher
             // Instantiate service
             $service = app($serviceClass);
             if (method_exists($service, $methodName)) {
-                $service->initializeEventContext($incomingStorage);
+                $service->initializeEventContext($incomingStorage, debug: true);
 
                 $result = [];
 

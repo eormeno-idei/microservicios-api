@@ -1,29 +1,28 @@
 <?php
-
 namespace App\Services\UI;
 
-use ReflectionClass;
-use RuntimeException;
-use ReflectionProperty;
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Support\UIDiffer;
-use App\Services\UI\Support\UIIdGenerator;
+use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\Components\CardBuilder;
+use App\Services\UI\Components\CheckboxBuilder;
 use App\Services\UI\Components\FormBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Support\UIStateManager;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\TableBuilder;
-use App\Services\UI\Components\ButtonBuilder;
-use App\Services\UI\Components\SelectBuilder;
-use App\Services\UI\Components\CheckboxBuilder;
-use App\Services\UI\Components\TableRowBuilder;
-use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
-use App\Services\UI\Components\TableHeaderRowBuilder;
+use App\Services\UI\Components\SelectBuilder;
+use App\Services\UI\Components\TableBuilder;
+use App\Services\UI\Components\TableCellBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
+use App\Services\UI\Components\TableHeaderRowBuilder;
+use App\Services\UI\Components\TableRowBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Support\UIDiffer;
+use App\Services\UI\Support\UIIdGenerator;
+use App\Services\UI\Support\UIStateManager;
+use ReflectionClass;
+use ReflectionProperty;
+use RuntimeException;
 
 /**
  * Abstract UI Service
@@ -89,7 +88,7 @@ abstract class AbstractUIService
     public function initializeEventContext(array $incomingStorage = [], bool $debug = false): void
     {
         $this->container = $this->getUIContainer($debug);
-        $this->oldUI = $this->container->toJson();
+        $this->oldUI     = $this->container->toJson();
 
         // Inject storage values into protected properties (store_* variables)
         $this->injectStorageValues($incomingStorage);
@@ -127,12 +126,12 @@ abstract class AbstractUIService
             $propertyName = $property->getName();
 
             // Only process properties that start with 'store_'
-            if (!str_starts_with($propertyName, 'store_')) {
+            if (! str_starts_with($propertyName, 'store_')) {
                 continue;
             }
 
             // Check if this key exists in incoming storage
-            if (!array_key_exists($propertyName, $incomingStorage)) {
+            if (! array_key_exists($propertyName, $incomingStorage)) {
                 continue;
             }
 
@@ -168,7 +167,7 @@ abstract class AbstractUIService
             $propertyType = $property->getType();
 
             // Skip if no type hint or is a built-in type
-            if (!$propertyType || $propertyType->isBuiltin()) {
+            if (! $propertyType || $propertyType->isBuiltin()) {
                 continue;
             }
 
@@ -177,15 +176,15 @@ abstract class AbstractUIService
             // Only process UI component types
             if (str_starts_with($typeName, 'App\\Services\\UI\\Components\\')) {
                 $componentName = $property->getName();
-                $component = $this->container->findByName($componentName);
+                $component     = $this->container->findByName($componentName);
 
                 if ($component) {
                     $property->setValue($this, $component);
-                } elseif (!$propertyType->allowsNull()) {
+                } elseif (! $propertyType->allowsNull()) {
                     // Component not found and property is not nullable
                     throw new RuntimeException(
                         "Component '{$componentName}' not found in UI container. " .
-                            "Make sure the component exists or make the property nullable: protected ?{$typeName} \${$componentName};"
+                        "Make sure the component exists or make the property nullable: protected ?{$typeName} \${$componentName};"
                     );
                 }
             }
@@ -212,15 +211,6 @@ abstract class AbstractUIService
             return [];
         }
 
-        if ($debug) {
-            UIDebug::info("Finalizing Event Context for " . static::class,
-                [
-                    'oldUI' => $this->oldUI,
-                    'newUI' => $this->newUI,
-                ]
-            );
-        }
-
         // Store updated UI
         $this->storeUI($this->container);
 
@@ -241,7 +231,7 @@ abstract class AbstractUIService
      */
     protected function buildDiffResponse(): array
     {
-        if (!$this->oldUI || !$this->newUI) {
+        if (! $this->oldUI || ! $this->newUI) {
             return [];
         }
 
@@ -282,7 +272,7 @@ abstract class AbstractUIService
      * @param mixed ...$params Optional parameters passed to buildBaseUI
      * @return array UI structure in JSON format
      */
-    protected function getStoredUI(string $parent = 'main', ...$params): array
+    protected function getStoredUI(string $parent = 'main', bool $debug = false, ...$params): array
     {
         // Check if UI exists in cache
         $cachedUI = UIStateManager::get(static::class);
@@ -291,9 +281,9 @@ abstract class AbstractUIService
             return $cachedUI;
         }
 
-        $current_class = static::class;
+        $current_class      = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
-        $container = UIBuilder::container($current_class_slug, $current_class)
+        $container          = UIBuilder::container($current_class_slug, $current_class)
             ->parent($parent)
             ->padding(30)
             ->layout(LayoutType::VERTICAL)
@@ -304,9 +294,13 @@ abstract class AbstractUIService
         $this->buildBaseUI($container, ...$params);
 
         $ui = $container
-        ->root(true)
+            ->root(true)
             // ->parent($parent)   // TODO: Acá está el problema.
             ->toJson();
+
+        if ($debug) {
+            UIDebug::debug("Generated new UI for " . static::class, $ui);
+        }
 
         UIStateManager::store(static::class, $ui);
 
@@ -322,7 +316,7 @@ abstract class AbstractUIService
     {
         // Always get JSON from cache and reconstruct container
         // This ensures we get the latest state after events modify it
-        $jsonUI = $this->getStoredUI($debug);
+        $jsonUI = $this->getStoredUI(debug: $debug);
         // Log::info(json_encode($jsonUI));
 
         // Reconstruct container from JSON
@@ -337,16 +331,16 @@ abstract class AbstractUIService
      */
     private function reconstructContainerFromJson(array $jsonUI): UIContainer
     {
-        $components = [];
+        $components    = [];
         $rootContainer = null;
 
         // UIDebug::debug("Reconstructing UI Container from JSON", $jsonUI);
 
         // First pass: instantiate all components
         foreach ($jsonUI as $id => $component) {
-            $type = $component['type'];
+            $type      = $component['type'];
             $className = $this->mapTypeToClass($type);
-            if (!$className) {
+            if (! $className) {
                 throw new RuntimeException("Unknown component type '{$type}'.");
             }
             $components[$id] = $className::deserialize($id, $component);
@@ -359,12 +353,12 @@ abstract class AbstractUIService
             if ($component->isContainer() && $component->isRoot()) {
                 $rootContainer = $component;
             }
-          
-            if (!$parentId) {
+
+            if (! $parentId) {
                 throw new RuntimeException("Component '{$id}' has no parent defined.");
             }
 
-            if (!$parentId || !isset($components[$parentId])) {
+            if (! $parentId || ! isset($components[$parentId])) {
                 continue;
             }
 
@@ -376,7 +370,7 @@ abstract class AbstractUIService
             $component->postConnect();
         }
 
-        if (!$rootContainer) {
+        if (! $rootContainer) {
             throw new RuntimeException("No root container found in UI JSON.");
         }
 
@@ -388,21 +382,21 @@ abstract class AbstractUIService
     private function mapTypeToClass(string $type): ?string
     {
         return match ($type) {
-            'label' => LabelBuilder::class,
-            'button' => ButtonBuilder::class,
-            'input' => InputBuilder::class,
-            'select' => SelectBuilder::class,
-            'checkbox' => CheckboxBuilder::class,
-            'card' => CardBuilder::class,
-            'table' => TableBuilder::class,
-            'container' => UIContainer::class,
-            'tablerow' => TableRowBuilder::class,
-            'tablecell' => TableCellBuilder::class,
+            'label'           => LabelBuilder::class,
+            'button'          => ButtonBuilder::class,
+            'input'           => InputBuilder::class,
+            'select'          => SelectBuilder::class,
+            'checkbox'        => CheckboxBuilder::class,
+            'card'            => CardBuilder::class,
+            'table'           => TableBuilder::class,
+            'container'       => UIContainer::class,
+            'tablerow'        => TableRowBuilder::class,
+            'tablecell'       => TableCellBuilder::class,
             'tableheadercell' => TableHeaderCellBuilder::class,
-            'form' => FormBuilder::class,
-            'tableheaderrow' => TableHeaderRowBuilder::class,
-            'menu_dropdown' => MenuDropdownBuilder::class,
-            'default' => null,
+            'form'            => FormBuilder::class,
+            'tableheaderrow'  => TableHeaderRowBuilder::class,
+            'menu_dropdown'   => MenuDropdownBuilder::class,
+            'default'         => null,
         };
     }
 
@@ -425,6 +419,7 @@ abstract class AbstractUIService
     public function clearStoredUI(): void
     {
         UIStateManager::clear(static::class);
+        UIDebug::debug("Cleared stored UI for " . static::class);
     }
 
     /**
@@ -432,7 +427,8 @@ abstract class AbstractUIService
      *
      * @return void
      */
-    public function onResetService(): void {}
+    public function onResetService(): void
+    {}
 
     /**
      * Get the service component ID
@@ -448,7 +444,7 @@ abstract class AbstractUIService
         // Find the first container (main container that represents the service)
         foreach ($ui as $id => $component) {
             if ($component['type'] === 'container') {
-                return (int)$id;
+                return (int) $id;
             }
         }
 
@@ -474,7 +470,7 @@ abstract class AbstractUIService
      */
     public function getStorageVariables(): array
     {
-        $storage = [];
+        $storage    = [];
         $reflection = new ReflectionClass($this);
         $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
 
@@ -482,11 +478,11 @@ abstract class AbstractUIService
             $propertyName = $property->getName();
             if (str_starts_with($propertyName, 'store_')) {
                 $propertyType = $property->getType();
-                if ($propertyType && !$propertyType->allowsNull()) {
-                    $typeName = $propertyType->getName();
+                if ($propertyType && ! $propertyType->allowsNull()) {
+                    $typeName    = $propertyType->getName();
                     $isPrimitive = in_array($typeName, ['int', 'float', 'string', 'bool', 'array']);
                     if ($isPrimitive) {
-                        $value = $property->getValue($this);
+                        $value                  = $property->getValue($this);
                         $storage[$propertyName] = $value;
                     }
                 }

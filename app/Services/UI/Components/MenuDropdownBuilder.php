@@ -2,8 +2,6 @@
 
 namespace App\Services\UI\Components;
 
-use App\Services\UI\Support\UIIdGenerator;
-
 /**
  * Menu Dropdown Builder
  *
@@ -11,19 +9,7 @@ use App\Services\UI\Support\UIIdGenerator;
  */
 class MenuDropdownBuilder extends UIComponent
 {
-    // private array $config = [];
     private array $items = [];
-    // private string $name;
-
-    // public function __construct(string $name)
-    // {
-    //     $this->name = $name;
-    //     $this->config = [
-    //         'type' => 'menu_dropdown',
-    //         'name' => $name,
-    //         'items' => []
-    //     ];
-    // }
 
     public function getDefaultConfig(): array
     {
@@ -44,6 +30,19 @@ class MenuDropdownBuilder extends UIComponent
 
         // Call parent implementation
         return parent::toJson($order);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function deserialize(int $id, array $config): self
+    {
+        /** @var MenuDropdownBuilder $component */
+        $component = parent::deserialize($id, $config);
+        if (isset($config['items']) && is_array($config['items'])) {
+            $component->items = $config['items'];
+        }
+        return $component;
     }
 
     /**
@@ -132,18 +131,6 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
-     * Set the parent container for this menu
-     *
-     * @param string $parentId Parent container ID or name
-     * @return self
-     */
-    // public function parent(string $parentId): self
-    // {
-    //     $this->config['parent'] = $parentId;
-    //     return $this;
-    // }
-
-    /**
      * Set the caller service ID for action callbacks
      *
      * @param string $serviceId Service component ID
@@ -200,23 +187,4 @@ class MenuDropdownBuilder extends UIComponent
         }
         return $this;
     }
-
-    /**
-     * Build and return the menu configuration
-     *
-     * @return array
-     */
-    // public function build(): array
-    // {
-    //     $this->config['items'] = $this->items;
-
-    //     // Generate unique ID for this menu
-    //     $id = UIIdGenerator::generate($this->name);
-    //     $this->config['_id'] = $id;
-
-    //     // Return as properly formatted UI component array
-    //     return [
-    //         $id => $this->config
-    //     ];
-    // }
 }

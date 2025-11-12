@@ -48,7 +48,6 @@ abstract class UIComponent implements UIElement
             $this->config['name'] = $this->name;
         }
     }
-
     public function isContainer(): bool
     {
         return false;
