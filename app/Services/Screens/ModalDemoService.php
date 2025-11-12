@@ -25,7 +25,12 @@ class ModalDemoService extends AbstractUIService
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container->title('Modal Component Demo');
+        $container
+            ->title('Modal Component Demo')
+            ->maxWidth('500px')
+            ->centerHorizontal()
+            ->shadow(2)
+            ->padding('30px');
 
         $container->add(
             UIBuilder::label('lbl_instruction')

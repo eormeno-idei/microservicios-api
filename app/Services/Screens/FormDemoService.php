@@ -1,14 +1,12 @@
 <?php
-
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\ButtonBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
 
 class FormDemoService extends AbstractUIService
 {
@@ -20,7 +18,12 @@ class FormDemoService extends AbstractUIService
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container->title('Form Component Demo');
+        $container
+            ->title('Form Component Demo')
+            ->maxWidth('500px')
+            ->centerHorizontal()
+            ->shadow(2)
+            ->padding('30px');
 
         $container->add(
             UIBuilder::label('lbl_instruction')
@@ -35,6 +38,7 @@ class FormDemoService extends AbstractUIService
                 ->value('')
                 ->required(true)
                 ->type('text')
+                ->width('100%')
         );
 
         $container->add(
@@ -44,6 +48,7 @@ class FormDemoService extends AbstractUIService
                 ->value('')
                 ->required(true)
                 ->type('email')
+                ->width('100%')
         );
 
         $container->add(
@@ -67,7 +72,7 @@ class FormDemoService extends AbstractUIService
     public function onSubmitForm(array $params): void
     {
         // Get input values from frontend parameters (sent by collectContextValues)
-        $name = trim($params['input_name'] ?? '');
+        $name  = trim($params['input_name'] ?? '');
         $email = trim($params['input_email'] ?? '');
 
         // Validation errors array
@@ -83,14 +88,14 @@ class FormDemoService extends AbstractUIService
         // Validate email
         if (empty($email)) {
             $errors[] = 'Email is required';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        } elseif (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Email is invalid';
         }
 
         // Show errors or success
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $errorMessage = "❌ Validation errors:\n" . implode("\n", array_map(fn($e) => "  • $e", $errors));
-            
+
             $this->lbl_result
                 ->text($errorMessage)
                 ->style('danger');
@@ -98,7 +103,7 @@ class FormDemoService extends AbstractUIService
             $this->lbl_result
                 ->text("✅ Form submitted successfully!\n\nName: {$name}\nEmail: {$email}")
                 ->style('success');
-            
+
             // Clear form inputs after successful submission
             $this->input_name->value('');
             $this->input_email->value('');

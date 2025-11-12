@@ -20,6 +20,10 @@ class ButtonDemoService extends AbstractUIService
             ->alignContent('center')
             ->alignItems('center')
             ->title('Button Demo - Click Me!')
+            ->padding('30px')
+            ->maxWidth('400px')
+            ->centerHorizontal()
+            ->shadow(2)
             ->add(
                 UIBuilder::button('btn_toggle')
                     ->label('Click Me!')

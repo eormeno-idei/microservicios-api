@@ -1,14 +1,12 @@
 <?php
-
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\Components\CheckboxBuilder;
+use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
 
 class CheckboxDemoService extends AbstractUIService
 {
@@ -26,7 +24,12 @@ class CheckboxDemoService extends AbstractUIService
      */
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container->title('Checkbox Component Demo');
+        $container
+            ->title('Checkbox Component Demo')
+            ->maxWidth('500px')
+            ->centerHorizontal()
+            ->padding('20px')
+            ->shadow(2);
 
         // Instruction label
         $container->add(
@@ -78,7 +81,7 @@ class CheckboxDemoService extends AbstractUIService
         // // Example validation: you could check any condition here
         // // For now, we'll allow the change
         // $this->store_js_checked = $wantsChecked;
-        
+
         // Update the checkbox with the confirmed state
         $this->chk_javascript->checked($wantsChecked);
 
@@ -101,12 +104,12 @@ class CheckboxDemoService extends AbstractUIService
     public function onTryChangePython(array $params): void
     {
         $wantsChecked = $params['checked'] ?? false;
-        $jsChecked = $this->chk_javascript->isChecked();
+        $jsChecked    = $this->chk_javascript->isChecked();
 
         // Example validation: only allow Python if JavaScript is also selected
         // if ($wantsChecked && !$this->store_js_checked) {
-        if ($wantsChecked && !$jsChecked) {
-            // ❌ REJECT: Don't allow Python without JavaScript
+        if ($wantsChecked && ! $jsChecked) {
+                                               // ❌ REJECT: Don't allow Python without JavaScript
             $this->chk_python->checked(false); // Keep it unchecked
             $this->lbl_result
                 ->text('❌ You must select JavaScript first before selecting Python!')
