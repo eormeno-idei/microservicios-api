@@ -35,6 +35,7 @@ class InputDemoService extends AbstractUIService
             UIBuilder::label('lbl_instruction')
                 ->text('📝 Type something in the input below and click "Get Value"')
                 ->style('info')
+                ->width('100%')
         );
 
         $container->add(
@@ -57,6 +58,7 @@ class InputDemoService extends AbstractUIService
             UIBuilder::label('lbl_result')
                 ->text('Result will appear here')
                 ->style('default')
+                ->width('100%')
         );
     }
 

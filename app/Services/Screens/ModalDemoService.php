@@ -27,7 +27,7 @@ class ModalDemoService extends AbstractUIService
     {
         $container
             ->title('Modal Component Demo')
-            ->maxWidth('500px')
+            ->maxWidth('600px')
             ->centerHorizontal()
             ->shadow(2)
             ->padding('30px');
@@ -47,35 +47,40 @@ class ModalDemoService extends AbstractUIService
         $buttonContainer = UIBuilder::container('button_container')
             ->layout(LayoutType::HORIZONTAL)
             ->centerContent()
-            ->gap("10px")
+            ->gap("15px")
             ->shadow(false)
             ->add(
                 UIBuilder::button('btn_open_modal')
                     ->label('Open Confirmation Dialog')
                     ->style('primary')
                     ->action('open_confirmation', [])
+                    ->width('230px')
             )->add(
-            UIBuilder::button('btn_error_dialog')
-                ->label('Open Error Dialog')
-                ->style('danger')
-                ->action('show_error_dialog', [])
-        )->add(
-            UIBuilder::button('btn_timeout_dialog')
-                ->label('Open Timeout Dialog (10 seg)')
-                ->style('warning')
-                ->action('show_timeout_dialog', ['duration' => 10])
-        )->add(
-            UIBuilder::button('btn_timeout_no_button')
-                ->label('Open Timeout Dialog (no button)')
-                ->style('warning')
-                ->action('show_timeout_no_button', [])
-        )->add(
-            UIBuilder::button('btn_show_settings')
-                ->label('Settings')
-                ->style('secondary')
-                ->icon('settings')
-                ->action('show_settings_confirm', [])
-        );
+                UIBuilder::button('btn_error_dialog')
+                    ->label('Open Error Dialog')
+                    ->style('danger')
+                    ->action('show_error_dialog', [])
+                    ->width('230px')
+            )->add(
+                UIBuilder::button('btn_timeout_dialog')
+                    ->label('Open Timeout Dialog (10 seg)')
+                    ->style('warning')
+                    ->action('show_timeout_dialog', ['duration' => 10])
+                    ->width('230px')
+            )->add(
+                UIBuilder::button('btn_timeout_no_button')
+                    ->label('Open Timeout Without button')
+                    ->style('warning')
+                    ->action('show_timeout_no_button', [])
+                    ->width('230px')
+            )->add(
+                UIBuilder::button('btn_show_settings')
+                    ->label('Settings')
+                    ->style('secondary')
+                    ->icon('settings')
+                    ->action('show_settings_confirm', [])
+                    ->width('230px')
+            );
         $container->add($buttonContainer);
     }
 
