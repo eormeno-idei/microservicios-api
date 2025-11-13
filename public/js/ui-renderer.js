@@ -1750,90 +1750,80 @@ class UIRenderer {
                 }
             }
 
-            // Items (menudropdown)
+            // Items (menudropdown) - DEPRECATED: items are immutable in frontend
+            // Only permissions array should be updated from backend
             if (changes.items !== undefined) {
-                const menuContent = element.querySelector('.menu-dropdown-content');
-                if (menuContent) {
-                    // Clear existing items
-                    menuContent.innerHTML = '';
+                console.warn('⚠️ Updating items[] is deprecated. Use permissions[] instead.');
+            }
 
-                    // Get the component instance to use its renderMenuItem method
-                    const componentId = changes._id;
-                    const component = globalRenderer?.components?.get(String(componentId));
+            // Permissions (menudropdown) - Update visibility based on permissions
+            if (changes.permissions !== undefined) {
+                const menuContainer = element;
+                const component = globalRenderer?.components?.get(String(changes._id));
 
-                    if (component && typeof component.renderMenuItem === 'function') {
-                        // Re-render all menu items
-                        changes.items.forEach(item => {
-                            menuContent.appendChild(component.renderMenuItem(item));
-                        });
-                    } else {
-                        // Fallback: simple rendering without component instance
-                        changes.items.forEach(item => {
+                if (component && component.config) {
+                    // Update component config
+                    component.config.permissions = changes.permissions;
+
+                    // Re-evaluate visibility of all items
+                    const menuContent = element.querySelector('.menu-dropdown-content');
+                    if (menuContent) {
+                        const allItems = menuContent.querySelectorAll('.menu-item, .menu-separator');
+                        const items = component.config.items || [];
+                        const permissions = changes.permissions;
+
+                        // Reset all items visibility
+                        items.forEach((item, index) => {
+                            const domElement = allItems[index];
+                            if (!domElement) return;
+
                             if (item.type === 'separator') {
-                                const separator = document.createElement('div');
-                                separator.className = 'menu-separator';
-                                menuContent.appendChild(separator);
-                            } else {
-                                const menuItem = document.createElement('button');
-                                menuItem.className = 'menu-item';
+                                return; // Separators always visible
+                            }
 
-                                if (item.icon) {
-                                    const icon = document.createElement('span');
-                                    icon.className = 'icon';
-                                    icon.textContent = item.icon;
-                                    menuItem.appendChild(icon);
-                                }
+                            const hasSubmenu = item.submenu && item.submenu.length > 0;
+                            let isVisible = component.isItemVisible(item, permissions);
 
-                                const label = document.createElement('span');
-                                label.textContent = item.label;
-                                menuItem.appendChild(label);
+                            if (hasSubmenu && isVisible) {
+                                isVisible = component.hasVisibleChildren(item.submenu, permissions);
+                            }
 
-                                // Handle action
-                                if (item.action) {
-                                    menuItem.addEventListener('click', async (e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
+                            domElement.style.display = isVisible ? '' : 'none';
 
-                                        // Close menu
-                                        menuContent.classList.remove('show');
+                            // Update submenu items visibility if exists
+                            if (hasSubmenu) {
+                                const submenuContainer = domElement.querySelector('.submenu');
+                                if (submenuContainer) {
+                                    const submenuItems = submenuContainer.querySelectorAll('.menu-item, .menu-separator');
+                                    item.submenu.forEach((subitem, subIndex) => {
+                                        const subDomElement = submenuItems[subIndex];
+                                        if (!subDomElement) return;
 
-                                        // Send action to backend
-                                        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-                                        const usimStorage = localStorage.getItem('usim') || '';
-
-                                        try {
-                                            const response = await fetch('/api/ui-event', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json',
-                                                    'Accept': 'application/json',
-                                                    'X-CSRF-TOKEN': csrfToken,
-                                                    'X-Requested-With': 'XMLHttpRequest',
-                                                    'X-USIM-Storage': usimStorage,
-                                                },
-                                                credentials: 'same-origin',
-                                                body: JSON.stringify({
-                                                    component_id: componentId,
-                                                    event: 'click',
-                                                    action: item.action,
-                                                    parameters: item.params || {},
-                                                }),
-                                            });
-
-                                            const result = await response.json();
-
-                                            if (response.ok && result && globalRenderer) {
-                                                globalRenderer.handleUIUpdate(result);
-                                            }
-                                        } catch (error) {
-                                            console.error('Menu item click error:', error);
+                                        if (subitem.type === 'separator') {
+                                            return;
                                         }
+
+                                        const subVisible = component.isItemVisible(subitem, permissions);
+                                        subDomElement.style.display = subVisible ? '' : 'none';
                                     });
                                 }
-
-                                menuContent.appendChild(menuItem);
                             }
                         });
+
+                        // Check if all items are hidden
+                        const hasVisibleItems = items.some(item => {
+                            if (item.type === 'separator') {
+                                return false;
+                            }
+                            const isVisible = component.isItemVisible(item, permissions);
+                            if (item.submenu && item.submenu.length > 0) {
+                                return isVisible && component.hasVisibleChildren(item.submenu, permissions);
+                            }
+                            return isVisible;
+                        });
+
+                        // Hide/show entire menu
+                        menuContainer.style.display = hasVisibleItems ? '' : 'none';
                     }
                 }
             }
@@ -2271,6 +2261,68 @@ window.closeModal = closeModal;
 
 // ==================== Menu Dropdown Component ====================
 class MenuDropdownComponent extends UIComponent {
+    /**
+     * Check if an item is visible based on permissions
+     * 
+     * @param {object} item - Menu item
+     * @param {array} permissions - Array of user permissions
+     * @returns {boolean} - True if item should be visible
+     */
+    isItemVisible(item, permissions) {
+        const itemPermission = item.permission;
+
+        // null/undefined = visible for all
+        if (!itemPermission) {
+            return true;
+        }
+
+        // 'auth' = only authenticated users
+        if (itemPermission === 'auth') {
+            return permissions.includes('auth');
+        }
+
+        // 'no-auth' = only non-authenticated users
+        if (itemPermission === 'no-auth') {
+            return permissions.includes('no-auth');
+        }
+
+        // Any other value = check if it exists in permissions array
+        return permissions.includes(itemPermission);
+    }
+
+    /**
+     * Check if a submenu has any visible children (recursive)
+     * 
+     * @param {array} submenu - Array of submenu items
+     * @param {array} permissions - Array of user permissions
+     * @returns {boolean} - True if at least one child is visible
+     */
+    hasVisibleChildren(submenu, permissions) {
+        if (!submenu || !Array.isArray(submenu) || submenu.length === 0) {
+            return false;
+        }
+
+        return submenu.some(item => {
+            // Separators don't count for visibility
+            if (item.type === 'separator') {
+                return false;
+            }
+
+            // If item itself is not visible, skip it
+            if (!this.isItemVisible(item, permissions)) {
+                return false;
+            }
+
+            // If item has submenu, check recursively
+            if (item.submenu && item.submenu.length > 0) {
+                return this.hasVisibleChildren(item.submenu, permissions);
+            }
+
+            // Regular visible item
+            return true;
+        });
+    }
+
     render() {
         const menuContainer = document.createElement('div');
         menuContainer.className = 'menu-dropdown';
@@ -2314,6 +2366,24 @@ class MenuDropdownComponent extends UIComponent {
             this.config.items.forEach(item => {
                 content.appendChild(this.renderMenuItem(item));
             });
+        }
+
+        // Check if all items are hidden
+        const permissions = this.config.permissions || [];
+        const hasVisibleItems = this.config.items && this.config.items.some(item => {
+            if (item.type === 'separator') {
+                return false;
+            }
+            const isVisible = this.isItemVisible(item, permissions);
+            if (item.submenu && item.submenu.length > 0) {
+                return isVisible && this.hasVisibleChildren(item.submenu, permissions);
+            }
+            return isVisible;
+        });
+
+        // Hide entire menu if no visible items
+        if (!hasVisibleItems) {
+            menuContainer.style.display = 'none';
         }
 
         // Toggle menu on click with improved UX
@@ -2382,11 +2452,30 @@ class MenuDropdownComponent extends UIComponent {
             return separator;
         }
 
+        // Get permissions from config
+        const permissions = this.config.permissions || [];
+
+        // Check if item has submenu
+        const hasSubmenu = item.submenu && item.submenu.length > 0;
+
+        // Determine visibility
+        let isVisible = this.isItemVisible(item, permissions);
+
+        // If has submenu, check if any children are visible
+        if (hasSubmenu && isVisible) {
+            isVisible = this.hasVisibleChildren(item.submenu, permissions);
+        }
+
         // Regular item or submenu parent
         const menuItem = document.createElement(item.url ? 'a' : 'button');
         menuItem.className = 'menu-item';
 
-        if (item.submenu && item.submenu.length > 0) {
+        // Apply visibility
+        if (!isVisible) {
+            menuItem.style.display = 'none';
+        }
+
+        if (hasSubmenu) {
             menuItem.classList.add('has-submenu');
         }
 
@@ -2442,9 +2531,7 @@ class MenuDropdownComponent extends UIComponent {
         }
 
         // Render submenu if exists
-        if (item.submenu && item.submenu.length > 0) {
-            // console.log(`🔄 Rendering submenu for "${item.label}" with ${item.submenu.length} items`);
-
+        if (hasSubmenu) {
             const submenu = document.createElement('div');
             submenu.className = 'submenu';
             submenu.style.display = 'none'; // Ensure it starts hidden

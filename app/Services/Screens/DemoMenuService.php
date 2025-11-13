@@ -4,13 +4,13 @@ namespace App\Services\Screens;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,39 +23,58 @@ class DemoMenuService extends AbstractUIService
 {
     protected MenuDropdownBuilder $main_menu;
     protected MenuDropdownBuilder $user_menu;
+    protected string $store_token;
+    protected string $store_password;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
             ->parent('menu') // Important to set parent!
             ->shadow(0)
-            ->borderRadius(0)
+            ->borderRadius(2)
             ->layout(LayoutType::HORIZONTAL)
             ->justifyContent(JustifyContent::SPACE_BETWEEN)
             ->alignItems(AlignItems::CENTER)
             ->padding(0);
 
-        $container->add(
-            $this->buildLeftMenu()
-        )->add(
-            $this->buildUserMenu()
-        );
+        $this->main_menu = $this->buildLeftMenu();
+        $this->user_menu = $this->buildUserMenu();
+
+        $container->add($this->main_menu);
+        $container->add($this->user_menu);
     }
 
-    private function buildLeftMenu(): UIElement
+
+    // TODO: La idea es que un bloque así se ejecute luego de construir el servicio
+    protected function builtService(): void
     {
-        $menu = UIBuilder::menuDropdown('main_menu')
+        UIDebug::info("DemoMenuService builtService called. " . Auth::check());
+        if (Auth::check()) {
+            $user     = Auth::user();
+            UIDebug::info("Authenticated user: " . $user->name);
+            $this->user_menu->trigger("👤  " . $user->name);
+            $this->main_menu->setUserPermissions(['auth']);
+            $this->user_menu->setUserPermissions(['auth']);
+        } else {
+            $this->user_menu->trigger("⚙️");
+            $this->user_menu->setUserPermissions(['no-auth']);
+            $this->main_menu->setUserPermissions(['no-auth']);
+        }
+    }
+
+    private function buildLeftMenu(): MenuDropdownBuilder
+    {
+        $main_menu = UIBuilder::menuDropdown('main_menu')
             ->trigger()
             ->position('bottom-left')
             ->width(200);
 
-        $menu->link('Home', '/', '🏠');
-        $this->buildDemosMenu($menu);
-        $menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
-        $menu->separator();
-        $menu->item('About', 'show_about_info', [], 'ℹ️');
-
-        return $menu;
+        $main_menu->link('Home', '/', '🏠');
+        $this->buildDemosMenu($main_menu);
+        $main_menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
+        $main_menu->separator();
+        $main_menu->item('About', 'show_about_info', [], 'ℹ️');
+        return $main_menu;
     }
 
     private function buildDemosMenu(MenuDropdownBuilder $menu): void
@@ -77,25 +96,17 @@ class DemoMenuService extends AbstractUIService
         });
     }
 
-    private function buildUserMenu(): UIElement
+    private function buildUserMenu(): MenuDropdownBuilder
     {
-        $this->user_menu = UIBuilder::menuDropdown('user_menu')
+        $user_menu = UIBuilder::menuDropdown('user_menu')
             ->position('bottom-right')
             ->width(180);
-
-        if (! Auth::check()) {
-            $this->user_menu->trigger("⚙️");
-        } else {
-            $userName = Auth::user()->name ?? 'User';
-            $this->user_menu->trigger("👤 " . $userName);
-        }
-
-        $this->user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
-        $this->user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
-        $this->user_menu->item('Profile', 'show_profile', [], '👤', permission: 'auth');
-        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
-
-        return $this->user_menu;
+        $user_menu->trigger("⚙️");
+        $user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
+        $user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
+        $user_menu->item('Profile', 'show_profile', [], '👤', permission: 'auth');
+        $user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
+        return $user_menu;
     }
 
     public function onLoggedUser(array $params): void
@@ -104,25 +115,31 @@ class DemoMenuService extends AbstractUIService
         $this->user_menu->trigger("👤  " . $userName);
         $this->main_menu->setUserPermissions(['auth']);
         $this->user_menu->setUserPermissions(['auth']);
-        // $this->user_menu->item('Profile', 'show_profile', [], '👤');
-        // $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
     }
 
     /**
      * Handler to confirm logout
      */
+    /**
+     * Handler to confirm logout
+     */
     public function onConfirmLogout(array $params): void
     {
-        // TODO: Clear token from localStorage
+        // Delete Sanctum token if user is authenticated
+        $user = request()->user();
+        if ($user && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
         Auth::logout();
+
+        // Clear storage variables
+        $this->store_token = '';
+        $this->store_password = '';
+
+        // Update menu permissions
         $this->user_menu->trigger("⚙️");
-        // $this->user_menu->link('Login', '/login', '🔑');
-        // $this->user_menu->item('Register', 'show_register_form', [], '📝');
         $this->user_menu->setUserPermissions(['no-auth']);
         $this->main_menu->setUserPermissions(['no-auth']);
-
-
-        // $this->closeModal();
     }
 
     /**

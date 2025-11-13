@@ -202,6 +202,9 @@ abstract class AbstractUIService
      */
     public function finalizeEventContext(bool $debug = false): array
     {
+        if ($debug) {
+            UIDebug::debug("Finalizing Event Context for " . static::class);
+        }
         // Get current UI state
         $this->newUI = $this->container->toJson();
 
@@ -209,6 +212,13 @@ abstract class AbstractUIService
         if ($this->oldUI === $this->newUI) {
             // No changes detected, return empty response
             return [];
+        }
+
+        if ($debug) {
+            UIDebug::debug("UI Changes Detected", [
+                'oldUI' => $this->oldUI,
+                'newUI' => $this->newUI,
+            ]);
         }
 
         // Store updated UI
@@ -219,7 +229,7 @@ abstract class AbstractUIService
         $storageVariables = $this->getStorageVariables();
 
         if ($debug) {
-            UIDebug::debug("UI Changes Detected", $diff);
+            // UIDebug::debug("UI Changes Detected", $diff);
             // UIDebug::debug("Storage Variables", $storageVariables);
         }
 
@@ -268,7 +278,8 @@ abstract class AbstractUIService
      */
     public function getUI(string $parent = 'main', ...$params): array
     {
-        return $this->getStoredUI($parent, ...$params);
+        $ui = $this->getStoredUI($parent, ...$params);
+        return $ui;
     }
 
     /**

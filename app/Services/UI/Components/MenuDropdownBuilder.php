@@ -212,10 +212,7 @@ class MenuDropdownBuilder extends UIComponent
             // No authenticated user - add 'no-auth' marker
             $this->config['permissions'] = ['no-auth'];
         } else {
-            // Authenticated user - always include 'auth'
-            if (! in_array('auth', $permissions)) {
-                $permissions[] = 'auth';
-            }
+            // Set permissions as provided (no automatic additions)
             $this->config['permissions'] = $permissions;
         }
         return $this;
