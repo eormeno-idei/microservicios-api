@@ -44,11 +44,9 @@ class DemoMenuService extends AbstractUIService
         $container->add($this->user_menu);
     }
 
-
-    // TODO: La idea es que un bloque así se ejecute luego de construir el servicio
-    protected function builtService(): void
+    protected function postLoadUI(): void
     {
-        UIDebug::info("DemoMenuService builtService called. " . Auth::check());
+        UIDebug::info("DemoMenuService postLoadUI called. Authenticated: " . (Auth::check() ? 'true' : 'false'));
         if (Auth::check()) {
             $user     = Auth::user();
             UIDebug::info("Authenticated user: " . $user->name);
