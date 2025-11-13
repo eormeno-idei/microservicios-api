@@ -21,12 +21,13 @@ use Illuminate\Support\Facades\Auth;
  */
 class DemoMenuService extends AbstractUIService
 {
+    protected MenuDropdownBuilder $main_menu;
     protected MenuDropdownBuilder $user_menu;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
-            ->parent('menu')    // Important to set parent!
+            ->parent('menu') // Important to set parent!
             ->shadow(0)
             ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
@@ -50,7 +51,7 @@ class DemoMenuService extends AbstractUIService
 
         $menu->link('Home', '/', '🏠');
         $this->buildDemosMenu($menu);
-        $menu->link('Admin Dashboard', '/admin/dashboard', '🛠️');
+        $menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
         $menu->separator();
         $menu->item('About', 'show_about_info', [], 'ℹ️');
 
@@ -74,7 +75,6 @@ class DemoMenuService extends AbstractUIService
             $submenu->link('Select Demo', '/demo/select-demo', '📋');
             $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
         });
-        $menu->separator();
     }
 
     private function buildUserMenu(): UIElement
@@ -85,14 +85,15 @@ class DemoMenuService extends AbstractUIService
 
         if (! Auth::check()) {
             $this->user_menu->trigger("⚙️");
-            $this->user_menu->link('Login', '/login', '🔑');
-            $this->user_menu->item('Register', 'show_register_form', [], '📝');
         } else {
             $userName = Auth::user()->name ?? 'User';
             $this->user_menu->trigger("👤 " . $userName);
-            $this->user_menu->item('Profile', 'show_profile', [], '👤');
-            $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
         }
+
+        $this->user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
+        $this->user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
+        $this->user_menu->item('Profile', 'show_profile', [], '👤', permission: 'auth');
+        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
 
         return $this->user_menu;
     }
@@ -101,8 +102,10 @@ class DemoMenuService extends AbstractUIService
     {
         $userName = $params['user']['name'] ?? 'User';
         $this->user_menu->trigger("👤  " . $userName);
-        $this->user_menu->item('Profile', 'show_profile', [], '👤');
-        $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
+        $this->main_menu->setUserPermissions(['auth']);
+        $this->user_menu->setUserPermissions(['auth']);
+        // $this->user_menu->item('Profile', 'show_profile', [], '👤');
+        // $this->user_menu->item('Logout', 'confirm_logout', [], '🚪');
     }
 
     /**
@@ -113,8 +116,11 @@ class DemoMenuService extends AbstractUIService
         // TODO: Clear token from localStorage
         Auth::logout();
         $this->user_menu->trigger("⚙️");
-        $this->user_menu->link('Login', '/login', '🔑');
-        $this->user_menu->item('Register', 'show_register_form', [], '📝');
+        // $this->user_menu->link('Login', '/login', '🔑');
+        // $this->user_menu->item('Register', 'show_register_form', [], '📝');
+        $this->user_menu->setUserPermissions(['no-auth']);
+        $this->main_menu->setUserPermissions(['no-auth']);
+
 
         // $this->closeModal();
     }

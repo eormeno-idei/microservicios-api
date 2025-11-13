@@ -1331,7 +1331,7 @@ class ComponentFactory {
                 return new TableCellComponent(id, config);
             case 'tableheadercell':
                 return new TableHeaderCellComponent(id, config);
-            case 'menu_dropdown':
+            case 'menudropdown':
                 return new MenuDropdownComponent(id, config);
             case 'card':
                 return new CardComponent(id, config);
@@ -1726,7 +1726,7 @@ class UIRenderer {
                 element.textContent = changes.label;
             }
 
-            // Trigger (menu_dropdown)
+            // Trigger (menudropdown)
             if (changes.trigger !== undefined) {
                 const triggerButton = element.querySelector('.menu-dropdown-trigger');
                 if (triggerButton) {
@@ -1750,7 +1750,7 @@ class UIRenderer {
                 }
             }
 
-            // Items (menu_dropdown)
+            // Items (menudropdown)
             if (changes.items !== undefined) {
                 const menuContent = element.querySelector('.menu-dropdown-content');
                 if (menuContent) {

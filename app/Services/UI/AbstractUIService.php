@@ -218,6 +218,11 @@ abstract class AbstractUIService
 
         $storageVariables = $this->getStorageVariables();
 
+        if ($debug) {
+            UIDebug::debug("UI Changes Detected", $diff);
+            // UIDebug::debug("Storage Variables", $storageVariables);
+        }
+
         $this->uiChanges()->add($diff);
         $this->uiChanges()->setStorage($storageVariables);
 
@@ -297,10 +302,6 @@ abstract class AbstractUIService
             ->root(true)
             // ->parent($parent)   // TODO: Acá está el problema.
             ->toJson();
-
-        if ($debug) {
-            UIDebug::debug("Generated new UI for " . static::class, $ui);
-        }
 
         UIStateManager::store(static::class, $ui);
 
@@ -395,7 +396,7 @@ abstract class AbstractUIService
             'tableheadercell' => TableHeaderCellBuilder::class,
             'form'            => FormBuilder::class,
             'tableheaderrow'  => TableHeaderRowBuilder::class,
-            'menu_dropdown'   => MenuDropdownBuilder::class,
+            'menudropdown'    => MenuDropdownBuilder::class,
             'default'         => null,
         };
     }
@@ -419,7 +420,6 @@ abstract class AbstractUIService
     public function clearStoredUI(): void
     {
         UIStateManager::clear(static::class);
-        UIDebug::debug("Cleared stored UI for " . static::class);
     }
 
     /**

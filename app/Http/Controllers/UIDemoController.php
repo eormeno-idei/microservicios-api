@@ -50,13 +50,6 @@ class UIDemoController extends Controller
         }
 
         $ui = $service->getUI($parent);
-
-        $firstElementType = $ui[array_keys($ui)[0]]['type'] ?? null;
-        if ($firstElementType !== 'menu_dropdown') {
-            //Log::info("\n" . json_encode($ui, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-        }
-
-        // Return UI JSON
         return response()->json($ui);
     }
 }
