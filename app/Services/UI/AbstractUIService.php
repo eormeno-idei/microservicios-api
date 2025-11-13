@@ -75,6 +75,9 @@ abstract class AbstractUIService
      */
     abstract protected function buildBaseUI(UIContainer $container, ...$params): void;
 
+    protected function postLoadUI(): void
+    {}
+
     /**
      * Initialize event context
      *
@@ -198,45 +201,26 @@ abstract class AbstractUIService
      * Automatically detects changes by comparing UI state, stores updated UI,
      * and returns formatted response.
      *
-     * @return array Indexed diff response
+     * @return void
      */
-    public function finalizeEventContext(bool $debug = false): array
+    public function finalizeEventContext(bool $reload = false, bool $debug = false): void
     {
-        if ($debug) {
-            UIDebug::debug("Finalizing Event Context for " . static::class);
+        if ($reload) {
+            $this->postLoadUI();
         }
+
         // Get current UI state
         $this->newUI = $this->container->toJson();
-
-        // Auto-detect if UI was modified by comparing states
-        if ($this->oldUI === $this->newUI) {
-            // No changes detected, return empty response
-            return [];
-        }
-
-        if ($debug) {
-            UIDebug::debug("UI Changes Detected", [
-                'oldUI' => $this->oldUI,
-                'newUI' => $this->newUI,
-            ]);
-        }
 
         // Store updated UI
         $this->storeUI($this->container);
 
-        $diff = $this->buildDiffResponse();
+        $diff = $this->buildDiffResponse($reload);
 
         $storageVariables = $this->getStorageVariables();
 
-        if ($debug) {
-            // UIDebug::debug("UI Changes Detected", $diff);
-            // UIDebug::debug("Storage Variables", $storageVariables);
-        }
-
         $this->uiChanges()->add($diff);
         $this->uiChanges()->setStorage($storageVariables);
-
-        return $diff;
     }
 
     /**
@@ -244,13 +228,11 @@ abstract class AbstractUIService
      *
      * @return array Indexed diff response
      */
-    protected function buildDiffResponse(): array
+    protected function buildDiffResponse(bool $reload = false): array
     {
-        if (! $this->oldUI || ! $this->newUI) {
-            return [];
-        }
-
-        $diff = UIDiffer::compare($this->oldUI, $this->newUI);
+        $diff = $reload ?
+        UIDiffer::compare([], $this->newUI) :
+        UIDiffer::compare($this->oldUI, $this->newUI);
 
         $result = [];
         foreach ($diff as $componentId => $changes) {

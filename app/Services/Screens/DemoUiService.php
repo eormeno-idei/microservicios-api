@@ -5,6 +5,7 @@ use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 
 class DemoUiService extends AbstractUIService
@@ -72,7 +73,9 @@ class DemoUiService extends AbstractUIService
         );
 
         $counterContainer->add(
-            $this->updateCounterLabel(UIBuilder::label('lbl_counter'), $this->store_counter)
+            UIBuilder::label('lbl_counter')
+                ->text($this->store_counter)
+                ->style('primary')
         );
 
         $counterContainer->add(
@@ -90,6 +93,11 @@ class DemoUiService extends AbstractUIService
                 ->text('💡 Nuevos componentes aparecerán aquí abajo:')
                 ->style('default')
         );
+    }
+
+    protected function postLoadUI(): void
+    {
+        $this->updateCounterLabel($this->lbl_counter, $this->store_counter);
     }
 
     public function onTestAction(array $params): void

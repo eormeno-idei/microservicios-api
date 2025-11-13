@@ -47,7 +47,6 @@ class UIEventController extends Controller
         ]);
 
         $componentId = $validated['component_id'];
-        $event = $validated['event'];
         $action = $validated['action'];
         $parameters = $validated['parameters'] ?? [];
 
@@ -97,43 +96,11 @@ class UIEventController extends Controller
             }
 
             $this->uiChanges->setStorage($incomingStorage);
-
             $service->initializeEventContext($incomingStorage);
+            $service->$method($parameters);
+            $service->finalizeEventContext();
 
-            // $result = [];
-
-            // Invoke handler method
-            $methodResult = $service->$method($parameters);
-
-            // if (is_array($methodResult)) {
-            //     // $result = $methodResult;
-            //     $this->uiChanges->add($methodResult);
-            // }
-
-            $finalizedResult = $service->finalizeEventContext();
-
-            // if (is_array($finalizedResult)) {
-            //     //$changes = $this->uiChanges->all();
-            //     $result += $finalizedResult;
-            //     //$result += $changes;
-            // }
-
-            // $storageVariables = $service->getStorageVariables();
-
-            // if (!empty($storageVariables)) {
-            //     $mergedStorage = array_merge($incomingStorage, $storageVariables);
-            //     $result['storage'] = ['usim' => encrypt(json_encode($mergedStorage))];
-            // }
-
-            // $changes = $this->uiChanges->all();
-            // if (!empty($changes)) {
-            //     UIDebug::info('UI Event: Adding collected UI changes', $changes);
-            // }
-
-            // UIDebug::info('Current', $result);
-            // UIDebug::info('NewCalc', $this->uiChanges->all());
             $result = $this->uiChanges->all();
-            // UIDebug::info('UI Event: Final collected UI changes', $result);
 
             return response()->json($result);
         } catch (\Exception $e) {

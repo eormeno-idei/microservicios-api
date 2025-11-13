@@ -1,12 +1,17 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Str;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\UIChangesCollector;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Str;
 
 class UIDemoController extends Controller
 {
+
+    public function __construct(protected UIChangesCollector $uiChanges)
+    {}
+
     /**
      * Show UI for the specified demo service
      *
@@ -16,7 +21,7 @@ class UIDemoController extends Controller
      */
     public function show(string $demo): JsonResponse
     {
-        $reset = request()->query('reset', false);
+        $reset  = request()->query('reset', false);
         $parent = request()->query('parent', "main");
 
         $incomingStorage = request()->storage;
@@ -29,18 +34,21 @@ class UIDemoController extends Controller
         $serviceClass = "App\\Services\\Screens\\{$serviceName}";
 
         // Check if service class exists
-        if (!class_exists($serviceClass)) {
+        if (! class_exists($serviceClass)) {
             return response()->json([
-                'error' => 'Demo service not found',
-                'service' => $serviceName
+                'error'   => 'Demo service not found',
+                'service' => $serviceName,
             ], 404);
         }
+
+        $this->uiChanges->setStorage($incomingStorage);
 
         // Instantiate service using Laravel's service container
         // This allows dependency injection to work
         $service = app($serviceClass);
+
         // Inject incoming storage values into the service
-        $service->injectStorageValues($incomingStorage);
+        // $service->injectStorageValues($incomingStorage);
 
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {
@@ -49,7 +57,11 @@ class UIDemoController extends Controller
             $service->onResetService();
         }
 
-        $ui = $service->getUI($parent);
-        return response()->json($ui);
+        $service->initializeEventContext($incomingStorage);
+        $service->finalizeEventContext(reload: true);
+
+        $result = $this->uiChanges->all();
+        // $ui     = $service->getUI($parent);
+        return response()->json($result);
     }
 }
