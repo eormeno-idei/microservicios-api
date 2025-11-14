@@ -46,10 +46,8 @@ class DemoMenuService extends AbstractUIService
 
     protected function postLoadUI(): void
     {
-        UIDebug::info("DemoMenuService postLoadUI called. Authenticated: " . (Auth::check() ? 'true' : 'false'));
         if (Auth::check()) {
             $user     = Auth::user();
-            UIDebug::info("Authenticated user: " . $user->name);
             $this->user_menu->trigger("👤  " . $user->name);
             $this->main_menu->setUserPermissions(['auth']);
             $this->user_menu->setUserPermissions(['auth']);

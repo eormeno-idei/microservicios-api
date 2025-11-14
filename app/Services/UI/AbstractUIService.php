@@ -276,8 +276,11 @@ abstract class AbstractUIService
         $cachedUI = UIStateManager::get(static::class);
 
         if ($cachedUI !== null) {
+            UIDebug::debug("Cached UI found for " . static::class);
             return $cachedUI;
         }
+
+        UIDebug::debug("No cached UI found for " . static::class . ", regenerating...");
 
         $current_class      = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
