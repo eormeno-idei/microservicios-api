@@ -2,6 +2,7 @@
 namespace App\Services\UI\Support;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 
 /**
  * UI State Manager
@@ -23,19 +24,62 @@ class UIStateManager
     public const DEFAULT_TTL = 1800;
 
     /**
+     * Cookie name for client identification
+     */
+    public const CLIENT_ID_COOKIE = 'ui_client_id';
+
+    /**
+     * Cookie lifetime (1 year in minutes)
+     */
+    public const COOKIE_LIFETIME = 525600;
+
+    /**
+     * Get or create a unique client identifier
+     * 
+     * This identifier persists across sessions and survives logout,
+     * allowing UI preferences to be maintained per device/browser.
+     *
+     * @return string Client UUID
+     */
+    protected static function getOrCreateClientId(): string
+    {
+        $clientId = request()->cookie(self::CLIENT_ID_COOKIE);
+
+        if ($clientId) {
+            return $clientId;
+        }
+
+        // Generate new UUID for this client
+        $clientId = (string) Str::uuid();
+
+        // Queue functional cookie (no consent required - essential for UI preferences)
+        cookie()->queue(
+            name: self::CLIENT_ID_COOKIE,
+            value: $clientId,
+            minutes: self::COOKIE_LIFETIME,
+            path: '/',
+            domain: null,
+            secure: request()->secure(), // HTTPS only in production
+            httpOnly: true, // Not accessible from JavaScript
+            sameSite: 'lax' // CSRF protection
+        );
+
+        return $clientId;
+    }
+
+    /**
      * Generate cache key for a service
      *
      * @param string $serviceClass Full service class name
-     * @param string|null $userId Optional user ID (defaults to current user)
+     * @param string|null $userId Optional user ID (deprecated, not used)
      * @return string Cache key
      */
     public static function getCacheKey(?string $serviceClass = null, ?string $userId = null, string $prefix = 'ui_state'): string
     {
         $serviceBaseName = $serviceClass ? class_basename($serviceClass) : '';
-        // $userId = $userId ?? (Auth::check() ? Auth::id() : session()->getId());
+        $clientId = self::getOrCreateClientId();
 
-        // return "{$prefix}:{$serviceBaseName}:{$userId}";
-        return "{$prefix}:{$serviceBaseName}";
+        return "{$prefix}:{$serviceBaseName}:{$clientId}";
     }
 
     /**
