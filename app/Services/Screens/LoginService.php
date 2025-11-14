@@ -103,6 +103,7 @@ class LoginService extends AbstractUIService
                 'user'      => $user,
                 'timestamp' => now(),
             ]));
+            $this->toast("Login successful! Welcome, {$user->name}!");
             $this->redirect();
         } else {
             // Authentication failed

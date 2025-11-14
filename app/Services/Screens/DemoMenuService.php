@@ -10,7 +10,6 @@ use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +46,7 @@ class DemoMenuService extends AbstractUIService
     protected function postLoadUI(): void
     {
         if (Auth::check()) {
-            $user     = Auth::user();
+            $user = Auth::user();
             $this->user_menu->trigger("👤  " . $user->name);
             $this->main_menu->setUserPermissions(['auth']);
             $this->user_menu->setUserPermissions(['auth']);
@@ -129,13 +128,14 @@ class DemoMenuService extends AbstractUIService
         Auth::logout();
 
         // Clear storage variables
-        $this->store_token = '';
+        $this->store_token    = '';
         $this->store_password = '';
 
         // Update menu permissions
         $this->user_menu->trigger("⚙️");
         $this->user_menu->setUserPermissions(['no-auth']);
         $this->main_menu->setUserPermissions(['no-auth']);
+        $this->toast('You have been logged out successfully.');
         $this->redirect();
     }
 

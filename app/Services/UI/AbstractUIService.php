@@ -502,6 +502,26 @@ abstract class AbstractUIService
         ]);
     }
 
+    protected function toast(string $message,
+        string $type = 'info',
+        int $duration = 5000,
+        string $openEffect = 'fade',
+        string $showEffect = 'bounce',
+        string $closeEffect = 'fade',
+        string $position = 'top-right'): void {
+        $this->uiChanges()->add([
+            'toast' => [
+                'message'      => $message,
+                'type'         => $type,
+                'duration'     => $duration,
+                'open_effect'  => $openEffect,
+                'show_effect'  => $showEffect,
+                'close_effect' => $closeEffect,
+                'position'     => $position,
+            ],
+        ]);
+    }
+
     protected function redirect(?string $url = null): void
     {
         // If no URL provided, use Laravel's intended redirect (previous URL or default)
@@ -510,7 +530,7 @@ abstract class AbstractUIService
         }
 
         $this->uiChanges()->add([
-            'redirect' => $url
+            'redirect' => $url,
         ]);
     }
 }

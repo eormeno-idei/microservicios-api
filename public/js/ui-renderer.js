@@ -1562,6 +1562,82 @@ class UIRenderer {
     }
 
     /**
+     * Show toast notification
+     * 
+     * @param {object} toastConfig - Toast configuration
+     */
+    showToast(toastConfig) {
+        const {
+            message,
+            type = 'info',
+            duration = 3000,
+            open_effect = 'fade',
+            show_effect = 'bounce',
+            close_effect = 'fade',
+            position = 'top-right'
+        } = toastConfig;
+
+        // Create toast container if it doesn't exist or update position
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            document.body.appendChild(toastContainer);
+        }
+        toastContainer.className = `toast-container toast-position-${position}`;
+
+        // Create toast element with position-aware classes
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type} toast-open-${open_effect} toast-show-${show_effect} toast-position-${position}`;
+        
+        // Toast icon based on type
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        const icon = icons[type] || icons.info;
+
+        toast.innerHTML = `
+            <span class="toast-icon">${icon}</span>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" aria-label="Close">&times;</button>
+        `;
+
+        // Add to container
+        toastContainer.appendChild(toast);
+
+        // Trigger opening animation
+        requestAnimationFrame(() => {
+            toast.classList.add('toast-open');
+        });
+
+        // Close button handler
+        const closeBtn = toast.querySelector('.toast-close');
+        const closeToast = () => {
+            toast.classList.remove('toast-open');
+            toast.classList.add(`toast-close-${close_effect}`);
+            
+            setTimeout(() => {
+                toast.remove();
+                
+                // Remove container if empty
+                if (toastContainer.children.length === 0) {
+                    toastContainer.remove();
+                }
+            }, 300);
+        };
+
+        closeBtn.addEventListener('click', closeToast);
+
+        // Auto close after duration
+        if (duration > 0) {
+            setTimeout(closeToast, duration);
+        }
+    }
+
+    /**
      * Handle UI updates from backend
      *
      * @param {object} uiUpdate - UI update object (same structure as initial render)
@@ -1574,8 +1650,17 @@ class UIRenderer {
             this.handleStorageUpdate(uiUpdate.storage);
         }
 
+        // Handle toast notifications if present (but only if no redirect)
+        if (uiUpdate.toast && !uiUpdate.redirect) {
+            this.showToast(uiUpdate.toast);
+        }
+
         // Handle redirects if present
         if (uiUpdate.redirect) {
+            // If there's a toast, save it to show after redirect
+            if (uiUpdate.toast) {
+                sessionStorage.setItem('pendingToast', JSON.stringify(uiUpdate.toast));
+            }
             window.location.href = uiUpdate.redirect;
             return; // Stop processing after redirect
         }
@@ -2720,4 +2805,18 @@ async function loadMenuUI() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDemoUI();  // Load main UI first to create globalRenderer
     await loadMenuUI();  // Then load menu and merge into globalRenderer
+    
+    // Check for pending toast after page load
+    const pendingToast = sessionStorage.getItem('pendingToast');
+    if (pendingToast) {
+        sessionStorage.removeItem('pendingToast');
+        try {
+            const toastConfig = JSON.parse(pendingToast);
+            if (globalRenderer) {
+                globalRenderer.showToast(toastConfig);
+            }
+        } catch (error) {
+            console.error('Error showing pending toast:', error);
+        }
+    }
 });
