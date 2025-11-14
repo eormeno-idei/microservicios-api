@@ -1756,7 +1756,7 @@ class UIRenderer {
                 console.warn('⚠️ Updating items[] is deprecated. Use permissions[] instead.');
             }
 
-            // Permissions (menudropdown) - Update visibility based on permissions
+            // Permissions (menudropdown) - Re-render menu items with new permissions
             if (changes.permissions !== undefined) {
                 const menuContainer = element;
                 const component = globalRenderer?.components?.get(String(changes._id));
@@ -1765,52 +1765,23 @@ class UIRenderer {
                     // Update component config
                     component.config.permissions = changes.permissions;
 
-                    // Re-evaluate visibility of all items
+                    // Re-render menu content
                     const menuContent = element.querySelector('.menu-dropdown-content');
+                    
                     if (menuContent) {
-                        const allItems = menuContent.querySelectorAll('.menu-item, .menu-separator');
+                        // Clear existing content
+                        menuContent.innerHTML = '';
+
+                        // Re-render all items with new permissions
                         const items = component.config.items || [];
-                        const permissions = changes.permissions;
-
-                        // Reset all items visibility
-                        items.forEach((item, index) => {
-                            const domElement = allItems[index];
-                            if (!domElement) return;
-
-                            if (item.type === 'separator') {
-                                return; // Separators always visible
-                            }
-
-                            const hasSubmenu = item.submenu && item.submenu.length > 0;
-                            let isVisible = component.isItemVisible(item, permissions);
-
-                            if (hasSubmenu && isVisible) {
-                                isVisible = component.hasVisibleChildren(item.submenu, permissions);
-                            }
-
-                            domElement.style.display = isVisible ? '' : 'none';
-
-                            // Update submenu items visibility if exists
-                            if (hasSubmenu) {
-                                const submenuContainer = domElement.querySelector('.submenu');
-                                if (submenuContainer) {
-                                    const submenuItems = submenuContainer.querySelectorAll('.menu-item, .menu-separator');
-                                    item.submenu.forEach((subitem, subIndex) => {
-                                        const subDomElement = submenuItems[subIndex];
-                                        if (!subDomElement) return;
-
-                                        if (subitem.type === 'separator') {
-                                            return;
-                                        }
-
-                                        const subVisible = component.isItemVisible(subitem, permissions);
-                                        subDomElement.style.display = subVisible ? '' : 'none';
-                                    });
-                                }
-                            }
+                        
+                        items.forEach(item => {
+                            const itemElement = component.renderMenuItem(item);
+                            menuContent.appendChild(itemElement);
                         });
 
                         // Check if all items are hidden
+                        const permissions = changes.permissions;
                         const hasVisibleItems = items.some(item => {
                             if (item.type === 'separator') {
                                 return false;
@@ -1820,10 +1791,15 @@ class UIRenderer {
                                 return isVisible && component.hasVisibleChildren(item.submenu, permissions);
                             }
                             return isVisible;
-                        });
-
-                        // Hide/show entire menu
+                });                        // Hide/show entire menu
                         menuContainer.style.display = hasVisibleItems ? '' : 'none';
+
+                        // Close menu if it was open
+                        menuContent.classList.remove('show');
+                        const trigger = element.querySelector('.menu-dropdown-trigger');
+                        if (trigger) {
+                            trigger.classList.remove('active');
+                        }
                     }
                 }
             }
@@ -2667,26 +2643,75 @@ async function loadMenuUI() {
         );
         const uiData = await response.json();
 
-        // console.log('📊 Menu UI Data received:', uiData);
-
         const menuContainer = document.getElementById('menu');
         if (!menuContainer) {
             console.error('❌ Menu container #menu not found');
             return;
         }
 
-        // Render menu
-        const menuRenderer = new UIRenderer(uiData);
-        menuRenderer.render();
-
-        // console.log('✅ Menu loaded successfully');
+        // If globalRenderer exists, merge menu data and components
+        if (globalRenderer) {
+            // Merge menu data
+            Object.assign(globalRenderer.data, uiData);
+            
+            // Sort components by _order field (preserves backend order)
+            const entries = Object.entries(uiData)
+                .filter(([id]) => id !== 'storage' && id !== 'action')
+                .sort((a, b) => {
+                    const orderA = a[1]._order || 999;
+                    const orderB = b[1]._order || 999;
+                    return orderA - orderB;
+                });
+            
+            // Separate top-level (parent='menu') from children
+            const topLevel = entries.filter(([, config]) => config.parent === 'menu');
+            const children = entries.filter(([, config]) => config.parent !== 'menu');
+            
+            // Combine: top-level first (sorted by _order), then children
+            const components = [...topLevel, ...children];
+            
+            // Create and add menu components to globalRenderer AND render them
+            for (const [id, config] of components) {
+                const component = ComponentFactory.create(id, config);
+                if (component) {
+                    // Add to global registry
+                    globalRenderer.components.set(id, component);
+                    
+                    // Render and mount component
+                    const element = component.render();
+                    if (element) {
+                        let parentEl;
+                        
+                        // Find parent element by data-component-id or by DOM id
+                        if (config.parent === 'menu') {
+                            parentEl = menuContainer;
+                        } else {
+                            // Try to find by data-component-id first
+                            parentEl = document.querySelector(`[data-component-id="${config.parent}"]`);
+                            // Fallback to regular id
+                            if (!parentEl) {
+                                parentEl = document.getElementById(config.parent);
+                            }
+                        }
+                        
+                        if (parentEl) {
+                            parentEl.appendChild(element);
+                        }
+                    }
+                }
+            }
+        } else {
+            // First load - create globalRenderer with menu
+            globalRenderer = new UIRenderer(uiData);
+            globalRenderer.render();
+        }
     } catch (error) {
         console.error('❌ Error loading menu:', error);
     }
 }
 
 // Load UI on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadMenuUI();
-    loadDemoUI();
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadDemoUI();  // Load main UI first to create globalRenderer
+    await loadMenuUI();  // Then load menu and merge into globalRenderer
 });

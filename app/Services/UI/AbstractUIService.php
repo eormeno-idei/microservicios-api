@@ -212,10 +212,15 @@ abstract class AbstractUIService
         // Get current UI state
         $this->newUI = $this->container->toJson();
 
-        // Store updated UI
-        $this->storeUI($this->container);
+        if (! $reload) {
+            // Store updated UI
+            $this->storeUI($this->container);
+        }
 
         $diff = $this->buildDiffResponse($reload);
+        $reloadMessage = $reload ? '🔄 RELOAD' : '📝 NO RELOAD';
+        $reloadedIds = implode(', ', array_keys($diff));
+        UIDebug::debug("UI Diff Response ({$reloadMessage})", $reload ? $reloadedIds : $diff);
 
         $storageVariables = $this->getStorageVariables();
 
@@ -276,11 +281,8 @@ abstract class AbstractUIService
         $cachedUI = UIStateManager::get(static::class);
 
         if ($cachedUI !== null) {
-            UIDebug::debug("Cached UI found for " . static::class);
             return $cachedUI;
         }
-
-        UIDebug::debug("No cached UI found for " . static::class . ", regenerating...");
 
         $current_class      = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));

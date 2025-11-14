@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\UI\Support;
 
 use Illuminate\Support\Facades\Cache;
@@ -48,7 +47,7 @@ class UIStateManager
      */
     private static function storeRootComponentId(string $parent, string $rootComponentId): void
     {
-        $parents = session()->get('ui_parents', []);
+        $parents          = session()->get('ui_parents', []);
         $parents[$parent] = $rootComponentId;
         session()->put('ui_parents', $parents);
     }
@@ -77,15 +76,19 @@ class UIStateManager
         }
 
         // Get TTL from environment or use default
-        $ttl = env('UI_CACHE_TTL', self::DEFAULT_TTL);
+        $ttl          = env('UI_CACHE_TTL', self::DEFAULT_TTL);
+        $encodedState = json_encode($uiState);
 
         // Store main UI state
         $cacheKey = self::getCacheKey($serviceClass);
-        $result = Cache::put($cacheKey, $uiState, $ttl);
+        $result   = Cache::put($cacheKey, $encodedState, $ttl);
+        $logLevel = $result ? 'warning' : 'error';
 
-        UIDebug::debug("Stored UI State", [
+        UIDebug::$logLevel("Stored UI State of {$serviceClass}", [
+            'result'    => $result ? 'CACHED' : 'NOT CACHED',
             'cache_key' => $cacheKey,
-            'components_ids' => array_keys($uiState),
+            'ids'       => implode(', ', array_keys($uiState)),
+            'caller'    => self::getCallerServiceInfo(),
         ]);
 
         // Store root component ID and its parent container
@@ -93,7 +96,7 @@ class UIStateManager
         if (isset($uiState[$firstKey]['parent'])) {
             self::storeRootComponentId(
                 $uiState[$firstKey]['parent'],
-                (string)$firstKey
+                (string) $firstKey
             );
         }
 
@@ -109,9 +112,19 @@ class UIStateManager
     public static function get(string $serviceClass): ?array
     {
         $cacheKey = self::getCacheKey($serviceClass);
-        $cache = Cache::get($cacheKey);
+        $cache    = json_decode(Cache::get($cacheKey), true);
 
-        return is_array($cache) ? $cache : null;
+        $result   = is_array($cache) ? $cache : null;
+        $logLevel = $result !== null ? 'info' : 'error';
+
+        UIDebug::$logLevel("Retrieving UI State of {$serviceClass}", [
+            'result'        => $result !== null ? 'FOUND' : 'NOT FOUND',
+            'cache_key'     => $cacheKey,
+            'service_class' => $serviceClass,
+            'caller'        => self::getCallerServiceInfo(),
+        ]);
+
+        return $result;
     }
 
     /**
@@ -136,5 +149,21 @@ class UIStateManager
     public static function exists(string $serviceClass): bool
     {
         return self::get($serviceClass) !== null;
+    }
+
+    private static function getCallerServiceInfo(): string
+    {
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        foreach ($stack as $frame) {
+            if (isset($frame['class']) &&
+                str_starts_with($frame['class'], 'App\\Services\\UI\\') &&
+                $frame['class'] !== self::class) {
+                $className    = class_basename($frame['class']);
+                $functionName = $frame['function'] ?? 'unknown';
+                $lineNumber   = $frame['line'] ?? null;
+                return $className . '::' . $functionName . ($lineNumber ? " (line {$lineNumber})" : '');
+            }
+        }
+        return 'unknown';
     }
 }

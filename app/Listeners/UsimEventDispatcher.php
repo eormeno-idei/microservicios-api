@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Listeners;
 
 use App\Events\UsimEvent;
@@ -14,7 +13,7 @@ class UsimEventDispatcher
         // "logged_user" -> "onLoggedUser"
         $methodName = 'on' . str_replace('_', '', ucwords($event->eventName, '_'));
 
-        $rootComponents = UIStateManager::getRootComponents();
+        $rootComponents  = UIStateManager::getRootComponents();
         $incomingStorage = request()->storage;
 
         foreach ($rootComponents as $parent => $rootComponentId) {
@@ -34,7 +33,7 @@ class UsimEventDispatcher
                 //     $result = $methodResult;
                 // }
 
-                $finalizedResult = $service->finalizeEventContext(true);
+                $finalizedResult = $service->finalizeEventContext(debug: true);
 
                 // if (is_array($finalizedResult)) {
                 //     $result += $finalizedResult;

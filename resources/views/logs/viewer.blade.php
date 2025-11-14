@@ -115,7 +115,7 @@
             min-height: 500px;
             max-height: 70vh;
             overflow-y: auto;
-            font-size: 11px;
+            font-size: 14px;
             line-height: 1.5;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
