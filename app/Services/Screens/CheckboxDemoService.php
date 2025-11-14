@@ -114,6 +114,7 @@ class CheckboxDemoService extends AbstractUIService
             $this->lbl_result
                 ->text('❌ You must select JavaScript first before selecting Python!')
                 ->style('danger');
+            $this->toast('You must select JavaScript first before selecting Python!', type: 'error');
             return;
         }
 
@@ -168,5 +169,7 @@ class CheckboxDemoService extends AbstractUIService
         $this->lbl_result
             ->text("✅ Submitted! Your selections: {$languagesList}")
             ->style('success');
+
+        $this->toast("Submitted! Your selections: {$languagesList}", type: 'success');
     }
 }
