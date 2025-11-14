@@ -136,6 +136,7 @@ class DemoMenuService extends AbstractUIService
         $this->user_menu->trigger("⚙️");
         $this->user_menu->setUserPermissions(['no-auth']);
         $this->main_menu->setUserPermissions(['no-auth']);
+        $this->redirect();
     }
 
     /**

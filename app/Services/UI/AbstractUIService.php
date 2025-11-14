@@ -217,9 +217,9 @@ abstract class AbstractUIService
             $this->storeUI($this->container);
         }
 
-        $diff = $this->buildDiffResponse($reload);
+        $diff          = $this->buildDiffResponse($reload);
         $reloadMessage = $reload ? '🔄 RELOAD' : '📝 NO RELOAD';
-        $reloadedIds = implode(', ', array_keys($diff));
+        $reloadedIds   = implode(', ', array_keys($diff));
         UIDebug::debug("UI Diff Response ({$reloadMessage})", $reload ? $reloadedIds : $diff);
 
         $storageVariables = $this->getStorageVariables();
@@ -499,6 +499,18 @@ abstract class AbstractUIService
     {
         $this->uiChanges()->add([
             'action' => 'close_modal',
+        ]);
+    }
+
+    protected function redirect(?string $url = null): void
+    {
+        // If no URL provided, use Laravel's intended redirect (previous URL or default)
+        if ($url === null) {
+            $url = redirect()->intended('/')->getTargetUrl();
+        }
+
+        $this->uiChanges()->add([
+            'redirect' => $url
         ]);
     }
 }

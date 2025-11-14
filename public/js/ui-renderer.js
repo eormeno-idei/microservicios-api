@@ -1574,6 +1574,12 @@ class UIRenderer {
             this.handleStorageUpdate(uiUpdate.storage);
         }
 
+        // Handle redirects if present
+        if (uiUpdate.redirect) {
+            window.location.href = uiUpdate.redirect;
+            return; // Stop processing after redirect
+        }
+
         // Check if there are components with parent='modal' - if so, open modal
         let hasModalComponents = false;
         for (const [key, component] of Object.entries(uiUpdate)) {
