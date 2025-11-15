@@ -23,6 +23,8 @@ IGNORE_FILES=(
     "app/Models/User.php"
     "database/factories/UserFactory.php"
     "database/seeders/DatabaseSeeder.php"
+    "database/seeders/RoleSeeder.php"
+    "database/seeders/UserSeeder.php"
     "routes/api.php"
     "routes/web.php"
     "config/app.php"
