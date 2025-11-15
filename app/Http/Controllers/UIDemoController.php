@@ -62,6 +62,7 @@ class UIDemoController extends Controller
 
         $result = $this->uiChanges->all();
         // $ui     = $service->getUI($parent);
+        UIDebug::info("UI Demo Service Response", $result);
         return response()->json($result);
     }
 }

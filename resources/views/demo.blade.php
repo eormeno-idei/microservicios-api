@@ -15,7 +15,7 @@
     <div id="modal-overlay" class="modal-overlay hidden">
         <div id="modal" class="modal-container"></div>
     </div>
-    <button id="reset-btn" onclick="location.href='?reset=true'">Reset</button>
+    <!-- <button id="reset-btn" onclick="location.href='?reset=true'">Reset</button> -->
 
     <script>
         // Pass demo name from Laravel to JavaScript
