@@ -1,22 +1,20 @@
 <?php
-
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
 
 /**
  * Input Demo Service
- * 
+ *
  * Demonstrates input component functionality:
  * - Text input with placeholder
  * - Reading input value from frontend
  * - Updating input value from backend
  * - Label updates based on input
- * 
+ *
  * Uses AbstractUIService for automatic event lifecycle management.
  * Event handlers only need to modify components, no return needed.
  */
@@ -24,17 +22,20 @@ class InputDemoService extends AbstractUIService
 {
     protected LabelBuilder $lbl_result;
 
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Input Component Demo');
+        $container
+            ->title('Input Component Demo')
+            ->maxWidth('500px')
+            ->centerHorizontal()
+            ->shadow(2)
+            ->padding('30px');
 
         $container->add(
             UIBuilder::label('lbl_instruction')
                 ->text('📝 Type something in the input below and click "Get Value"')
                 ->style('info')
+                ->width('100%')
         );
 
         $container->add(
@@ -42,6 +43,8 @@ class InputDemoService extends AbstractUIService
                 ->placeholder('Enter your text here...')
                 ->value('')
                 ->required(false)
+                ->type('text')
+                ->width('100%')
         );
 
         $container->add(
@@ -55,24 +58,23 @@ class InputDemoService extends AbstractUIService
             UIBuilder::label('lbl_result')
                 ->text('Result will appear here')
                 ->style('default')
+                ->width('100%')
         );
-
-        return $container;
     }
 
     /**
      * Handle "Get Value" button click
-     * 
+     *
      * Reads the input value sent from frontend and displays it in the result label.
      * No return needed - AbstractUIService handles diff calculation and response.
-     * 
+     *
      * @param array $params Event parameters (should include 'input_text' from input)
      * @return void
      */
     public function onGetValue(array $params): void
     {
         $inputValue = $params['input_text'] ?? '';
-        
+
         if (empty($inputValue)) {
             $this->lbl_result->text('⚠️ Input is empty!')->style('warning');
         } else {

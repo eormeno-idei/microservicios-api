@@ -19,7 +19,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Servicios que generan UIs y manejan eventos de componentes.
-    | Cada servicio debe implementar métodos de evento con el formato:
+    | Cada servicio puede implementar métodos de evento con el formato:
     | 
     | public function on{ActionName}(array $params): array
     | 
@@ -36,5 +36,8 @@ return [
     \App\Services\Screens\TableDemoService::class,
     \App\Services\Screens\ModalDemoService::class,
     \App\Services\Screens\DemoMenuService::class,
+
+    // Servicio de login
+    \App\Services\Screens\LoginService::class,
     
 ];

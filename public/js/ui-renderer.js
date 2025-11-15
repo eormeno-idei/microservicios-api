@@ -58,6 +58,43 @@ class UIComponent {
             }
         }
 
+        // Apply margin
+        if (this.config.margin !== undefined) {
+            element.style.margin = this.config.margin;
+        }
+        if (this.config.margin_left !== undefined) {
+            element.style.setProperty('margin-left', this.config.margin_left, 'important');
+        }
+        if (this.config.margin_right !== undefined) {
+            element.style.marginRight = this.config.margin_right;
+        }
+        if (this.config.margin_top !== undefined) {
+            element.style.marginTop = this.config.margin_top;
+        }
+        if (this.config.margin_bottom !== undefined) {
+            element.style.marginBottom = this.config.margin_bottom;
+        }
+
+        // Apply sizing
+        if (this.config.width !== undefined) {
+            element.style.width = this.config.width;
+        }
+        if (this.config.height !== undefined) {
+            element.style.height = this.config.height;
+        }
+        if (this.config.max_width !== undefined) {
+            element.style.maxWidth = this.config.max_width;
+        }
+        if (this.config.max_height !== undefined) {
+            element.style.maxHeight = this.config.max_height;
+        }
+        if (this.config.min_width !== undefined) {
+            element.style.minWidth = this.config.min_width;
+        }
+        if (this.config.min_height !== undefined) {
+            element.style.minHeight = this.config.min_height;
+        }
+
         // Apply font size
         if (this.config.font_size) {
             element.style.fontSize = this.config.font_size + 'px';
@@ -81,6 +118,9 @@ class UIComponent {
             // Use internal component ID (_id), not the JSON key
             const componentId = this.config._id || parseInt(this.id);
 
+            // Get USIM storage from localStorage
+            const usimStorage = localStorage.getItem('usim') || '';
+
             // console.log('Sending event:', { component_id: componentId, action, csrfToken });
 
             const response = await fetch('/api/ui-event', {
@@ -90,6 +130,7 @@ class UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -213,21 +254,46 @@ class ButtonComponent extends UIComponent {
         // Find the button element in the DOM
         const buttonElement = document.querySelector(`[data-component-id="${this.config._id}"]`);
         if (!buttonElement) {
-            console.log('⚠️ Button element not found for collectContextValues');
             return values;
         }
 
-        // Find the parent container (or fallback to document)
-        let container = buttonElement.closest('.ui-container');
-        if (!container) {
-            console.log('⚠️ No .ui-container found, using document');
-            container = document;
+        // Check if we're inside a modal first
+        const modalElement = buttonElement.closest('#modal');
+        let container;
+        
+        if (modalElement) {
+            // If inside modal, use the modal as the container to collect all inputs from the entire modal
+            container = modalElement;
+        } else {
+            // For non-modal contexts, find all parent containers from closest to furthest
+            const allContainers = [];
+            let currentElement = buttonElement.parentElement;
+            
+            while (currentElement && currentElement !== document.body) {
+                if (currentElement.classList.contains('ui-container')) {
+                    allContainers.push(currentElement);
+                }
+                currentElement = currentElement.parentElement;
+            }
+            
+            // Try each container from closest to furthest until we find one with inputs
+            for (const potentialContainer of allContainers) {
+                const hasInputs = potentialContainer.querySelectorAll('input, textarea, select').length > 0;
+                if (hasInputs) {
+                    container = potentialContainer;
+                    break;
+                }
+            }
+            
+            // If no container with inputs found, use the furthest container or document
+            if (!container) {
+                container = allContainers[allContainers.length - 1] || document;
+            }
         }
 
         // Collect values from text inputs
         const inputs = container.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea');
         inputs.forEach(input => {
-            console.log(`  - Input: type="${input.type}", name="${input.name}", value="${input.value}"`);
             if (input.name) {
                 values[input.name] = input.value;
             }
@@ -426,8 +492,7 @@ class SelectComponent extends UIComponent {
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             const componentId = this.config._id || parseInt(this.id);
-
-            console.log('Sending change event:', { component_id: componentId, action, value });
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -436,6 +501,7 @@ class SelectComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -490,6 +556,20 @@ class CheckboxComponent extends UIComponent {
             checkbox.value = this.config.value;
         }
 
+        // Add change event listener if on_change action is defined
+        if (this.config.on_change) {
+            checkbox.addEventListener('change', async (e) => {
+                // Prevent default to control the checked state from backend
+                const newCheckedState = e.target.checked;
+
+                // Revert immediately - backend will confirm the actual state
+                e.target.checked = this.config.checked || false;
+
+                // Send to backend with the attempted new state
+                await this.handleChange(this.config.on_change, newCheckedState);
+            });
+        }
+
         group.appendChild(checkbox);
 
         if (this.config.label) {
@@ -506,6 +586,73 @@ class CheckboxComponent extends UIComponent {
         }
 
         return this.applyCommonAttributes(group);
+    }
+
+    /**
+     * Handle checkbox change event
+     * Sends the attempted new state to backend for validation
+     * 
+     * @param {string} action - The action name (snake_case)
+     * @param {boolean} checked - The new checked state the user attempted
+     */
+    async handleChange(action, checked) {
+        console.log('Checkbox change attempt:', action, checked);
+
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+
+            const response = await fetch('/api/ui-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    component_id: componentId,
+                    event: 'change',
+                    action: action,
+                    parameters: {
+                        checked: checked,
+                        name: this.config.name
+                    }
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                console.log('✅ Checkbox change processed:', result);
+
+                // Update UI with backend response (backend controls final state)
+                if (result && Object.keys(result).length > 0) {
+                    if (globalRenderer) {
+                        globalRenderer.handleUIUpdate(result);
+                    } else {
+                        console.error('❌ Global renderer not initialized');
+                    }
+                }
+            } else {
+                console.error('❌ Checkbox change failed:', response.status, result);
+
+                // Ensure checkbox reverts to original state on error
+                const checkbox = document.querySelector(`[data-component-id="${componentId}"] input[type="checkbox"]`);
+                if (checkbox) {
+                    checkbox.checked = this.config.checked || false;
+                }
+            }
+        } catch (error) {
+            console.error('❌ Network error on checkbox change:', error);
+
+            // Revert to original state on error
+            const checkbox = document.querySelector(`[data-component-id="${this.config._id}"] input[type="checkbox"]`);
+            if (checkbox) {
+                checkbox.checked = this.config.checked || false;
+            }
+        }
     }
 }
 
@@ -693,6 +840,8 @@ class TableComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -701,9 +850,10 @@ class TableComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 body: JSON.stringify({
-                    component_id: this.id,
+                    component_id: componentId,
                     event: 'action',
                     action: 'change_page',
                     parameters: { page }
@@ -902,6 +1052,8 @@ class TableCellComponent extends UIComponent {
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -910,10 +1062,11 @@ class TableCellComponent extends UIComponent {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
-                    component_id: this.config._id,
+                    component_id: componentId,
                     event: 'click',
                     action: action,
                     parameters: parameters,
@@ -1178,10 +1331,12 @@ class ComponentFactory {
                 return new TableCellComponent(id, config);
             case 'tableheadercell':
                 return new TableHeaderCellComponent(id, config);
-            case 'menu_dropdown':
+            case 'menudropdown':
                 return new MenuDropdownComponent(id, config);
             case 'card':
                 return new CardComponent(id, config);
+            case 'storage':
+                return new StorageComponent(id, config);
             default:
                 console.warn(`Unknown component type: ${config.type}`);
                 return null;
@@ -1208,6 +1363,12 @@ class UIRenderer {
 
         for (const key of componentIds) {
             const config = this.data[key];
+            
+            // Skip special keys that are not UI components
+            if (key === 'storage' || key === 'action') {
+                continue;
+            }
+            
             if (config._id !== undefined) {
                 internalIdToKey.set(config._id, key);
                 // console.log(`  🔗 Mapped _id ${config._id} -> JSON key "${key}"`);
@@ -1216,6 +1377,11 @@ class UIRenderer {
 
         // Step 2: Create all component instances
         for (const id of componentIds) {
+            // Skip special keys that are not UI components
+            if (id === 'storage' || id === 'action') {
+                continue;
+            }
+            
             const config = this.data[id];
             // console.log(`  🏗️ Creating component type="${config.type}" id="${id}"`, config);
             const component = ComponentFactory.create(id, config);
@@ -1232,6 +1398,11 @@ class UIRenderer {
         // Step 3: Group components by parent and sort by _order
         const childrenByParent = new Map();
         for (const id of componentIds) {
+            // Skip special keys that are not UI components
+            if (id === 'storage' || id === 'action') {
+                continue;
+            }
+            
             const component = this.components.get(id);
             if (!component) continue;
 
@@ -1371,12 +1542,128 @@ class UIRenderer {
     }
 
     /**
+     * Handle storage updates - store variables in localStorage
+     *
+     * @param {object} storageData - Storage variables object
+     */
+    handleStorageUpdate(storageData) {
+
+        Object.keys(storageData).forEach(key => {
+            const value = storageData[key];
+
+            // Store the value in localStorage
+            // If it's an object/array, stringify it
+            if (typeof value === 'object' && value !== null) {
+                localStorage.setItem(key, JSON.stringify(value));
+            } else {
+                localStorage.setItem(key, String(value));
+            }
+        });
+    }
+
+    /**
+     * Show toast notification
+     * 
+     * @param {object} toastConfig - Toast configuration
+     */
+    showToast(toastConfig) {
+        const {
+            message,
+            type = 'info',
+            duration = 3000,
+            open_effect = 'fade',
+            show_effect = 'bounce',
+            close_effect = 'fade',
+            position = 'top-right'
+        } = toastConfig;
+
+        // Create toast container if it doesn't exist or update position
+        let toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'toast-container';
+            document.body.appendChild(toastContainer);
+        }
+        toastContainer.className = `toast-container toast-position-${position}`;
+
+        // Create toast element with position-aware classes
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type} toast-open-${open_effect} toast-show-${show_effect} toast-position-${position}`;
+        
+        // Toast icon based on type
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+        const icon = icons[type] || icons.info;
+
+        toast.innerHTML = `
+            <span class="toast-icon">${icon}</span>
+            <span class="toast-message">${message}</span>
+            <button class="toast-close" aria-label="Close">&times;</button>
+        `;
+
+        // Add to container
+        toastContainer.appendChild(toast);
+
+        // Trigger opening animation
+        requestAnimationFrame(() => {
+            toast.classList.add('toast-open');
+        });
+
+        // Close button handler
+        const closeBtn = toast.querySelector('.toast-close');
+        const closeToast = () => {
+            toast.classList.remove('toast-open');
+            toast.classList.add(`toast-close-${close_effect}`);
+            
+            setTimeout(() => {
+                toast.remove();
+                
+                // Remove container if empty
+                if (toastContainer.children.length === 0) {
+                    toastContainer.remove();
+                }
+            }, 300);
+        };
+
+        closeBtn.addEventListener('click', closeToast);
+
+        // Auto close after duration
+        if (duration > 0) {
+            setTimeout(closeToast, duration);
+        }
+    }
+
+    /**
      * Handle UI updates from backend
      *
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
         // console.log('📦 Processing UI updates:', uiUpdate);
+
+        // Handle storage updates if present
+        if (uiUpdate.storage) {
+            this.handleStorageUpdate(uiUpdate.storage);
+        }
+
+        // Handle toast notifications if present (but only if no redirect)
+        if (uiUpdate.toast && !uiUpdate.redirect) {
+            this.showToast(uiUpdate.toast);
+        }
+
+        // Handle redirects if present
+        if (uiUpdate.redirect) {
+            // If there's a toast, save it to show after redirect
+            if (uiUpdate.toast) {
+                sessionStorage.setItem('pendingToast', JSON.stringify(uiUpdate.toast));
+            }
+            window.location.href = uiUpdate.redirect;
+            return; // Stop processing after redirect
+        }
 
         // Check if there are components with parent='modal' - if so, open modal
         let hasModalComponents = false;
@@ -1404,46 +1691,48 @@ class UIRenderer {
 
                 case 'close_modal':
                     closeModal();
-                    break; // Continue to process ui_updates if any
+                    // Process UI updates directly from root object
+                    for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
+                        // Skip special keys
+                        if (jsonKey === 'action' || jsonKey === 'modal' || jsonKey === 'storage') {
+                            continue;
+                        }
+
+                        const componentId = changes._id;
+                        if (!componentId) continue;
+
+                        const element = document.querySelector(`[data-component-id="${componentId}"]`);
+
+                        if (element) {
+                            // console.log(`✏️ Updating component ${componentId}`, changes);
+                            this.updateComponent(element, changes);
+                        } else {
+                            // console.log(`➕ Creating new component ${componentId}`, changes);
+                            this.addComponent(jsonKey, changes);
+                        }
+                    }
+                    return; // Don't continue processing
             }
         }
 
-        // Handle UI updates if present
-        if (uiUpdate.ui_updates) {
-            for (const [jsonKey, changes] of Object.entries(uiUpdate.ui_updates)) {
-                const componentId = changes._id;
-                const element = document.querySelector(`[data-component-id="${componentId}"]`);
-
-                if (element) {
-                    // Component exists in DOM → UPDATE
-                    console.log(`✏️ Updating component ${componentId}`, changes);
-                    this.updateComponent(element, changes);
-                } else {
-                    // Component doesn't exist → CREATE (rare in events, more common in initial render)
-                    console.log(`➕ Creating new component ${componentId}`, changes);
-                    this.addComponent(jsonKey, changes);
-                }
+        // Handle UI updates (for non-modal actions)
+        for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
+            // Skip special keys
+            if (jsonKey === 'action' || jsonKey === 'modal' || jsonKey === 'storage') {
+                continue;
             }
-        } else if (!hasModalComponents && !uiUpdate.action) {
-            // Fallback: if no ui_updates key and no modal, treat entire object as updates (backward compatibility)
-            for (const [jsonKey, changes] of Object.entries(uiUpdate)) {
-                // Skip special keys
-                if (jsonKey === 'action' || jsonKey === 'modal') {
-                    continue;
-                }
 
-                const componentId = changes._id;
-                if (!componentId) continue;
+            const componentId = changes._id;
+            if (!componentId) continue;
 
-                const element = document.querySelector(`[data-component-id="${componentId}"]`);
+            const element = document.querySelector(`[data-component-id="${componentId}"]`);
 
-                if (element) {
-                    // console.log(`✏️ Updating ${componentId}`, changes);
-                    this.updateComponent(element, changes);
-                } else {
-                    console.log(`➕ Creating new component ${componentId}`, changes);
-                    this.addComponent(jsonKey, changes);
-                }
+            if (element) {
+                // console.log(`✏️ Updating component ${componentId}`, changes);
+                this.updateComponent(element, changes);
+            } else {
+                // console.log(`➕ Creating new component ${componentId}`, changes);
+                this.addComponent(jsonKey, changes);
             }
         }
     }
@@ -1475,6 +1764,7 @@ class UIRenderer {
                     btn.addEventListener('click', async () => {
                         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
                         const componentId = element.getAttribute('data-component-id');
+                        const usimStorage = localStorage.getItem('usim') || '';
 
                         try {
                             const response = await fetch('/api/ui-event', {
@@ -1484,6 +1774,7 @@ class UIRenderer {
                                     'Accept': 'application/json',
                                     'X-CSRF-TOKEN': csrfToken,
                                     'X-Requested-With': 'XMLHttpRequest',
+                                    'X-USIM-Storage': usimStorage,
                                 },
                                 credentials: 'same-origin',
                                 body: JSON.stringify({
@@ -1524,6 +1815,84 @@ class UIRenderer {
             // Label (buttons)
             if (changes.label !== undefined) {
                 element.textContent = changes.label;
+            }
+
+            // Trigger (menudropdown)
+            if (changes.trigger !== undefined) {
+                const triggerButton = element.querySelector('.menu-dropdown-trigger');
+                if (triggerButton) {
+                    const triggerConfig = changes.trigger;
+                    const triggerLabel = triggerConfig.label || '☰ Menu';
+                    const triggerIcon = triggerConfig.icon;
+                    const triggerStyle = triggerConfig.style || 'default';
+
+                    // Update trigger style classes
+                    triggerButton.className = 'menu-dropdown-trigger';
+                    triggerButton.className += ` menu-trigger-${triggerStyle}`;
+
+                    // Build trigger content
+                    let triggerContent = '';
+                    if (triggerIcon) {
+                        triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+                    }
+                    triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
+
+                    triggerButton.innerHTML = triggerContent;
+                }
+            }
+
+            // Items (menudropdown) - DEPRECATED: items are immutable in frontend
+            // Only permissions array should be updated from backend
+            if (changes.items !== undefined) {
+                console.warn('⚠️ Updating items[] is deprecated. Use permissions[] instead.');
+            }
+
+            // Permissions (menudropdown) - Re-render menu items with new permissions
+            if (changes.permissions !== undefined) {
+                const menuContainer = element;
+                const component = globalRenderer?.components?.get(String(changes._id));
+
+                if (component && component.config) {
+                    // Update component config
+                    component.config.permissions = changes.permissions;
+
+                    // Re-render menu content
+                    const menuContent = element.querySelector('.menu-dropdown-content');
+                    
+                    if (menuContent) {
+                        // Clear existing content
+                        menuContent.innerHTML = '';
+
+                        // Re-render all items with new permissions
+                        const items = component.config.items || [];
+                        
+                        items.forEach(item => {
+                            const itemElement = component.renderMenuItem(item);
+                            menuContent.appendChild(itemElement);
+                        });
+
+                        // Check if all items are hidden
+                        const permissions = changes.permissions;
+                        const hasVisibleItems = items.some(item => {
+                            if (item.type === 'separator') {
+                                return false;
+                            }
+                            const isVisible = component.isItemVisible(item, permissions);
+                            if (item.submenu && item.submenu.length > 0) {
+                                return isVisible && component.hasVisibleChildren(item.submenu, permissions);
+                            }
+                            return isVisible;
+                });                        // Hide/show entire menu
+                        menuContainer.style.display = hasVisibleItems ? '' : 'none';
+
+                        // Close menu if it was open
+                        menuContent.classList.remove('show');
+                        const trigger = element.querySelector('.menu-dropdown-trigger');
+                        if (trigger) {
+                            trigger.classList.remove('active');
+                        }
+                    }
+                }
             }
 
             // Style/classes
@@ -1648,7 +2017,7 @@ class UIRenderer {
 
             // Find parent and append
             const parentElement = document.querySelector(`[data-component-id="${config.parent}"]`)
-                               || document.getElementById(config.parent);
+                || document.getElementById(config.parent);
 
             if (parentElement) {
                 parentElement.appendChild(element);
@@ -1670,17 +2039,20 @@ async function loadDemoUI(demoName = null) {
     try {
         // Use demo name from window global (set by Laravel) or parameter
         const demo = demoName || window.DEMO_NAME || 'button-demo';
+        const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
 
+        const usimStorage = localStorage.getItem('usim') || '';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        console.log(`Fetching UI data from /api/${demo}...`);
+        console.log(`Fetching UI data from /api/${demo}${resetQuery}...`);
 
-        const response = await fetch(`/api/${demo}`, {
+        const response = await fetch(`/api/${demo}${resetQuery}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-USIM-Storage': usimStorage,
             }
         });
 
@@ -1693,6 +2065,14 @@ async function loadDemoUI(demoName = null) {
         // Create and store global renderer
         globalRenderer = new UIRenderer(uiData);
         globalRenderer.render();
+
+        // If reset flag was used, clear it after loading
+        if (window.RESET_DEMO) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            window.RESET_DEMO = false;
+        }
+
+        console.log('✅ Demo UI loaded successfully');
 
     } catch (error) {
         console.error('Error loading demo UI:', error);
@@ -1733,6 +2113,12 @@ function openModal(uiData) {
     if (window.modalTimeoutId) {
         clearInterval(window.modalTimeoutId);
         window.modalTimeoutId = null;
+    }
+
+    // Add ui-container class to modal container so collectContextValues() can find inputs
+    // This ensures that buttons inside modals can collect form values correctly
+    if (!modalContainer.classList.contains('ui-container')) {
+        modalContainer.classList.add('ui-container');
     }
 
     // Render modal content using UIRenderer
@@ -1859,7 +2245,7 @@ function startModalCountdown(totalMs, initialValue, timeUnit, timeUnitLabel, tim
  * Get remaining value in the specified time unit
  */
 function getRemainingValue(remainingMs, timeUnit) {
-    switch(timeUnit) {
+    switch (timeUnit) {
         case 'seconds': return remainingMs / 1000;
         case 'minutes': return remainingMs / (60 * 1000);
         case 'hours': return remainingMs / (60 * 60 * 1000);
@@ -1872,7 +2258,7 @@ function getRemainingValue(remainingMs, timeUnit) {
  * Get singular label for time unit
  */
 function getSingularLabel(timeUnit) {
-    switch(timeUnit) {
+    switch (timeUnit) {
         case 'seconds': return 'segundo';
         case 'minutes': return 'minuto';
         case 'hours': return 'hora';
@@ -1891,6 +2277,7 @@ async function executeTimeoutAction(action, callerServiceId) {
         // Execute custom action via backend
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const usimStorage = localStorage.getItem('usim') || '';
 
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
@@ -1899,6 +2286,7 @@ async function executeTimeoutAction(action, callerServiceId) {
                     'Accept': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify({
@@ -1940,6 +2328,68 @@ window.closeModal = closeModal;
 
 // ==================== Menu Dropdown Component ====================
 class MenuDropdownComponent extends UIComponent {
+    /**
+     * Check if an item is visible based on permissions
+     * 
+     * @param {object} item - Menu item
+     * @param {array} permissions - Array of user permissions
+     * @returns {boolean} - True if item should be visible
+     */
+    isItemVisible(item, permissions) {
+        const itemPermission = item.permission;
+
+        // null/undefined = visible for all
+        if (!itemPermission) {
+            return true;
+        }
+
+        // 'auth' = only authenticated users
+        if (itemPermission === 'auth') {
+            return permissions.includes('auth');
+        }
+
+        // 'no-auth' = only non-authenticated users
+        if (itemPermission === 'no-auth') {
+            return permissions.includes('no-auth');
+        }
+
+        // Any other value = check if it exists in permissions array
+        return permissions.includes(itemPermission);
+    }
+
+    /**
+     * Check if a submenu has any visible children (recursive)
+     * 
+     * @param {array} submenu - Array of submenu items
+     * @param {array} permissions - Array of user permissions
+     * @returns {boolean} - True if at least one child is visible
+     */
+    hasVisibleChildren(submenu, permissions) {
+        if (!submenu || !Array.isArray(submenu) || submenu.length === 0) {
+            return false;
+        }
+
+        return submenu.some(item => {
+            // Separators don't count for visibility
+            if (item.type === 'separator') {
+                return false;
+            }
+
+            // If item itself is not visible, skip it
+            if (!this.isItemVisible(item, permissions)) {
+                return false;
+            }
+
+            // If item has submenu, check recursively
+            if (item.submenu && item.submenu.length > 0) {
+                return this.hasVisibleChildren(item.submenu, permissions);
+            }
+
+            // Regular visible item
+            return true;
+        });
+    }
+
     render() {
         const menuContainer = document.createElement('div');
         menuContainer.className = 'menu-dropdown';
@@ -1985,6 +2435,24 @@ class MenuDropdownComponent extends UIComponent {
             });
         }
 
+        // Check if all items are hidden
+        const permissions = this.config.permissions || [];
+        const hasVisibleItems = this.config.items && this.config.items.some(item => {
+            if (item.type === 'separator') {
+                return false;
+            }
+            const isVisible = this.isItemVisible(item, permissions);
+            if (item.submenu && item.submenu.length > 0) {
+                return isVisible && this.hasVisibleChildren(item.submenu, permissions);
+            }
+            return isVisible;
+        });
+
+        // Hide entire menu if no visible items
+        if (!hasVisibleItems) {
+            menuContainer.style.display = 'none';
+        }
+
         // Toggle menu on click with improved UX
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -2028,7 +2496,19 @@ class MenuDropdownComponent extends UIComponent {
         menuContainer.appendChild(trigger);
         menuContainer.appendChild(content);
 
-        return this.applyCommonAttributes(menuContainer);
+        // Remove width from config before applying common attributes
+        // because width is already applied to the dropdown content
+        const originalWidth = this.config.width;
+        delete this.config.width;
+        
+        const result = this.applyCommonAttributes(menuContainer);
+        
+        // Restore width to config for future use
+        if (originalWidth) {
+            this.config.width = originalWidth;
+        }
+        
+        return result;
     }
 
     renderMenuItem(item) {
@@ -2039,11 +2519,30 @@ class MenuDropdownComponent extends UIComponent {
             return separator;
         }
 
+        // Get permissions from config
+        const permissions = this.config.permissions || [];
+
+        // Check if item has submenu
+        const hasSubmenu = item.submenu && item.submenu.length > 0;
+
+        // Determine visibility
+        let isVisible = this.isItemVisible(item, permissions);
+
+        // If has submenu, check if any children are visible
+        if (hasSubmenu && isVisible) {
+            isVisible = this.hasVisibleChildren(item.submenu, permissions);
+        }
+
         // Regular item or submenu parent
         const menuItem = document.createElement(item.url ? 'a' : 'button');
         menuItem.className = 'menu-item';
 
-        if (item.submenu && item.submenu.length > 0) {
+        // Apply visibility
+        if (!isVisible) {
+            menuItem.style.display = 'none';
+        }
+
+        if (hasSubmenu) {
             menuItem.classList.add('has-submenu');
         }
 
@@ -2099,9 +2598,7 @@ class MenuDropdownComponent extends UIComponent {
         }
 
         // Render submenu if exists
-        if (item.submenu && item.submenu.length > 0) {
-            // console.log(`🔄 Rendering submenu for "${item.label}" with ${item.submenu.length} items`);
-
+        if (hasSubmenu) {
             const submenu = document.createElement('div');
             submenu.className = 'submenu';
             submenu.style.display = 'none'; // Ensure it starts hidden
@@ -2174,6 +2671,43 @@ class MenuDropdownComponent extends UIComponent {
     }
 }
 
+// ==================== Storage Component ====================
+class StorageComponent extends UIComponent {
+    render() {
+        // This component doesn't render anything visible
+        // It just stores data in localStorage
+        this.storeData();
+        return document.createDocumentFragment(); // Return empty fragment
+    }
+
+    storeData() {
+        // Iterate over all config properties (except internal ones)
+        Object.keys(this.config).forEach(key => {
+            // Skip internal properties that start with underscore
+            if (key.startsWith('_') || key === 'type') {
+                return;
+            }
+
+            const value = this.config[key];
+
+            // Store the value in localStorage
+            // If it's an object/array, stringify it
+            if (typeof value === 'object' && value !== null) {
+                localStorage.setItem(key, JSON.stringify(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${JSON.stringify(value)}`);
+            } else {
+                localStorage.setItem(key, String(value));
+                console.log(`💾 Stored in localStorage: "${key}" = ${value}`);
+            }
+        });
+    }
+
+    updateComponent(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        this.storeData();
+    }
+}
+
 /**
  * Load menu UI
  */
@@ -2184,10 +2718,21 @@ async function loadMenuUI() {
     }
 
     try {
-        const response = await fetch(`/api/${window.MENU_SERVICE}`);
-        const uiData = await response.json();
+        const resetQuery = window.RESET_DEMO ? 'reset=true' : '';
+        const usimStorage = localStorage.getItem('usim') || '';
+        const parentElement = 'parent=menu';
 
-        // console.log('📊 Menu UI Data received:', uiData);
+        const response = await fetch(`/api/${window.MENU_SERVICE}?${parentElement}&${resetQuery}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
+                }
+            }
+        );
+        const uiData = await response.json();
 
         const menuContainer = document.getElementById('menu');
         if (!menuContainer) {
@@ -2195,18 +2740,83 @@ async function loadMenuUI() {
             return;
         }
 
-        // Render menu
-        const menuRenderer = new UIRenderer(uiData);
-        menuRenderer.render();
-
-        // console.log('✅ Menu loaded successfully');
+        // If globalRenderer exists, merge menu data and components
+        if (globalRenderer) {
+            // Merge menu data
+            Object.assign(globalRenderer.data, uiData);
+            
+            // Sort components by _order field (preserves backend order)
+            const entries = Object.entries(uiData)
+                .filter(([id]) => id !== 'storage' && id !== 'action')
+                .sort((a, b) => {
+                    const orderA = a[1]._order || 999;
+                    const orderB = b[1]._order || 999;
+                    return orderA - orderB;
+                });
+            
+            // Separate top-level (parent='menu') from children
+            const topLevel = entries.filter(([, config]) => config.parent === 'menu');
+            const children = entries.filter(([, config]) => config.parent !== 'menu');
+            
+            // Combine: top-level first (sorted by _order), then children
+            const components = [...topLevel, ...children];
+            
+            // Create and add menu components to globalRenderer AND render them
+            for (const [id, config] of components) {
+                const component = ComponentFactory.create(id, config);
+                if (component) {
+                    // Add to global registry
+                    globalRenderer.components.set(id, component);
+                    
+                    // Render and mount component
+                    const element = component.render();
+                    if (element) {
+                        let parentEl;
+                        
+                        // Find parent element by data-component-id or by DOM id
+                        if (config.parent === 'menu') {
+                            parentEl = menuContainer;
+                        } else {
+                            // Try to find by data-component-id first
+                            parentEl = document.querySelector(`[data-component-id="${config.parent}"]`);
+                            // Fallback to regular id
+                            if (!parentEl) {
+                                parentEl = document.getElementById(config.parent);
+                            }
+                        }
+                        
+                        if (parentEl) {
+                            parentEl.appendChild(element);
+                        }
+                    }
+                }
+            }
+        } else {
+            // First load - create globalRenderer with menu
+            globalRenderer = new UIRenderer(uiData);
+            globalRenderer.render();
+        }
     } catch (error) {
         console.error('❌ Error loading menu:', error);
     }
 }
 
 // Load UI on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadMenuUI();
-    loadDemoUI();
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadDemoUI();  // Load main UI first to create globalRenderer
+    await loadMenuUI();  // Then load menu and merge into globalRenderer
+    
+    // Check for pending toast after page load
+    const pendingToast = sessionStorage.getItem('pendingToast');
+    if (pendingToast) {
+        sessionStorage.removeItem('pendingToast');
+        try {
+            const toastConfig = JSON.parse(pendingToast);
+            if (globalRenderer) {
+                globalRenderer.showToast(toastConfig);
+            }
+        } catch (error) {
+            console.error('Error showing pending toast:', error);
+        }
+    }
 });

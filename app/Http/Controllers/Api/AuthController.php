@@ -21,17 +21,14 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string|max:100',
-            'last_name' => 'required|string|max:100',
-            'mobile' => 'nullable|string|max:100',
-            'semantic_context' => 'nullable|string',
+            'name' => 'required|string|max:100',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
             return response()->json([
-                'status' => 'error',
+                'success' => false,
                 'message' => 'Validation errors',
                 'errors' => $validator->errors()
             ], 422);
@@ -41,10 +38,6 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $fullName,
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'mobile' => $request->mobile,
-            'semantic_context' => $request->semantic_context,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -52,7 +45,11 @@ class AuthController extends Controller
         // Asignar rol por defecto
         $user->assignRole('user');
 
-        event(new Registered($user));
+        // Intentar enviar email de verificación (sin bloquear el registro si falla)
+        $this->trySendEmail(
+            fn() => event(new Registered($user)),
+            'registro de usuario'
+        );
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -134,14 +131,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // public function verifyEmail(Request $request) {
-    //     return response()->json([
-    //         'status' => 'success',
-    //         'data' => null,
-    //         'message' => 'Email verified successfully'
-    //     ]);
-    // }
-
     public function verifyEmail(Request $request)
     {
         $user = User::find($request->route('id'));
@@ -171,7 +160,7 @@ class AuthController extends Controller
 
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'status' => 'success',
+                'success' => true,
                 'data' => null,
                 'message' => 'Email already verified'
             ], 200);
@@ -183,10 +172,8 @@ class AuthController extends Controller
             }
         }
 
-        $user->assignRole('verified');
-
         return response()->json([
-            'status' => 'success',
+            'success' => true,
             'data' => null,
             'message' => 'Email verified successfully'
         ], 200);

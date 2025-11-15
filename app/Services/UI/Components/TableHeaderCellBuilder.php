@@ -101,7 +101,7 @@ class TableHeaderCellBuilder extends UIComponent
      * @param string $width Width value (e.g., '200px', '20%')
      * @return self For method chaining
      */
-    public function width(string $width): self
+    public function width(string $width): static
     {
         return $this->setConfig('width', $width);
     }

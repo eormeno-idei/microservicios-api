@@ -33,7 +33,7 @@ body {
     /* Remove default gap and align-items - let inline styles or defaults handle it */
     /* gap: 15px; */
     /* align-items: stretch; */
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* Allow items to wrap to next line if needed */
     /* Ensure container takes full width of parent */
     width: 100%;
 }
@@ -55,6 +55,7 @@ body {
 .ui-button {
     display: inline-flex;
     align-items: center;
+    justify-content: center; /* Center button text */
     gap: 8px;
     padding: 10px 20px;
     border: none;
@@ -64,6 +65,8 @@ body {
     cursor: pointer;
     transition: all 0.2s;
     text-decoration: none;
+    flex-shrink: 0; /* Don't shrink when width is set */
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .ui-button:hover:not(:disabled) {
@@ -698,11 +701,17 @@ body.modal-open #menu {
     height: 60px;
     display: flex;
     align-items: center;
-    justify-content: space-between; /* Space between menu and user-info */
+    /* Removed justify-content to allow children to control their own spacing */
 }
 
 #menu {
     flex: 1; /* Grow to fill available space */
+    display: flex; /* Make it a flex container so margin-left: auto works on children */
+}
+
+/* Ensure the UI container inside #menu takes full width */
+#menu > .ui-container {
+    width: 100%;
 }
 
 #user-info {
@@ -725,11 +734,14 @@ body.modal-open #menu {
 
 /* When inside a horizontal flex container, behave as flex item */
 .ui-container.horizontal > .menu-dropdown {
-    /* Keep inline-block but make it work with flex */
-    display: inline-block !important;
+    /* Use inline-flex to allow margin: auto to work while keeping natural width */
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-start; /* Don't stretch children horizontally */
     flex-shrink: 0; /* Don't shrink */
-    /* Don't grow to fill space */
-    flex-grow: 0;
+    flex-grow: 0; /* Don't grow by default */
+    width: auto; /* Keep natural width based on content */
+    min-width: 0; /* Allow shrinking if needed */
 }
 
 .menu-dropdown-trigger {
@@ -1361,4 +1373,405 @@ body.modal-open #menu {
     animation: cardSlideIn 0.4s ease-out;
 }
 
+/* ==================== Toast Notifications ==================== */
+.toast-container {
+    position: fixed;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+/* Toast Container Positions */
+.toast-position-top-right {
+    top: 20px;
+    right: 20px;
+    align-items: flex-end;
+}
+
+.toast-position-top-left {
+    top: 20px;
+    left: 20px;
+    align-items: flex-start;
+}
+
+.toast-position-top-middle {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.toast-position-bottom-right {
+    bottom: 20px;
+    right: 20px;
+    align-items: flex-end;
+}
+
+.toast-position-bottom-left {
+    bottom: 20px;
+    left: 20px;
+    align-items: flex-start;
+}
+
+.toast-position-bottom-middle {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: all 0.3s ease;
+    position: relative;
+    min-width: 300px;
+    border-left: 4px solid #3498db;
+}
+
+/* Initial position for toasts - will be animated */
+.toast.toast-position-top-right,
+.toast.toast-position-bottom-right {
+    transform: translateX(100vw);
+}
+
+.toast.toast-position-top-left,
+.toast.toast-position-bottom-left {
+    transform: translateX(-100vw);
+}
+
+.toast.toast-position-top-middle {
+    transform: translateY(-200px);
+}
+
+.toast.toast-position-bottom-middle {
+    transform: translateY(200px);
+}
+
+.toast-icon {
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.toast-message {
+    flex: 1;
+    font-size: 14px;
+    color: #2c3e50;
+    line-height: 1.4;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #95a5a6;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: color 0.2s;
+}
+
+.toast-close:hover {
+    color: #2c3e50;
+}
+
+/* Toast Types */
+.toast-success {
+    border-left-color: #27ae60;
+}
+
+.toast-error {
+    border-left-color: #e74c3c;
+}
+
+.toast-warning {
+    border-left-color: #f39c12;
+}
+
+.toast-info {
+    border-left-color: #3498db;
+}
+
+/* Open Animations */
+.toast-open-fade {
+    animation: toastFadeIn 0.3s ease forwards;
+}
+
+.toast-open-slide.toast-position-top-right,
+.toast-open-slide.toast-position-bottom-right {
+    animation: toastSlideInFromRight 0.3s ease forwards;
+}
+
+.toast-open-slide.toast-position-top-left,
+.toast-open-slide.toast-position-bottom-left {
+    animation: toastSlideInFromLeft 0.3s ease forwards;
+}
+
+.toast-open-slide.toast-position-top-middle {
+    animation: toastSlideInFromTop 0.3s ease forwards;
+}
+
+.toast-open-slide.toast-position-bottom-middle {
+    animation: toastSlideInFromBottom 0.3s ease forwards;
+}
+
+.toast-open {
+    opacity: 1;
+    transform: translate(0, 0);
+}
+
+/* Show Animations */
+.toast-show-bounce.toast-open.toast-position-top-right,
+.toast-show-bounce.toast-open.toast-position-bottom-right {
+    animation: toastBounceRight 0.5s ease forwards;
+}
+
+.toast-show-bounce.toast-open.toast-position-top-left,
+.toast-show-bounce.toast-open.toast-position-bottom-left {
+    animation: toastBounceLeft 0.5s ease forwards;
+}
+
+.toast-show-bounce.toast-open.toast-position-top-middle {
+    animation: toastBounceTop 0.5s ease forwards;
+}
+
+.toast-show-bounce.toast-open.toast-position-bottom-middle {
+    animation: toastBounceBottom 0.5s ease forwards;
+}
+
+.toast-show-shake.toast-open {
+    animation: toastShake 0.5s ease forwards;
+}
+
+/* Close Animations */
+.toast-close-fade {
+    animation: toastFadeOut 0.3s ease forwards;
+}
+
+.toast-close-slide.toast-position-top-right,
+.toast-close-slide.toast-position-bottom-right {
+    animation: toastSlideOutToRight 0.3s ease forwards;
+}
+
+.toast-close-slide.toast-position-top-left,
+.toast-close-slide.toast-position-bottom-left {
+    animation: toastSlideOutToLeft 0.3s ease forwards;
+}
+
+.toast-close-slide.toast-position-top-middle {
+    animation: toastSlideOutToTop 0.3s ease forwards;
+}
+
+.toast-close-slide.toast-position-bottom-middle {
+    animation: toastSlideOutToBottom 0.3s ease forwards;
+}
+
+/* Keyframes */
+@keyframes toastFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Slide In Animations */
+@keyframes toastSlideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100vw);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastSlideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100vw);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes toastSlideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-200px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes toastSlideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(200px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Bounce Animations */
+@keyframes toastBounceRight {
+    0% {
+        opacity: 0;
+        transform: translateX(100vw) scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastBounceLeft {
+    0% {
+        opacity: 0;
+        transform: translateX(-100vw) scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes toastBounceTop {
+    0% {
+        opacity: 0;
+        transform: translateY(-200px) scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toastBounceBottom {
+    0% {
+        opacity: 0;
+        transform: translateY(200px) scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.05);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes toastShake {
+    0%, 100% {
+        transform: translate(0, 0);
+    }
+    10%, 30%, 50%, 70%, 90% {
+        transform: translate(-5px, 0);
+    }
+    20%, 40%, 60%, 80% {
+        transform: translate(5px, 0);
+    }
+}
+
+/* Fade Out */
+@keyframes toastFadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Slide Out Animations */
+@keyframes toastSlideOutToRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100vw);
+    }
+}
+
+@keyframes toastSlideOutToLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100vw);
+    }
+}
+
+@keyframes toastSlideOutToTop {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-200px);
+    }
+}
+
+@keyframes toastSlideOutToBottom {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(200px);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .toast-container {
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+
+    .toast {
+        min-width: auto;
+    }
+}
 

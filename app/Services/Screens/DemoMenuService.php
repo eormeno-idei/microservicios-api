@@ -1,18 +1,17 @@
 <?php
-
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\TimeUnit;
-use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Contracts\UIElement;
+use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Enums\AlignItems;
+use App\Services\UI\Enums\DialogType;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Modals\ConfirmDialogService;
-use Illuminate\Support\Facades\Log;
+use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\UI\UIBuilder;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Demo Menu Service
@@ -21,411 +20,150 @@ use Illuminate\Support\Facades\Log;
  */
 class DemoMenuService extends AbstractUIService
 {
-    protected function buildBaseUI(...$params): UIContainer
+    protected MenuDropdownBuilder $main_menu;
+    protected MenuDropdownBuilder $user_menu;
+    protected string $store_token = '';
+    protected string $store_password = '';
+
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        // OPCIÓN 1: Items juntos al inicio (por defecto)
-        // No se especifica justifyContent, usa flex-start por defecto
-
-        // OPCIÓN 2: Primer item a la izquierda, último a la derecha (JUSTIFICADO)
-        // ->justifyContent(JustifyContent::SPACE_BETWEEN)
-
-        // OPCIÓN 3: Ambos items centrados con espacio entre ellos
-        // ->justifyContent(JustifyContent::CENTER)
-        // ->gap('20px')
-
-        $menu_placeholder = UIBuilder::container('_menu_placeholder')
-            ->parent('menu')
+        $container
+            ->parent('menu') // Important to set parent!
             ->shadow(0)
-            ->borderRadius(0)
+            ->borderRadius(2)
             ->layout(LayoutType::HORIZONTAL)
-            ->justifyContent(JustifyContent::SPACE_BETWEEN)  // 👈 Cambiar aquí según necesites
-            ->alignItems(AlignItems::CENTER)  // Alinear verticalmente al centro
-            ->gap('20px')  // Espacio entre items (opcional)
+            ->justifyContent(JustifyContent::SPACE_BETWEEN)
+            ->alignItems(AlignItems::CENTER)
             ->padding(0);
 
-        $menu_placeholder->add(
-            $this->buildMenu()
-        )->add(
-            $this->buildUserMenu()
-        );
+        $this->main_menu = $this->buildLeftMenu();
+        $this->user_menu = $this->buildUserMenu();
 
-        return $menu_placeholder;
+        $container->add($this->main_menu);
+        $container->add($this->user_menu);
     }
 
-    private function buildMenu(): UIElement
+    protected function postLoadUI(): void
     {
-        $menu = UIBuilder::menuDropdown('main_menu')
+        if (Auth::check()) {
+            $user = Auth::user();
+            $this->user_menu->trigger("👤  " . $user->name);
+            $this->main_menu->setUserPermissions(['auth']);
+            $this->user_menu->setUserPermissions(['auth']);
+        } else {
+            $this->user_menu->trigger("⚙️");
+            $this->user_menu->setUserPermissions(['no-auth']);
+            $this->main_menu->setUserPermissions(['no-auth']);
+        }
+    }
+
+    private function buildLeftMenu(): MenuDropdownBuilder
+    {
+        $main_menu = UIBuilder::menuDropdown('main_menu')
             ->trigger()
             ->position('bottom-left')
-            ->width(100);
+            ->width(200);
 
-        // Home link
-        $menu->link('Home', '/', '🏠');
+        $main_menu->link('Home', '/', '🏠');
+        $this->buildDemosMenu($main_menu);
+        $main_menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
+        $main_menu->separator();
+        $main_menu->item('About', 'show_about_info', [], 'ℹ️');
+        return $main_menu;
+    }
+
+    private function buildDemosMenu(MenuDropdownBuilder $menu): void
+    {
+        if (env('APP_DEMO_MODE', true) === false) {
+            return;
+        }
 
         $menu->separator();
-
-        // // Demos submenu
         $menu->submenu('Demos', '🎮', function ($submenu) {
-            $submenu->link('Demo UI', '/demo-ui', '🎨');
-            $submenu->link('Table Demo', '/table-demo', '📊');
-            $submenu->link('Modal Demo', '/modal-demo', '🪟');
-            $submenu->link('Form Demo', '/form-demo', '📝');
-            $submenu->link('Button Demo', '/button-demo', '🔘');
-            $submenu->link('Input Demo', '/input-demo', '⌨️');
-            $submenu->link('Select Demo', '/select-demo', '📋');
-            $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
+            $submenu->link('Demo UI', '/demo/demo-ui', '🎨');
+            $submenu->link('Table Demo', '/demo/table-demo', '📊');
+            $submenu->link('Modal Demo', '/demo/modal-demo', '🪟');
+            $submenu->link('Form Demo', '/demo/form-demo', '📝');
+            $submenu->link('Button Demo', '/demo/button-demo', '🔘');
+            $submenu->link('Input Demo', '/demo/input-demo', '⌨️');
+            $submenu->link('Select Demo', '/demo/select-demo', '📋');
+            $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
         });
-
-        $menu->separator();
-
-        // UI Components submenu (future components)
-        $menu->submenu('Components', '🧩', function ($submenu) {
-            $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
-            $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
-            $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');
-            $submenu->item('Test Timeout (no button)', 'show_timeout_no_button', [], '⏱️');
-        });
-
-        $menu->separator();
-
-        // Settings (with WARNING dialog)
-        $menu->item('Settings', 'show_settings_confirm', [], '⚙️');
-
-        // About (with INFO dialog)
-        $menu->item('About', 'show_about_info', [], 'ℹ️');
-
-        return $menu;
     }
 
-    private function buildUserMenu(): UIElement
+    private function buildUserMenu(): MenuDropdownBuilder
     {
-        $userMenu = UIBuilder::menuDropdown('user_menu')
-            ->trigger('⚙')  // Ícono de engranaje/settings - más minimalista
-            // Otras opciones: '●' '◉' '≡' '👤'
-            ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
-            ->width(180);  // Ancho fijo para el dropdown
-
-        // Authentication options
-        $userMenu->item('Login', 'show_login_form', [], '🔑');
-        $userMenu->item('Register', 'show_register_form', [], '📝');
-
-        $userMenu->separator();
-
-        // User profile options
-        $userMenu->item('Profile', 'show_profile', [], '👤');
-        $userMenu->item('Logout', 'logout_user', [], '🚪');
-
-        return $userMenu;
+        $user_menu = UIBuilder::menuDropdown('user_menu')
+            ->position('bottom-right')
+            ->width(180);
+        $user_menu->trigger("⚙️");
+        $user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
+        $user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
+        $user_menu->item('Profile', 'show_profile', [], '👤', permission: 'auth');
+        $user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
+        return $user_menu;
     }
 
-    // public function getUI(...$params): array
-    // {
-    //     // Get service ID to receive callbacks
-    //     $serviceId = $this->getServiceComponentId();
-
-    //     // Build menu using UIBuilder with modern design
-    //     $menu = UIBuilder::menuDropdown('main_menu')
-    //         ->parent('menu') // Render in #menu div
-    //         ->callerServiceId($serviceId) // Set service for action callbacks
-    //         ->trigger() // Custom trigger
-    //         ->position('bottom-left')
-    //         ->width(100);
-
-    //     // Home link
-    //     $menu->link('Home', '/', '🏠');
-
-    //     $menu->separator();
-
-    //     // Demos submenu
-    //     $menu->submenu('Demos', '🎮', function ($submenu) {
-    //         $submenu->link('Demo UI', '/demo-ui', '🎨');
-    //         $submenu->link('Table Demo', '/table-demo', '📊');
-    //         $submenu->link('Modal Demo', '/modal-demo', '🪟');
-    //         $submenu->link('Form Demo', '/form-demo', '📝');
-    //         $submenu->link('Button Demo', '/button-demo', '🔘');
-    //         $submenu->link('Input Demo', '/input-demo', '⌨️');
-    //         $submenu->link('Select Demo', '/select-demo', '📋');
-    //         $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
-    //     });
-
-    //     $menu->separator();
-
-    //     // UI Components submenu (future components)
-    //     $menu->submenu('Components', '🧩', function ($submenu) {
-    //         $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
-    //         $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
-    //         $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');
-    //         $submenu->item('Test Timeout (no button)', 'show_timeout_no_button', [], '⏱️');
-    //     });
-
-    //     $menu->separator();
-
-    //     // Settings (with WARNING dialog)
-    //     $menu->item('Settings', 'show_settings_confirm', [], '⚙️');
-
-    //     // About (with INFO dialog)
-    //     $menu->item('About', 'show_about_info', [], 'ℹ️');
-
-    //     return $menu->build();
-    // }
-
-    /**
-     * Handler for Settings confirmation dialog
-     */
-    public function onShowSettingsConfirm(array $params): array
+    public function onLoggedUser(array $params): void
     {
-        // Get this service ID to receive the callback
-        $serviceId = $this->getServiceComponentId();
-
-        // Build warning dialog using ConfirmDialogService with DialogType
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::WARNING,
-            title: "Configuración",
-            message: "¿Quieres resetear la configuración? Esta acción no se puede deshacer.",
-            confirmAction: 'reset_settings',
-            confirmParams: [],
-            cancelAction: 'cancel_settings',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
+        $userName = $params['user']['name'] ?? 'User';
+        $this->user_menu->trigger("👤  " . $userName);
+        $this->main_menu->setUserPermissions(['auth']);
+        $this->user_menu->setUserPermissions(['auth']);
     }
 
     /**
-     * Handler for cancel button (closes modal)
+     * Handler to confirm logout
      */
-    public function onCancelSettings(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
     /**
-     * Handler for reset button - shows success dialog
+     * Handler to confirm logout
      */
-    public function onResetSettings(array $params): array
+    public function onConfirmLogout(array $params): void
     {
-        // Get this service ID to receive the callback
-        $serviceId = $this->getServiceComponentId();
+        // Delete Sanctum token if user is authenticated
+        $user = request()->user();
+        if ($user && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
+        }
+        Auth::logout();
 
-        // First close the warning dialog, then show success dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::SUCCESS,
-            title: "¡Completado!",
-            message: "La configuración ha sido reseteada correctamente.",
-            confirmAction: 'close_success_dialog',
-            callerServiceId: $serviceId
-        );
+        // Clear storage variables
+        $this->store_token    = '';
+        $this->store_password = '';
 
-        return $modalUI;
-    }
-
-    /**
-     * Handler to close success dialog
-     */
-    public function onCloseSuccessDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        // Update menu permissions
+        $this->user_menu->trigger("⚙️");
+        $this->user_menu->setUserPermissions(['no-auth']);
+        $this->main_menu->setUserPermissions(['no-auth']);
+        $this->toast('You have been logged out successfully.');
+        $this->redirect();
     }
 
     /**
      * Handler for About info dialog
      */
-    public function onShowAboutInfo(array $params): array
+    public function onShowAboutInfo(array $params): void
     {
         // Get this service ID to receive the callback
         $serviceId = $this->getServiceComponentId();
 
-        // Build info dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::INFO,
             title: "Acerca de USIM Framework",
-            message: "Sistema de componentes UI v1.0\nDesarrollado con Laravel y componentes modulares.\nSoporta: Tables, Modals, Forms, Menus y más.",
+            message: "Sistema de componentes UI v1.0\n
+            Desarrollado con Laravel y componentes modulares.\n
+            Soporta: Tables, Modals, Forms, Menus y más.",
             confirmAction: 'close_about_dialog',
             callerServiceId: $serviceId
         );
-
-        return $modalUI;
     }
 
     /**
      * Handler to close about dialog
      */
-    public function onCloseAboutDialog(array $params): array
+    public function onCloseAboutDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler for Error dialog demo
-     */
-    public function onShowErrorDialog(array $params): array
-    {
-        // Get this service ID to receive the callback
-        $serviceId = $this->getServiceComponentId();
-
-        // Build error dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::ERROR,
-            title: "Error de conexión",
-            message: "No se pudo conectar con el servidor.\nPor favor, verifica tu conexión a internet e intenta nuevamente.",
-            confirmAction: 'close_error_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler to close error dialog
-     */
-    public function onCloseErrorDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler for Timeout dialog (10 seconds)
-     */
-    public function onShowTimeoutDialog(array $params): array
-    {
-        $serviceId = $this->getServiceComponentId();
-        $duration = $params['duration'] ?? 10;
-
-        // Build timeout dialog
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::TIMEOUT,
-            title: "Notificación Temporal",
-            message: "Este mensaje se autodestruirá en:",
-            timeout: $duration,
-            timeUnit: TimeUnit::SECONDS,
-            showCountdown: true,
-            confirmAction: 'close_timeout_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler for Timeout dialog (5 minutes)
-     */
-    public function onShowTimeoutMinutes(array $params): array
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        // Build timeout dialog with minutes
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::TIMEOUT,
-            title: "Sesión Temporal",
-            message: "Tu sesión de prueba expirará en:",
-            timeout: 5,
-            timeUnit: TimeUnit::MINUTES,
-            showCountdown: true,
-            confirmAction: 'close_timeout_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler to close timeout dialog
-     */
-    public function onCloseTimeoutDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler for Timeout dialog without close button (5 seconds)
-     */
-    public function onShowTimeoutNoButton(array $params): array
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        // Build timeout dialog without close button
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::TIMEOUT,
-            title: "Auto-cierre",
-            message: "Este diálogo se cerrará automáticamente en:",
-            timeout: 5,
-            timeUnit: TimeUnit::SECONDS,
-            showCountdown: true,
-            showCloseButton: false, // No mostrar botón de cerrar
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    // ==================== USER MENU HANDLERS ====================
-
-    /**
-     * Handler for Login form
-     */
-    public function onShowLoginForm(array $params): array
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        $loginService = app(\App\Services\UI\Modals\LoginDialogService::class);
-        $modalUI = $loginService->getUI(
-            submitAction: 'submit_login',
-            cancelAction: 'close_login_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
-    }
-
-    /**
-     * Handler to close login dialog
-     */
-    public function onCloseLoginDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler to submit login (receives email and password from form)
-     */
-    public function onSubmitLogin(array $params): array
-    {
-        // TODO: Validate and authenticate user
-        // For now, just show a success message
-        $email = $params['login_email'] ?? '';
-        $password = $params['login_password'] ?? '';
-
-        // Here you would call the API /api/login with email and password
-        // For now, just close the modal
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
@@ -435,8 +173,8 @@ class DemoMenuService extends AbstractUIService
     {
         $serviceId = $this->getServiceComponentId();
 
-        $registerService = app(\App\Services\UI\Modals\RegisterDialogService::class);
-        $modalUI = $registerService->getUI(
+        $registerService = app(RegisterDialogService::class);
+        $modalUI         = $registerService->getUI(
             submitAction: 'submit_register',
             cancelAction: 'close_register_dialog',
             callerServiceId: $serviceId
@@ -448,123 +186,76 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler to close register dialog
      */
-    public function onCloseRegisterDialog(array $params): array
+    public function onCloseRegisterDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
      * Handler to submit register (receives form data)
      */
-    public function onSubmitRegister(array $params): array
+    public function onSubmitRegister(array $params): void
     {
         // TODO: Validate and create user
         // For now, just show a success message
-        $name = $params['register_name'] ?? '';
-        $email = $params['register_email'] ?? '';
-        $password = $params['register_password'] ?? '';
+        $name                 = $params['register_name'] ?? '';
+        $email                = $params['register_email'] ?? '';
+        $password             = $params['register_password'] ?? '';
         $passwordConfirmation = $params['register_password_confirmation'] ?? '';
 
         // Here you would call the API /api/register with the data
         // For now, just close the modal
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
      * Handler for Profile view
      */
-    public function onShowProfile(array $params): array
+    public function onShowProfile(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
 
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
+        ConfirmDialogService::open(
             type: DialogType::INFO,
             title: "User Profile",
             message: "Aquí se mostrará el perfil del usuario.\n(Por implementar)",
             confirmAction: 'close_profile_dialog',
             callerServiceId: $serviceId
         );
-
-        return $modalUI;
     }
 
     /**
      * Handler to close profile dialog
      */
-    public function onCloseProfileDialog(array $params): array
+    public function onCloseProfileDialog(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 
     /**
      * Handler for Logout
      */
-    public function onLogoutUser(array $params): array
+    public function onLogoutUser(array $params): void
     {
         $serviceId = $this->getServiceComponentId();
 
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::WARNING,
-            title: "Logout",
+        ConfirmDialogService::open(
+            type: DialogType::CONFIRM,
+            title: "Cerrar Sesión",
             message: "¿Estás seguro que deseas cerrar sesión?",
             confirmAction: 'confirm_logout',
             cancelAction: 'cancel_logout',
             callerServiceId: $serviceId
         );
 
-        return $modalUI;
-    }
-
-    /**
-     * Handler to confirm logout
-     */
-    public function onConfirmLogout(array $params): array
-    {
-        // TODO: Clear token from localStorage
-        $serviceId = $this->getServiceComponentId();
-
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::SUCCESS,
-            title: "Logout Exitoso",
-            message: "Has cerrado sesión correctamente.",
-            confirmAction: 'close_logout_dialog',
-            callerServiceId: $serviceId
-        );
-
-        return $modalUI;
+        // TODO: Los eventos de los modales no persisten los cambios
     }
 
     /**
      * Handler to cancel logout
      */
-    public function onCancelLogout(array $params): array
+    public function onCancelLogout(array $params): void
     {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
-    }
-
-    /**
-     * Handler to close logout success dialog
-     */
-    public function onCloseLogoutDialog(array $params): array
-    {
-        return [
-            'action' => 'close_modal',
-            'modal_id' => 'confirm_dialog'
-        ];
+        $this->closeModal();
     }
 }

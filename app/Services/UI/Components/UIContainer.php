@@ -2,11 +2,10 @@
 
 namespace App\Services\UI\Components;
 
-use Illuminate\Support\Facades\Log;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\AlignItems;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Contracts\UIElement;
+use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Support\UIIdGenerator;
 
 /**
@@ -30,12 +29,14 @@ class UIContainer implements UIElement
     /** @var array|null Legacy elements array for backward compatibility */
     public ?array $legacyElements = null;
 
-    public function __construct(?string $name = null)
+    public function __construct(?string $name = null, ?string $context = null)
     {
         $this->name = $name;
 
-        // Detectar automáticamente el contexto desde la clase que invoca
-        $context = $this->detectCallingContext();
+        if ($context === null) {
+            // Detectar automáticamente el contexto desde la clase que invoca
+            $context = $this->detectCallingContext();
+        }
 
         // Generar ID según si tiene nombre o no
         if ($this->name !== null) {
@@ -53,6 +54,7 @@ class UIContainer implements UIElement
             'layout' => LayoutType::VERTICAL->value,
             'parent' => null,
             'title' => null,
+            'root' => false,
 
             // Flexbox properties
             'flex_direction' => null,
@@ -146,6 +148,14 @@ class UIContainer implements UIElement
     /**
      * {@inheritDoc}
      */
+    public function isContainer(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public static function deserialize(int $id, array $data): UIContainer
     {
         $container = new self();
@@ -227,6 +237,28 @@ class UIContainer implements UIElement
     public function visible(bool $visible = true): self
     {
         return $this->setVisible($visible);
+    }
+
+    /**
+     * Set the root flag for this container
+     *
+     * @param bool $root True if this is the root container, false otherwise
+     * @return self For method chaining
+     */
+    public function root(bool $root = true): self
+    {
+        $this->config['root'] = $root;
+        return $this;
+    }
+
+    /**
+     * Check if this container is marked as root
+     *
+     * @return bool True if root, false otherwise
+     */
+    public function isRoot(): bool
+    {
+        return $this->config['root'] ?? false;
     }
 
     /**
@@ -849,7 +881,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function margin(string $margin): self
+    public function margin(string $margin): static
     {
         $this->config['margin'] = $margin;
         return $this;
@@ -864,7 +896,7 @@ class UIContainer implements UIElement
      * @param string|null $left Left margin
      * @return self For method chaining
      */
-    public function marginEach(?string $top = null, ?string $right = null, ?string $bottom = null, ?string $left = null): self
+    public function marginEach(?string $top = null, ?string $right = null, ?string $bottom = null, ?string $left = null): static
     {
         if ($top !== null) $this->config['margin_top'] = $top;
         if ($right !== null) $this->config['margin_right'] = $right;
@@ -879,7 +911,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginTop(string $margin): self
+    public function marginTop(string $margin): static
     {
         $this->config['margin_top'] = $margin;
         return $this;
@@ -891,7 +923,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginRight(string $margin): self
+    public function marginRight(string $margin): static
     {
         $this->config['margin_right'] = $margin;
         return $this;
@@ -903,7 +935,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginBottom(string $margin): self
+    public function marginBottom(string $margin): static
     {
         $this->config['margin_bottom'] = $margin;
         return $this;
@@ -915,7 +947,7 @@ class UIContainer implements UIElement
      * @param string $margin Margin value
      * @return self For method chaining
      */
-    public function marginLeft(string $margin): self
+    public function marginLeft(string $margin): static
     {
         $this->config['margin_left'] = $margin;
         return $this;
@@ -931,7 +963,7 @@ class UIContainer implements UIElement
      * @param string $width Width value (px, %, vh, auto, etc)
      * @return self For method chaining
      */
-    public function width(string $width): self
+    public function width(string $width): static
     {
         $this->config['width'] = $width;
         return $this;
@@ -943,7 +975,7 @@ class UIContainer implements UIElement
      * @param string $height Height value
      * @return self For method chaining
      */
-    public function height(string $height): self
+    public function height(string $height): static
     {
         $this->config['height'] = $height;
         return $this;
@@ -955,7 +987,7 @@ class UIContainer implements UIElement
      * @param string $width Min width value
      * @return self For method chaining
      */
-    public function minWidth(string $width): self
+    public function minWidth(string $width): static
     {
         $this->config['min_width'] = $width;
         return $this;
@@ -967,7 +999,7 @@ class UIContainer implements UIElement
      * @param string $height Min height value
      * @return self For method chaining
      */
-    public function minHeight(string $height): self
+    public function minHeight(string $height): static
     {
         $this->config['min_height'] = $height;
         return $this;
@@ -979,7 +1011,7 @@ class UIContainer implements UIElement
      * @param string $width Max width value
      * @return self For method chaining
      */
-    public function maxWidth(string $width): self
+    public function maxWidth(string $width): static
     {
         $this->config['max_width'] = $width;
         return $this;
@@ -991,7 +1023,7 @@ class UIContainer implements UIElement
      * @param string $height Max height value
      * @return self For method chaining
      */
-    public function maxHeight(string $height): self
+    public function maxHeight(string $height): static
     {
         $this->config['max_height'] = $height;
         return $this;

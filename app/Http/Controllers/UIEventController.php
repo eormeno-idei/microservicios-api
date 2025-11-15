@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\UI\Support\UIIdGenerator;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\UIChangesCollector;
+use App\Services\UI\Support\UIIdGenerator;
 
 /**
  * UI Event Controller
- * 
+ *
  * Handles UI component events from the frontend.
  * Uses reflection to dynamically route events to service methods
  * based on component ID and action name.
- * 
+ *
  * Flow:
  * 1. Receive event from frontend (component_id, event, action, parameters)
  * 2. Resolve service class from component ID using UIIdGenerator
@@ -23,14 +25,19 @@ use Illuminate\Support\Facades\Log;
  */
 class UIEventController extends Controller
 {
+
+    public function __construct(protected UIChangesCollector $uiChanges) {}
+
     /**
      * Handle UI component event
-     * 
+     *
      * @param Request $request
      * @return JsonResponse
      */
     public function handleEvent(Request $request): JsonResponse
     {
+        $incomingStorage = $request->storage;
+
         // Validate request
         $validated = $request->validate([
             'component_id' => 'required|integer',
@@ -40,7 +47,6 @@ class UIEventController extends Controller
         ]);
 
         $componentId = $validated['component_id'];
-        $event = $validated['event'];
         $action = $validated['action'];
         $parameters = $validated['parameters'] ?? [];
 
@@ -89,44 +95,12 @@ class UIEventController extends Controller
                 ], 404);
             }
 
-            // Check if service uses new AbstractUIService architecture
-            // $usesAbstractService = $service instanceof \App\Services\UI\AbstractUIService;
+            $this->uiChanges->setStorage($incomingStorage);
+            $service->initializeEventContext($incomingStorage);
+            $service->$method($parameters);
+            $service->finalizeEventContext();
 
-            // Initialize event context for AbstractUIService
-            // if ($usesAbstractService) {
-            $service->initializeEventContext();
-            // }
-
-            // Invoke method
-            $result = $service->$method($parameters);
-            if (!is_array($result)) {
-                $result = $service->finalizeEventContext();
-            }
-
-            // Finalize event context for AbstractUIService
-            // if ($usesAbstractService) {
-            // $autoDetectedChanges = $service->finalizeEventContext();
-
-            // If handler returned explicit changes, use those
-            // Otherwise, use auto-detected changes from UI comparison
-            // if (empty($result) || !is_array($result)) {
-            //     $result = $autoDetectedChanges;
-            // }
-            // If handler returned changes, keep them (don't overwrite)
-            // }
-
-            // Ensure result is an array
-            // if (!is_array($result)) {
-            //     $result = ['data' => $result];
-            // }
-
-            // $simpleName = class_basename($serviceClass);
-
-            // Log::info('UI Event: Action executed', [
-            //     'service' => $simpleName,
-            //     'method' => $method,
-            //     'component_id' => $componentId,
-            // ]);
+            $result = $this->uiChanges->all();
 
             return response()->json($result);
         } catch (\Exception $e) {
@@ -146,14 +120,14 @@ class UIEventController extends Controller
 
     /**
      * Convert action name to method name
-     * 
+     *
      * Convention: snake_case → onPascalCase
      * Examples:
      * - test_action → onTestAction
      * - submit_form → onSubmitForm
      * - cancel_form → onCancelForm
      * - open_settings → onOpenSettings
-     * 
+     *
      * @param string $action Action name in snake_case
      * @return string Method name in onPascalCase format
      */

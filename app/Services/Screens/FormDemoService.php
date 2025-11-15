@@ -1,42 +1,36 @@
 <?php
-
 namespace App\Services\Screens;
 
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\ButtonBuilder;
+use App\Services\UI\Components\InputBuilder;
+use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
 
 class FormDemoService extends AbstractUIService
 {
-    // Component references (auto-injected)
     protected LabelBuilder $lbl_instruction;
     protected InputBuilder $input_name;
     protected InputBuilder $input_email;
     protected ButtonBuilder $btn_submit;
     protected LabelBuilder $lbl_result;
 
-    /**
-     * Build the form demo UI
-     */
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
-            ->layout(LayoutType::VERTICAL)
-            ->title('Form Component Demo');
+        $container
+            ->title('Form Component Demo')
+            ->maxWidth('500px')
+            ->centerHorizontal()
+            ->shadow(2)
+            ->padding('30px');
 
-        // Instruction label
         $container->add(
             UIBuilder::label('lbl_instruction')
                 ->text('Fill out the form below (all fields are required):')
                 ->style('info')
         );
 
-        // Name input
         $container->add(
             UIBuilder::input('input_name')
                 ->label('Name')
@@ -44,9 +38,9 @@ class FormDemoService extends AbstractUIService
                 ->value('')
                 ->required(true)
                 ->type('text')
+                ->width('100%')
         );
 
-        // Email input
         $container->add(
             UIBuilder::input('input_email')
                 ->label('Email')
@@ -54,9 +48,9 @@ class FormDemoService extends AbstractUIService
                 ->value('')
                 ->required(true)
                 ->type('email')
+                ->width('100%')
         );
 
-        // Submit button
         $container->add(
             UIBuilder::button('btn_submit')
                 ->label('Submit Form')
@@ -64,14 +58,11 @@ class FormDemoService extends AbstractUIService
                 ->style('primary')
         );
 
-        // Result label
         $container->add(
             UIBuilder::label('lbl_result')
                 ->text('Fill the form to continue')
                 ->style('secondary')
         );
-
-        return $container;
     }
 
     /**
@@ -81,7 +72,7 @@ class FormDemoService extends AbstractUIService
     public function onSubmitForm(array $params): void
     {
         // Get input values from frontend parameters (sent by collectContextValues)
-        $name = trim($params['input_name'] ?? '');
+        $name  = trim($params['input_name'] ?? '');
         $email = trim($params['input_email'] ?? '');
 
         // Validation errors array
@@ -97,14 +88,14 @@ class FormDemoService extends AbstractUIService
         // Validate email
         if (empty($email)) {
             $errors[] = 'Email is required';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        } elseif (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $errors[] = 'Email is invalid';
         }
 
         // Show errors or success
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             $errorMessage = "❌ Validation errors:\n" . implode("\n", array_map(fn($e) => "  • $e", $errors));
-            
+
             $this->lbl_result
                 ->text($errorMessage)
                 ->style('danger');
@@ -112,7 +103,7 @@ class FormDemoService extends AbstractUIService
             $this->lbl_result
                 ->text("✅ Form submitted successfully!\n\nName: {$name}\nEmail: {$email}")
                 ->style('success');
-            
+
             // Clear form inputs after successful submission
             $this->input_name->value('');
             $this->input_email->value('');

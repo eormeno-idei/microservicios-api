@@ -1,8 +1,5 @@
 <?php
-
 namespace App\Services\UI\Components;
-
-use App\Services\UI\Support\UIIdGenerator;
 
 /**
  * Menu Dropdown Builder
@@ -11,27 +8,15 @@ use App\Services\UI\Support\UIIdGenerator;
  */
 class MenuDropdownBuilder extends UIComponent
 {
-    // private array $config = [];
     private array $items = [];
-    // private string $name;
-
-    // public function __construct(string $name)
-    // {
-    //     $this->name = $name;
-    //     $this->config = [
-    //         'type' => 'menu_dropdown',
-    //         'name' => $name,
-    //         'items' => []
-    //     ];
-    // }
 
     public function getDefaultConfig(): array
     {
         return [
-            'type' => 'menu_dropdown',
-            'name' => $this->name,
-            'items' => []
-         ];
+            'name'        => $this->name,
+            'items'       => [],
+            'permissions' => [],
+        ];
     }
 
     /**
@@ -42,8 +27,29 @@ class MenuDropdownBuilder extends UIComponent
         // Copy items to config before rendering
         $this->config['items'] = $this->items;
 
+        // Ensure permissions array is in config
+        if (! isset($this->config['permissions'])) {
+            $this->config['permissions'] = [];
+        }
+
         // Call parent implementation
         return parent::toJson($order);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public static function deserialize(int $id, array $config): self
+    {
+        /** @var MenuDropdownBuilder $component */
+        $component = parent::deserialize($id, $config);
+        if (isset($config['items']) && is_array($config['items'])) {
+            $component->items = $config['items'];
+        }
+        if (isset($config['permissions']) && is_array($config['permissions'])) {
+            $component->config['permissions'] = $config['permissions'];
+        }
+        return $component;
     }
 
     /**
@@ -54,6 +60,7 @@ class MenuDropdownBuilder extends UIComponent
      * @param array $params Action parameters
      * @param string|null $icon Icon emoji or text
      * @param array $submenu Submenu items
+     * @param string|null $permission Permission required ('auth' for authenticated, specific permission slug, or null for public)
      * @return self
      */
     public function item(
@@ -61,14 +68,16 @@ class MenuDropdownBuilder extends UIComponent
         ?string $action = null,
         array $params = [],
         ?string $icon = null,
-        array $submenu = []
+        array $submenu = [],
+        ?string $permission = null
     ): self {
         $item = [
-            'label' => $label,
-            'action' => $action,
-            'params' => $params,
-            'icon' => $icon,
-            'submenu' => $submenu
+            'label'      => $label,
+            'action'     => $action,
+            'params'     => $params,
+            'icon'       => $icon,
+            'submenu'    => $submenu,
+            'permission' => $permission,
         ];
 
         $this->items[] = $item;
@@ -83,7 +92,7 @@ class MenuDropdownBuilder extends UIComponent
     public function separator(): self
     {
         $this->items[] = [
-            'type' => 'separator'
+            'type' => 'separator',
         ];
         return $this;
     }
@@ -94,14 +103,16 @@ class MenuDropdownBuilder extends UIComponent
      * @param string $label Item label
      * @param string $url URL to navigate to
      * @param string|null $icon Icon emoji or text
+     * @param string|null $permission Permission required ('auth' for authenticated, specific permission slug, or null for public)
      * @return self
      */
-    public function link(string $label, string $url, ?string $icon = null): self
+    public function link(string $label, string $url, ?string $icon = null, ?string $permission = null): self
     {
         $item = [
-            'label' => $label,
-            'url' => $url,
-            'icon' => $icon,
+            'label'      => $label,
+            'url'        => $url,
+            'icon'       => $icon,
+            'permission' => $permission,
         ];
 
         $this->items[] = $item;
@@ -122,26 +133,14 @@ class MenuDropdownBuilder extends UIComponent
         $callback($submenuBuilder);
 
         $item = [
-            'label' => $label,
-            'icon' => $icon,
-            'submenu' => $submenuBuilder->items
+            'label'   => $label,
+            'icon'    => $icon,
+            'submenu' => $submenuBuilder->items,
         ];
 
         $this->items[] = $item;
         return $this;
     }
-
-    /**
-     * Set the parent container for this menu
-     *
-     * @param string $parentId Parent container ID or name
-     * @return self
-     */
-    // public function parent(string $parentId): self
-    // {
-    //     $this->config['parent'] = $parentId;
-    //     return $this;
-    // }
 
     /**
      * Set the caller service ID for action callbacks
@@ -167,8 +166,8 @@ class MenuDropdownBuilder extends UIComponent
     {
         $this->config['trigger'] = [
             'label' => $label,
-            'icon' => $icon,
-            'style' => $style
+            'icon'  => $icon,
+            'style' => $style,
         ];
         return $this;
     }
@@ -186,33 +185,36 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
-     * Set menu width
+     * Set menu width (overrides parent to accept int or string)
      *
-     * @param int $width Width in pixels
-     * @return self
+     * @param int|string $width Width in pixels (int) or with units (string)
+     * @return static
      */
-    public function width(int $width = 240): self
+    public function width(int | string $width): static
     {
-        $this->config['width'] = $width . 'px';
+        if (is_int($width)) {
+            $this->config['width'] = $width . 'px';
+        } else {
+            $this->config['width'] = $width;
+        }
         return $this;
     }
 
     /**
-     * Build and return the menu configuration
+     * Set user permissions for menu visibility control
      *
-     * @return array
+     * @param array|null $permissions Array of user permissions, or null to clear
+     * @return self
      */
-    // public function build(): array
-    // {
-    //     $this->config['items'] = $this->items;
-
-    //     // Generate unique ID for this menu
-    //     $id = UIIdGenerator::generate($this->name);
-    //     $this->config['_id'] = $id;
-
-    //     // Return as properly formatted UI component array
-    //     return [
-    //         $id => $this->config
-    //     ];
-    // }
+    public function setUserPermissions(?array $permissions = null): self
+    {
+        if ($permissions === null || empty($permissions)) {
+            // No authenticated user - add 'no-auth' marker
+            $this->config['permissions'] = ['no-auth'];
+        } else {
+            // Set permissions as provided (no automatic additions)
+            $this->config['permissions'] = $permissions;
+        }
+        return $this;
+    }
 }

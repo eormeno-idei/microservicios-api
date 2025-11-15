@@ -119,6 +119,16 @@ class CheckboxBuilder extends UIComponent
     }
 
     /**
+     * Get the checked state
+     * 
+     * @return bool
+     */
+    public function isChecked(): bool
+    {
+        return $this->config['checked'] ?? false;
+    }
+
+    /**
      * Set the checkbox value
      * For single checkbox: any value to submit when checked
      * For checkbox group: array of selected values

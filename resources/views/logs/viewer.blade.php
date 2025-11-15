@@ -115,7 +115,7 @@
             min-height: 500px;
             max-height: 70vh;
             overflow-y: auto;
-            font-size: 11px;
+            font-size: 14px;
             line-height: 1.5;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
@@ -323,7 +323,8 @@
             container.innerHTML = '<div class="loading">Cargando logs...</div>';
 
             try {
-                const response = await fetch(`/logs/content?file=${file}&lines=${lines}&search=${encodeURIComponent(search)}`, {
+                const logsApiUrl = `/logs/content?file=${file}&lines=${lines}&search=${encodeURIComponent(search)}`;
+                const response = await fetch(logsApiUrl, {
                     headers: {
                         'X-CSRF-TOKEN': csrfToken,
                         'X-Requested-With': 'XMLHttpRequest'

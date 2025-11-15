@@ -2,17 +2,17 @@
 
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\UIBuilder;
 
 class LandingDemoService extends AbstractUIService
 {
-    protected function buildBaseUI(...$params): UIContainer
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container = UIBuilder::container('main')
-            ->parent('main')
+        $container //= UIBuilder::container('main')
+            //->parent('main')
             ->layout(LayoutType::VERTICAL)
             ->shadow(false)
             ->justifyContent('center')
@@ -104,7 +104,7 @@ class LandingDemoService extends AbstractUIService
                 ->addAction('Documentación', 'view_docs', [], 'info')
         );
 
-        return $container;
+        // return $container;
     }
 
     /**

@@ -166,7 +166,7 @@ UIRenderer.handleUIUpdate() → Aplica cambios al DOM
 - `table` - Tablas con paginación
 - `card` - Tarjetas visuales
 - `container` - Contenedores para agrupar componentes
-- `menu_dropdown` - Menús desplegables
+- `menudropdown` - Menús desplegables
 
 **Anatomía de un componente:**
 ```php

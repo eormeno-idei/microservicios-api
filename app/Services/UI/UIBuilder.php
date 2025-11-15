@@ -119,9 +119,9 @@ class UIBuilder
      * @param string|null $name The optional semantic name for the container
      * @return UIContainer
      */
-    public static function container(?string $name = null): UIContainer
+    public static function container(?string $name = null, ?string $context = null): UIContainer
     {
-        return new UIContainer($name);
+        return new UIContainer($name, $context);
     }
 
     /**
