@@ -22,8 +22,8 @@ class DemoMenuService extends AbstractUIService
 {
     protected MenuDropdownBuilder $main_menu;
     protected MenuDropdownBuilder $user_menu;
-    protected string $store_token;
-    protected string $store_password;
+    protected string $store_token = '';
+    protected string $store_password = '';
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {

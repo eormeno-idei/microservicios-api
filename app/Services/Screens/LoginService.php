@@ -94,16 +94,13 @@ class LoginService extends AbstractUIService
             $this->store_token    = $token;
             $this->store_email    = $email;
             $this->store_password = $password;
-            // $this->lbl_login_result
-            //     ->text("Login successful!\nWelcome, " . $user->name . "!")
-            //     ->style('success');
 
             // Disparar evento - TODOS los servicios en ui-services.php lo recibirán
             event(new UsimEvent('logged_user', [
                 'user'      => $user,
                 'timestamp' => now(),
             ]));
-            $this->toast("Login successful! Welcome, {$user->name}!");
+            $this->toast("Login successful! Welcome, {$user->name}!", 'success');
             $this->redirect();
         } else {
             // Authentication failed
