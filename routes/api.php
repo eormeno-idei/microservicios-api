@@ -10,12 +10,12 @@ Route::get('/ping', fn() => response()->json([
     'message' => 'API is running correctly'
 ]));
 
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
 // Rutas para reset de contraseña
-Route::post('/password/forgot', [AuthController::class, 'forgotPassword']);
-Route::post('/password/reset', [AuthController::class, 'resetPassword']);
+Route::post('/password/forgot', [AuthController::class, 'forgotPassword'])->name('api.password.forgot');
+Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('api.password.reset');
 
 // Ruta para verificar email
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
