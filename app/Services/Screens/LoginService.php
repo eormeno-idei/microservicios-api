@@ -1,20 +1,22 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Support\UIDebug;
+use App\Models\User;
+use App\Events\UsimEvent;
 use App\Services\UI\UIBuilder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Components\LabelBuilder;
 
 class LoginService extends AbstractUIService
 {
-    protected string $store_email    = 'admin@email.com';
+    protected string $store_email = 'admin@email.com';
     protected string $store_password = '2444';
-    protected string $store_token    = '';
+    protected string $store_token = '';
     protected LabelBuilder $lbl_login_result;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
@@ -76,17 +78,42 @@ class LoginService extends AbstractUIService
 
     public function onSubmitLogin(array $params): void
     {
-        $email    = $params['login_email'] ?? '';
+        $email = $params['login_email'] ?? '';
         $password = $params['login_password'] ?? '';
-        $remember  = $params['remember'] ?? false;
+        $remember = $params['remember'] ?? false;
 
         $response = $this->httpPost('api.login', [
-            'email'    => $email,
+            'email' => $email,
             'password' => $password,
             'remember' => $remember,
         ]);
 
-        UIDebug::info('Login response:', $response);
+        $message = $response['message'] ?? 'Login failed.';
+        $status = $response['status'] ?? 'error';
+        $this->toast($message, $status);
+        $this->lbl_login_result->text($message)->style($status);
+
+        if ($response['status'] === 'error') {
+            return;
+        }
+
+        $this->store_token = $response['data']['token'] ?? '';
+        $this->store_email = $email;
+        $this->store_password = $password;
+
+        $user = User::where('email', $email)->first();
+        Auth::login($user);
+
+        // Disparar evento - TODOS los servicios en ui-services.php lo recibirán
+        event(new UsimEvent('logged_user', [
+            'user' => $user,
+            'timestamp' => now(),
+        ]));
+
+        $this->redirect();
+
+        // UIDebug::info('Token stored:', ['token' => $this->store_token]);
+
 
         // // Here I use the Auth facade for authentication
         // if (Auth::attempt(['email' => $email, 'password' => $password])) {
@@ -117,7 +144,7 @@ class LoginService extends AbstractUIService
 
     private function httpPost(string $route, array $data): array
     {
-        $url      = route($route);
+        $url = route($route);
         $response = Http::post($url, $data);
         return $response->json();
     }

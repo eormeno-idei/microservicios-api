@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -83,9 +84,12 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
+            UIDebug::error('Credenciales inválidas para el email: ' . $request->email);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Credenciales inválidas',
+                'errors' => ['email' => ['The provided credentials are incorrect.']]
+            ], 401);
         }
 
         // Determinar el nombre del token según "remember"

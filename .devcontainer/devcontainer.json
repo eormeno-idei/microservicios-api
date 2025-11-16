@@ -4,6 +4,16 @@
     "forwardPorts": [
         8000
     ],
+    "portsAttributes": {
+        "8000": {
+            "label": "Laravel Octane",
+            "onAutoForward": "openBrowser"
+        },
+        "6001": {
+            "label": "RoadRunner RPC (Internal)",
+            "onAutoForward": "ignore"
+        }
+    },
     "postCreateCommand": "bash -c 'composer install && (cp .env.example .env || true) && php artisan key:generate --force && php artisan migrate --seed --force && (php artisan storage:link || true) && chmod -R 775 storage bootstrap/cache'",
     "postStartCommand": "bash /workspaces/microservicios-api/.devcontainer/init.sh",
     "customizations": {

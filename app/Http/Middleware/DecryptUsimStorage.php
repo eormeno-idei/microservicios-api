@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\UI\Support\UIDebug;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\DecryptException;

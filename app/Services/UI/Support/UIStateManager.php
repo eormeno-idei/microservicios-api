@@ -35,7 +35,7 @@ class UIStateManager
 
     /**
      * Get or create a unique client identifier
-     * 
+     *
      * This identifier persists across sessions and survives logout,
      * allowing UI preferences to be maintained per device/browser.
      *
@@ -156,7 +156,8 @@ class UIStateManager
     public static function get(string $serviceClass): ?array
     {
         $cacheKey = self::getCacheKey($serviceClass);
-        $cache    = json_decode(Cache::get($cacheKey), true);
+        $content  = Cache::get($cacheKey);
+        $cache    = ($content === null || $content === '') ? null : json_decode($content, true);
 
         $result   = is_array($cache) ? $cache : null;
         $logLevel = $result !== null ? 'info' : 'error';
