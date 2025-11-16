@@ -4,14 +4,7 @@
     "forwardPorts": [
         8000
     ],
-    "postCreateCommand": [
-        "composer install",
-        "cp .env.example .env || true",
-        "php artisan key:generate --force",
-        "php artisan migrate --seed --force",
-        "php artisan storage:link || true",
-        "chmod -R 775 storage bootstrap/cache"
-    ],
+    "postCreateCommand": "bash -c 'composer install && (cp .env.example .env || true) && php artisan key:generate --force && php artisan migrate --seed --force && (php artisan storage:link || true) && chmod -R 775 storage bootstrap/cache'",
     "postStartCommand": "bash /workspaces/microservicios-api/.devcontainer/init.sh",
     "customizations": {
         "vscode": {
