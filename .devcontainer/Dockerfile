@@ -14,7 +14,7 @@ ENV LC_ALL=es_ES.UTF-8
 
 # Instala PHP 8.3 y extensiones comunes para Laravel, incluyendo SQLite
 RUN apt-get update && \
-    apt-get install -y software-properties-common tzdata && \
+    apt-get install -y software-properties-common tzdata ca-certificates gnupg && \
     add-apt-repository ppa:ondrej/php -y && \
     apt-get update && \
     apt-get install -y \
@@ -35,6 +35,13 @@ RUN apt-get update && \
         htop \
         vim \
         nano
+
+# Instalar Node.js 20 LTS
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+
+# Verificar instalación de Node.js y npm
+RUN node --version && npm --version
 
 # Limpieza
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
