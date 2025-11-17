@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\UserController;
 
 Route::get('/ping', fn() => response()->json([
     'success' => true,
@@ -68,8 +69,24 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// Endpoint de prueba para archivos (sin autenticación para testing)
-Route::post('/test-files', [FileController::class, 'upload']);
-Route::get('/test-files', [FileController::class, 'index']);
-Route::get('/test-files/download/{filename}', [FileController::class, 'download']);
-Route::delete('/test-files/{filename}', [FileController::class, 'delete']);
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::apiResource('users', UserController::class);
+
+    // Rutas adicionales específicas si las necesitas
+    // Route::post('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+    // Route::delete('users/{user}/force-delete', [UserController::class, 'forceDelete'])->name('users.force-delete');
+});
+
+/*
+ * Esto genera automáticamente las siguientes rutas (protegidas con Sanctum y rol admin):
+ * GET    /api/users           -> index   (Lista todos los usuarios)
+ * POST   /api/users           -> store   (Crea un nuevo usuario)
+ * GET    /api/users/{user}    -> show    (Muestra un usuario específico)
+ * PUT    /api/users/{user}    -> update  (Actualiza un usuario completo)
+ * PATCH  /api/users/{user}    -> update  (Actualiza parcialmente un usuario)
+ * DELETE /api/users/{user}    -> destroy (Elimina un usuario)
+ *
+ * Todas las rutas requieren:
+ * - Autenticación mediante token de Sanctum
+ * - Rol de 'admin' (usando Spatie Permission)
+ */
