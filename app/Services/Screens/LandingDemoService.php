@@ -11,8 +11,7 @@ class LandingDemoService extends AbstractUIService
 {
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        $container //= UIBuilder::container('main')
-            //->parent('main')
+        $container
             ->layout(LayoutType::VERTICAL)
             ->shadow(false)
             ->justifyContent('center')
@@ -23,22 +22,22 @@ class LandingDemoService extends AbstractUIService
         $container->add(
             UIBuilder::label('welcome')
                 ->text('🚀 Welcome to USIM UI Framework')
-                ->style('h2')
+                ->style('h1')
                 ->center()
         );
 
         $container->add(
             UIBuilder::label('subtitle')
-                ->text('Sistema moderno de componentes UI para aplicaciones web')
-                ->style('h4')
+                ->text('A modern UI component system for web applications')
+                ->style('h2')
                 ->center()
         );
 
         // Features Section
         $container->add(
             UIBuilder::label('features_title')
-                ->text('✨ Características Principales')
-                ->style('h2')
+                ->text('✨ Key Features')
+                ->style('h3')
                 ->center()
         );
 
