@@ -22,7 +22,7 @@ test('user can request password reset link', function () {
 
     $response->assertStatus(200)
             ->assertJson([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Password reset link sent to your email address',
             ]);
 
@@ -36,7 +36,7 @@ test('user cannot request password reset with invalid email', function () {
 
     $response->assertStatus(404)
             ->assertJson([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'We can\'t find a user with that email address.',
             ]);
 });
@@ -46,7 +46,7 @@ test('forgot password validates email field', function () {
 
     $response->assertStatus(422)
             ->assertJson([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
             ])
             ->assertJsonValidationErrors('email');
@@ -69,7 +69,7 @@ test('user can reset password with valid token', function () {
 
     $response->assertStatus(200)
             ->assertJson([
-                'success' => true,
+                'status' => 'success',
                 'message' => 'Password has been reset successfully',
             ]);
 
@@ -90,7 +90,7 @@ test('user cannot reset password with invalid token', function () {
 
     $response->assertStatus(400)
             ->assertJson([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Unable to reset password',
             ]);
 });
@@ -100,7 +100,7 @@ test('password reset validates required fields', function () {
 
     $response->assertStatus(422)
             ->assertJson([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
             ])
             ->assertJsonValidationErrors(['token', 'email', 'password']);
@@ -116,7 +116,7 @@ test('password reset validates password confirmation', function () {
 
     $response->assertStatus(422)
             ->assertJson([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
             ])
             ->assertJsonValidationErrors('password');

@@ -108,7 +108,7 @@ test('index puede buscar usuarios por email', function () {
 
 test('index puede ordenar por nombre ascendente', function () {
     User::factory()->create(['name' => 'Zulema']);
-    User::factory()->create(['name' => 'Alberto']);
+    User::factory()->create(['name' => 'Aalberto']);
 
     $response = $this->actingAs($this->admin, 'sanctum')
         ->getJson('/api/users?sort_by=name&sort_direction=asc');
@@ -116,12 +116,12 @@ test('index puede ordenar por nombre ascendente', function () {
     $response->assertStatus(200);
     $data = $response->json('data');
 
-    expect($data[0]['name'])->toBe('Alberto');
+    expect($data[0]['name'])->toBe('Aalberto');
 });
 
 test('index puede ordenar por email descendente', function () {
     User::factory()->create(['email' => 'a@test.com']);
-    User::factory()->create(['email' => 'z@test.com']);
+    User::factory()->create(['email' => 'zzzz@test.com']);
 
     $response = $this->actingAs($this->admin, 'sanctum')
         ->getJson('/api/users?sort_by=email&sort_direction=desc');
@@ -129,7 +129,7 @@ test('index puede ordenar por email descendente', function () {
     $response->assertStatus(200);
     $data = $response->json('data');
 
-    expect($data[0]['email'])->toBe('z@test.com');
+    expect($data[0]['email'])->toBe('zzzz@test.com');
 });
 
 test('index puede ordenar por cantidad de roles', function () {
