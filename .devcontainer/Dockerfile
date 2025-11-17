@@ -1,5 +1,4 @@
 FROM ubuntu:22.04
-
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Argentina/San_Juan
 
@@ -21,7 +20,21 @@ RUN apt-get update && \
     apt-get install -y \
         php8.3 php8.3-cli php8.3-mbstring php8.3-xml php8.3-bcmath php8.3-curl php8.3-zip \
         php8.3-sqlite3 php8.3-pdo php8.3-pdo-mysql php8.3-gd php8.3-intl php8.3-readline \
-        openssl curl git unzip composer
+        openssl curl git unzip composer \
+        # Herramientas de red y diagnóstico
+        iputils-ping \
+        net-tools \
+        dnsutils \
+        traceroute \
+        telnet \
+        netcat-openbsd \
+        wget \
+        iproute2 \
+        tcpdump \
+        nmap \
+        htop \
+        vim \
+        nano
 
 # Limpieza
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
