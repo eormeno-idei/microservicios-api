@@ -4,6 +4,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\CustomVerifyEmailNotification;
+use Spatie\Permission\Models\Role;
 
 describe('Email Verification', function () {
 
@@ -18,6 +19,9 @@ describe('Email Verification', function () {
             'password' => 'password123',
             'password_confirmation' => 'password123',
         ];
+
+        Role::create(['name' => 'admin']);
+        Role::create(['name' => 'user']);
 
         $response = $this->postJson('/api/register', $userData);
 

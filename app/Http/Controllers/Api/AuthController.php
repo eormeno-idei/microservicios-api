@@ -29,7 +29,7 @@ class AuthController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
+                'status' => 'error',
                 'message' => 'Validation errors',
                 'errors' => $validator->errors()
             ], 422);
@@ -134,7 +134,6 @@ class AuthController extends Controller
             'message' => 'Sesión cerrada exitosamente'
         ]);
     }
-
     public function verifyEmail(Request $request)
     {
         $user = User::find($request->route('id'));
@@ -182,7 +181,6 @@ class AuthController extends Controller
             'message' => 'Email verified successfully'
         ], 200);
     }
-
     public function resendVerificationEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {
