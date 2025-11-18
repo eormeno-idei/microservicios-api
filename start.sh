@@ -66,4 +66,4 @@ fi
 # Start the Laravel server (this will block the terminal)
 echo "Starting Laravel server..."
 # php artisan serve
-php artisan octane:start --host=0.0.0.0 --port=8000
+php artisan octane:start --watch --host=0.0.0.0 --port=8000

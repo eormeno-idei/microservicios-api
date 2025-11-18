@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Support\UIStateManager;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\DecryptException;
@@ -37,7 +38,9 @@ class DecryptUsimStorage
             $request->merge(['storage' => $storage]);
 
             if (!empty($storage['store_token'])) {
-                $request->headers->set('Authorization', 'Bearer ' . $storage['store_token']);
+                $store_token = $storage['store_token'];
+                $request->headers->set('Authorization', 'Bearer ' . $store_token);
+                UIStateManager::setAuthToken($store_token);
             }
         }
 

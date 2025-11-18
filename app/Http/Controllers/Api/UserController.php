@@ -69,21 +69,25 @@ class UserController extends Controller
         });
 
         return response()->json([
-            'data' => $transformedUsers,
-            'pagination' => [
-                'current_page' => $users->currentPage(),
-                'total_pages' => $users->lastPage(),
-                'per_page' => $users->perPage(),
-                'total_items' => $users->total(),
-                'from' => $users->firstItem(),
-                'to' => $users->lastItem(),
-            ],
-            'links' => [
-                'first' => $users->url(1),
-                'last' => $users->url($users->lastPage()),
-                'prev' => $users->previousPageUrl(),
-                'next' => $users->nextPageUrl(),
-            ],
+            'status' => 'success',
+            'message' => 'Usuarios recuperados exitosamente',
+            'data' => [
+                'users' => $transformedUsers,
+                'pagination' => [
+                    'current_page' => $users->currentPage(),
+                    'total_pages' => $users->lastPage(),
+                    'per_page' => $users->perPage(),
+                    'total_items' => $users->total(),
+                    'from' => $users->firstItem(),
+                    'to' => $users->lastItem(),
+                ],
+                'links' => [
+                    'first' => $users->url(1),
+                    'last' => $users->url($users->lastPage()),
+                    'prev' => $users->previousPageUrl(),
+                    'next' => $users->nextPageUrl(),
+                ],
+            ]
         ]);
     }
 

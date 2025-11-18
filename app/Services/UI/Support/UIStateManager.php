@@ -74,7 +74,7 @@ class UIStateManager
      * @param string|null $userId Optional user ID (deprecated, not used)
      * @return string Cache key
      */
-    public static function getCacheKey(?string $serviceClass = null, ?string $userId = null, string $prefix = 'ui_state'): string
+    public static function getCacheKey(?string $serviceClass = null, string $prefix = 'ui_state'): string
     {
         $serviceBaseName = $serviceClass ? class_basename($serviceClass) : '';
         $clientId = self::getOrCreateClientId();
@@ -91,7 +91,7 @@ class UIStateManager
      */
     private static function storeRootComponentId(string $parent, string $rootComponentId): void
     {
-        $parents          = session()->get('ui_parents', []);
+        $parents = session()->get('ui_parents', []);
         $parents[$parent] = $rootComponentId;
         session()->put('ui_parents', $parents);
     }
@@ -120,20 +120,20 @@ class UIStateManager
         }
 
         // Get TTL from environment or use default
-        $ttl          = env('UI_CACHE_TTL', self::DEFAULT_TTL);
+        $ttl = env('UI_CACHE_TTL', self::DEFAULT_TTL);
         $encodedState = json_encode($uiState);
 
         // Store main UI state
         $cacheKey = self::getCacheKey($serviceClass);
-        $result   = Cache::put($cacheKey, $encodedState, $ttl);
+        $result = Cache::put($cacheKey, $encodedState, $ttl);
         $logLevel = $result ? 'warning' : 'error';
 
-        UIDebug::$logLevel("Stored UI State of {$serviceClass}", [
-            'result'    => $result ? 'CACHED' : 'NOT CACHED',
-            'cache_key' => $cacheKey,
-            'ids'       => implode(', ', array_keys($uiState)),
-            'caller'    => self::getCallerServiceInfo(),
-        ]);
+        // UIDebug::$logLevel("Stored UI State of {$serviceClass}", [
+        //     'result' => $result ? 'CACHED' : 'NOT CACHED',
+        //     'cache_key' => $cacheKey,
+        //     'ids' => implode(', ', array_keys($uiState)),
+        //     'caller' => self::getCallerServiceInfo(),
+        // ]);
 
         // Store root component ID and its parent container
         $firstKey = array_key_first($uiState);
@@ -156,18 +156,18 @@ class UIStateManager
     public static function get(string $serviceClass): ?array
     {
         $cacheKey = self::getCacheKey($serviceClass);
-        $content  = Cache::get($cacheKey);
-        $cache    = ($content === null || $content === '') ? null : json_decode($content, true);
+        $content = Cache::get($cacheKey);
+        $cache = ($content === null || $content === '') ? null : json_decode($content, true);
 
-        $result   = is_array($cache) ? $cache : null;
+        $result = is_array($cache) ? $cache : null;
         $logLevel = $result !== null ? 'info' : 'error';
 
-        UIDebug::$logLevel("Retrieving UI State of {$serviceClass}", [
-            'result'        => $result !== null ? 'FOUND' : 'NOT FOUND',
-            'cache_key'     => $cacheKey,
-            'service_class' => $serviceClass,
-            'caller'        => self::getCallerServiceInfo(),
-        ]);
+        // UIDebug::$logLevel("Retrieving UI State of {$serviceClass}", [
+        //     'result' => $result !== null ? 'FOUND' : 'NOT FOUND',
+        //     'cache_key' => $cacheKey,
+        //     'service_class' => $serviceClass,
+        //     'caller' => self::getCallerServiceInfo(),
+        // ]);
 
         return $result;
     }
@@ -181,31 +181,38 @@ class UIStateManager
     public static function clear(string $serviceClass): bool
     {
         $cacheKey = self::getCacheKey($serviceClass);
-        Cache::clear(); // TODO: Remove this line after testing
+        // Cache::clear(); // TODO: Remove this line after testing
         return Cache::forget($cacheKey);
     }
 
-    /**
-     * Check if UI state exists in cache
-     *
-     * @param string $serviceClass Service class name
-     * @return bool True if cache exists
-     */
-    public static function exists(string $serviceClass): bool
+    public static function setAuthToken(string $token): bool
     {
-        return self::get($serviceClass) !== null;
+        $cacheKey = self::getCacheKey(prefix: 'ui_auth_token');
+        Cache::put($cacheKey, $token, self::DEFAULT_TTL);
+        // UIDebug::info("Stored auth token '$token' in cache with key: $cacheKey");
+        return true;
+    }
+
+    public static function getAuthToken(): ?string
+    {
+        $cacheKey = self::getCacheKey(prefix: 'ui_auth_token');
+        $token = Cache::get($cacheKey);
+        // UIDebug::warning("Retrieved auth token '$token' from cache with key: $cacheKey");
+        return $token;
     }
 
     private static function getCallerServiceInfo(): string
     {
         $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
         foreach ($stack as $frame) {
-            if (isset($frame['class']) &&
+            if (
+                isset($frame['class']) &&
                 str_starts_with($frame['class'], 'App\\Services\\UI\\') &&
-                $frame['class'] !== self::class) {
-                $className    = class_basename($frame['class']);
+                $frame['class'] !== self::class
+            ) {
+                $className = class_basename($frame['class']);
                 $functionName = $frame['function'] ?? 'unknown';
-                $lineNumber   = $frame['line'] ?? null;
+                $lineNumber = $frame['line'] ?? null;
                 return $className . '::' . $functionName . ($lineNumber ? " (line {$lineNumber})" : '');
             }
         }

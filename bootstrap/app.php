@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Use custom EncryptCookies to exclude ui_client_id from encryption
+        $middleware->encryptCookies(except: [
+            'ui_client_id',
+        ]);
+
         $middleware->web(prepend: [
             \App\Http\Middleware\DecryptUsimStorage::class,
         ]);
