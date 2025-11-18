@@ -71,6 +71,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('users', UserController::class);
+    Route::get('users/count', [UserController::class, 'count'])->name('users.count');
 
     // Rutas adicionales específicas si las necesitas
     // Route::post('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');

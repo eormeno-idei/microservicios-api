@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -87,6 +88,21 @@ class UserController extends Controller
                     'prev' => $users->previousPageUrl(),
                     'next' => $users->nextPageUrl(),
                 ],
+            ]
+        ]);
+    }
+
+    public function count(): JsonResponse
+    {
+        $totalUsers = User::count();
+
+        UIDebug::info("Total users count: $totalUsers");
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Conteo de usuarios recuperado exitosamente',
+            'data' => [
+                'count' => $totalUsers,
             ]
         ]);
     }

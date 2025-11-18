@@ -25,15 +25,25 @@ class UserApiTableModel extends AbstractDataTableModel
 
     protected function getAllData(): array
     {
-        $paginationData = $this->getPaginationData();
-        // UIDebug::info("Pagination Data", $paginationData);
+        return [];
+    }
+
+    protected function countTotal(): int
+    {
+        return $this->httpGet('users.count')['data']['count'] ?? 0;
+    }
+
+    public function getPageData(): array
+    {
+        $paginationData = $this->tableBuilder->getPaginationData();
+        $currentPage = $paginationData['current_page'];
+        $perPage = $paginationData['per_page'];
+
         $data = $this->httpGet('users.index', [
-            'per_page' => $paginationData['per_page'],
-            'page' => $paginationData['current_page'],
+            'per_page' => $perPage,
+            'page' => $currentPage,
         ]);
-        // UIDebug::info("Fetched data from API", $users);
         return $data['data']['users'] ?? [];
-        // return User::all()->toArray();
     }
 
     public function getFormattedPageData(int $currentPage, int $perPage): array
@@ -68,9 +78,15 @@ class UserApiTableModel extends AbstractDataTableModel
     {
         $url = route($route);
         $auth_token = UIStateManager::getAuthToken();
+
+        UIDebug::debug("Making HTTP GET request to $url with token '$auth_token'", $queryParams);
+
         $response = Http::withHeaders([
             'Authorization' => "Bearer $auth_token"
         ])->get($url, $queryParams);
+
+        UIDebug::debug("Received response from $url", $response);
+
         return $response->json();
     }
 }
