@@ -1,10 +1,10 @@
-# Material de Estudio: Desarrollo con Laravel I
+# Material de Estudio: Desarrollo Backend I
 
 ## Introducción
 
-Bienvenido a esta guía de estudio completa sobre el desarrollo de aplicaciones web y APIs con Laravel. Este documento consolida una serie de tutoriales prácticos en un manual coherente, diseñado para llevar a los estudiantes desde los conceptos fundamentales de la base de datos hasta la creación de una API REST segura y funcional.
+Esta es una guía de estudio sobre el desarrollo de aplicaciones web y APIs con Laravel. Este documento consolida una serie de tutoriales prácticos en un manual coherente, diseñado para llevar a los estudiantes desde los conceptos fundamentales de la base de datos hasta la creación de una API REST segura y funcional.
 
-A lo largo de estos módulos, aprenderás a estructurar tu base de datos con migraciones, a interactuar con ella de forma elegante usando el ORM Eloquent, a poblarla con datos realistas mediante Seeders y Factories, y a construir la lógica de negocio con Rutas y Controladores. Finalmente, expondremos esta lógica como una API REST y la aseguraremos con un sistema de autenticación y autorización profesional.
+El objetivo es ayudarte a recordar y a resumir todo el proceso llevado a cabo a lo largo de la materia, desde estructurar tu base de datos con migraciones, a interactuar con ella de forma elegante usando el ORM Eloquent, a poblarla con datos realistas mediante Seeders y Factories, y a construir la lógica de negocio con Rutas y Controladores. Finalmente, expondremos esta lógica como una API REST y la aseguraremos con un sistema de autenticación y autorización profesional.
 
 
 ### **Índice del Documento**
