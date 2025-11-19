@@ -13,6 +13,15 @@ use App\Services\UI\Enums\JustifyContent;
  */
 class RegisterDialogService
 {
+
+    public static function open(...$params): void
+    {
+        $dialog = new self();
+        $format = $dialog->getUI(...$params);
+        $uiChanges = app('App\Services\UI\UIChangesCollector');
+        $uiChanges->add($format);
+    }
+
     /**
      * Build register dialog UI
      *
@@ -23,7 +32,7 @@ class RegisterDialogService
      */
     public function getUI(
         string $submitAction = 'submit_register',
-        ?string $cancelAction = 'close_register_dialog',
+        ?string $cancelAction = 'close_modal',
         ?int $callerServiceId = null
     ): array {
         // Main container for the modal
@@ -34,7 +43,7 @@ class RegisterDialogService
 
         // Name input
         $registerContainer->add(
-            UIBuilder::input('register_name')
+            UIBuilder::input('name')
                 ->label('Full Name')
                 ->placeholder('Enter your full name')
                 ->required(true)
@@ -42,7 +51,7 @@ class RegisterDialogService
 
         // Email input
         $registerContainer->add(
-            UIBuilder::input('register_email')
+            UIBuilder::input('email')
                 ->label('Email')
                 ->placeholder('Enter your email')
                 ->required(true)
@@ -50,7 +59,7 @@ class RegisterDialogService
 
         // Password input
         $registerContainer->add(
-            UIBuilder::input('register_password')
+            UIBuilder::input('password')
                 ->label('Password')
                 ->type('password')
                 ->placeholder('Enter your password (min 8 characters)')
@@ -59,10 +68,23 @@ class RegisterDialogService
 
         // Password confirmation
         $registerContainer->add(
-            UIBuilder::input('register_password_confirmation')
+            UIBuilder::input('password_confirmation')
                 ->label('Confirm Password')
                 ->type('password')
                 ->placeholder('Confirm your password')
+                ->required(true)
+        );
+
+        // Role select
+        $registerContainer->add(
+            UIBuilder::select('role')
+                ->label('Role')
+                ->options([
+                    ['value' => 'user', 'label' => 'User'],
+                    ['value' => 'admin', 'label' => 'Admin'],
+                    ['value' => 'moderator', 'label' => 'Moderator'],
+                ])
+                ->value('user')
                 ->required(true)
         );
 
@@ -72,7 +94,7 @@ class RegisterDialogService
             ->justifyContent(JustifyContent::SPACE_BETWEEN)
             ->shadow(false)
             ->gap('10px')
-            ->padding('20px 0 0 0');
+            ->padding('10px 0 0 0');
 
         // Cancel button
         if ($cancelAction) {

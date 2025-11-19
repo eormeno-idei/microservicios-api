@@ -2,9 +2,7 @@
 
 namespace App\Services\UI\DataTable;
 
-use App\Models\User;
-use App\Services\UI\Support\UIDebug;
-use Illuminate\Support\Facades\Http;
+use App\Services\UI\Support\HttpClient;
 use App\Services\UI\Support\UIStateManager;
 
 /**
@@ -17,7 +15,7 @@ class UserApiTableModel extends AbstractDataTableModel
     public function getColumns(): array
     {
         return [
-            'name' => ['label' => 'Name', 'width' => [500, 500]],
+            'name' => ['label' => 'Name', 'width' => [400, 400]],
             'email' => ['label' => 'Email', 'width' => [400, 400]],
             'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
             'roles' => ['label' => 'Roles', 'width' => [200, 200]],
@@ -33,7 +31,7 @@ class UserApiTableModel extends AbstractDataTableModel
 
     protected function countTotal(): int
     {
-        return $this->httpGet('users.count')['data']['count'] ?? 0;
+        return HttpClient::get('users.count')['data']['count'] ?? 0;
     }
 
     public function getPageData(): array
@@ -42,7 +40,7 @@ class UserApiTableModel extends AbstractDataTableModel
         $currentPage = $paginationData['current_page'];
         $perPage = $paginationData['per_page'];
 
-        $data = $this->httpGet('users.index', [
+        $data = HttpClient::get('users.index', [
             'per_page' => $perPage,
             'page' => $currentPage,
         ]);
@@ -76,17 +74,5 @@ class UserApiTableModel extends AbstractDataTableModel
         }
 
         return $formatted;
-    }
-
-    private function httpGet(string $route, array $queryParams = []): array
-    {
-        $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
-
-        $response = Http::withHeaders([
-            'Authorization' => "Bearer $auth_token"
-        ])->get($url, $queryParams);
-
-        return $response->json();
     }
 }
