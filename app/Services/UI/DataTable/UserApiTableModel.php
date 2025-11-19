@@ -17,9 +17,12 @@ class UserApiTableModel extends AbstractDataTableModel
     public function getColumns(): array
     {
         return [
-            'name' => ['label' => 'Name', 'width' => [300, 500]],
-            'email' => ['label' => 'Email', 'width' => [250, 350]],
-            'actions' => ['label' => 'Actions', 'width' => [100, 150]],
+            'name' => ['label' => 'Name', 'width' => [500, 500]],
+            'email' => ['label' => 'Email', 'width' => [400, 400]],
+            'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
+            'roles' => ['label' => 'Roles', 'width' => [200, 200]],
+            'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
+            'actions' => ['label' => 'Actions', 'width' => [150, 150]],
         ];
     }
 
@@ -52,13 +55,14 @@ class UserApiTableModel extends AbstractDataTableModel
         $formatted = [];
 
         foreach ($users as $index => $user) {
-            // rowIndex is the visual row index in the table (0-based within current page)
-            // $rowIndex = $index;
 
             $formatted[] = [
                 // 'id' => $user['id'],
                 'name' => $user['name'],
                 'email' => $user['email'],
+                'email_verified' => $user['email_verified'] ? '✅' : '⚠️',
+                'roles' => $user['roles'],
+                'updated_at' => $user['updated_at'],
                 'actions' => [
                     'button' => [
                         'label' => "✏️",
@@ -79,13 +83,9 @@ class UserApiTableModel extends AbstractDataTableModel
         $url = route($route);
         $auth_token = UIStateManager::getAuthToken();
 
-        UIDebug::debug("Making HTTP GET request to $url with token '$auth_token'", $queryParams);
-
         $response = Http::withHeaders([
             'Authorization' => "Bearer $auth_token"
         ])->get($url, $queryParams);
-
-        UIDebug::debug("Received response from $url", $response);
 
         return $response->json();
     }

@@ -5,7 +5,6 @@ use App\Services\UI\UIBuilder;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\TableBuilder;
-use App\Services\UI\DataTable\UsersTableModel;
 use App\Services\UI\DataTable\UserApiTableModel;
 
 class AdminDashboardService extends AbstractUIService
@@ -16,7 +15,7 @@ class AdminDashboardService extends AbstractUIService
     {
         $container
             ->title('Admin Dashboard')
-            ->maxWidth('800px')
+            ->maxWidth('1200px')
             ->centerHorizontal()
             ->padding('20px')
             ->shadow(2);

@@ -62,10 +62,10 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
-                'email_verified_at' => $user->email_verified_at,
+                'email_verified' => $user->email_verified_at ? true : false,
                 'roles' => $rolesString,
-                'created_at' => $user->created_at,
-                'updated_at' => $user->updated_at,
+                'created_at' => $user->created_at->diffForHumans(),
+                'updated_at' => $user->updated_at->diffForHumans(),
             ];
         });
 
@@ -95,8 +95,6 @@ class UserController extends Controller
     public function count(): JsonResponse
     {
         $totalUsers = User::count();
-
-        UIDebug::info("Total users count: $totalUsers");
 
         return response()->json([
             'status' => 'success',
