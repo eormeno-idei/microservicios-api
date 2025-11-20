@@ -120,6 +120,6 @@ class RegisterDialogService
 
         $registerContainer->add($buttonsContainer);
 
-        return $registerContainer->build();
+        return $registerContainer->toJson();
     }
 }

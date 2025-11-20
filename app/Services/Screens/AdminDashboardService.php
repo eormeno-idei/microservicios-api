@@ -22,11 +22,10 @@ class AdminDashboardService extends AbstractUIService
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
-            ->title('Admin Dashboard')
             ->maxWidth('1200px')
             ->centerHorizontal()
-            ->padding('20px')
-            ->shadow(2);
+            ->padding('10px')
+            ->shadow(0);
 
         $toolbar = UIBuilder::container('users_toolbar')
             ->layout(LayoutType::HORIZONTAL)
@@ -48,9 +47,9 @@ class AdminDashboardService extends AbstractUIService
         $container->add($toolbar);
 
         $table = UIBuilder::table('users_table')
-            ->pagination(10)
+            ->pagination(7)
             ->dataModel(UserApiTableModel::class)
-            ->rowMinHeight(40);
+            ->rowMinHeight(50);
 
         $container->add($table);
     }

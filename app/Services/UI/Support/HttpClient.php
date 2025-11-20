@@ -13,18 +13,26 @@ use Illuminate\Http\Client\Response;
 class HttpClient
 {
     /**
+     * Get common headers with authentication
+     */
+    private static function getHeaders(): array
+    {
+        return [
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
+            'Authorization' => "Bearer " . UIStateManager::getAuthToken()
+        ];
+    }
+
+    /**
      * Execute GET request
      */
     public static function get(string $route, array $queryParams = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->get($url, $queryParams);
+        $response = Http::withHeaders(self::getHeaders())
+            ->get($url, $queryParams);
 
         return $response->json();
     }
@@ -35,13 +43,9 @@ class HttpClient
     public static function post(string $route, array $data = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->post($url, $data);
+        $response = Http::withHeaders(self::getHeaders())
+            ->post($url, $data);
 
         return $response->json();
     }
@@ -52,13 +56,9 @@ class HttpClient
     public static function put(string $route, array $data = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->put($url, $data);
+        $response = Http::withHeaders(self::getHeaders())
+            ->put($url, $data);
 
         return $response->json();
     }
@@ -69,13 +69,9 @@ class HttpClient
     public static function patch(string $route, array $data = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->patch($url, $data);
+        $response = Http::withHeaders(self::getHeaders())
+            ->patch($url, $data);
 
         return $response->json();
     }
@@ -86,13 +82,9 @@ class HttpClient
     public static function delete(string $route, array $data = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->delete($url, $data);
+        $response = Http::withHeaders(self::getHeaders())
+            ->delete($url, $data);
 
         return $response->json();
     }
@@ -103,13 +95,9 @@ class HttpClient
     public static function request(string $method, string $route, array $data = []): array
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        $response = Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->send($method, $url, ['json' => $data]);
+        $response = Http::withHeaders(self::getHeaders())
+            ->send($method, $url, ['json' => $data]);
 
         return $response->json();
     }
@@ -120,13 +108,9 @@ class HttpClient
     public static function getRaw(string $route, array $queryParams = []): Response
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        return Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->get($url, $queryParams);
+        return Http::withHeaders(self::getHeaders())
+            ->get($url, $queryParams);
     }
 
     /**
@@ -135,12 +119,8 @@ class HttpClient
     public static function postRaw(string $route, array $data = []): Response
     {
         $url = route($route);
-        $auth_token = UIStateManager::getAuthToken();
 
-        return Http::withHeaders([
-            "Content-Type" => "application/json",
-            "Accept" => "application/json",
-            'Authorization' => "Bearer $auth_token"
-        ])->post($url, $data);
+        return Http::withHeaders(self::getHeaders())
+            ->post($url, $data);
     }
 }

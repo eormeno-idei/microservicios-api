@@ -85,6 +85,6 @@ class LoginDialogService
 
         $loginContainer->add($buttonsContainer);
 
-        return $loginContainer->build();
+        return $loginContainer->toJson();
     }
 }

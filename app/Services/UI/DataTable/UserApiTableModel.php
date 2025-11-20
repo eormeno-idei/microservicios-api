@@ -16,9 +16,9 @@ class UserApiTableModel extends AbstractDataTableModel
     {
         return [
             'name' => ['label' => 'Name', 'width' => [400, 400]],
-            'email' => ['label' => 'Email', 'width' => [400, 400]],
+            'email' => ['label' => 'Email', 'width' => [350, 350]],
             'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
-            'roles' => ['label' => 'Roles', 'width' => [200, 200]],
+            'role' => ['label' => 'Role', 'width' => [100, 100]],
             'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
             'actions' => ['label' => 'Actions', 'width' => [150, 150]],
         ];
