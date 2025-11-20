@@ -63,7 +63,7 @@ class AdminDashboardService extends AbstractUIService
 
     public function onSubmitRegister(array $params): void
     {
-        UIDebug::info('New user registered', $params);
+        // UIDebug::info('New user registered', $params);
         $params['roles'] = [$params['roles']];
         $response = HttpClient::post('users.store', $params);
         $status = $response['status'] ?? 'success';
@@ -72,11 +72,6 @@ class AdminDashboardService extends AbstractUIService
         if ($status === 'success') {
             $this->closeModal();
         }
-    }
-
-    public function onCloseModal(array $params): void
-    {
-        $this->closeModal();
     }
 
     public function onChangePage(array $params): void

@@ -76,7 +76,8 @@ abstract class AbstractUIService
     abstract protected function buildBaseUI(UIContainer $container, ...$params): void;
 
     protected function postLoadUI(): void
-    {}
+    {
+    }
 
     /**
      * Initialize event context
@@ -91,7 +92,7 @@ abstract class AbstractUIService
     public function initializeEventContext(array $incomingStorage = [], bool $debug = false): void
     {
         $this->container = $this->getUIContainer($debug);
-        $this->oldUI     = $this->container->toJson();
+        $this->oldUI = $this->container->toJson();
 
         // Inject storage values into protected properties (store_* variables)
         $this->injectStorageValues($incomingStorage);
@@ -129,12 +130,12 @@ abstract class AbstractUIService
             $propertyName = $property->getName();
 
             // Only process properties that start with 'store_'
-            if (! str_starts_with($propertyName, 'store_')) {
+            if (!str_starts_with($propertyName, 'store_')) {
                 continue;
             }
 
             // Check if this key exists in incoming storage
-            if (! array_key_exists($propertyName, $incomingStorage)) {
+            if (!array_key_exists($propertyName, $incomingStorage)) {
                 continue;
             }
 
@@ -170,7 +171,7 @@ abstract class AbstractUIService
             $propertyType = $property->getType();
 
             // Skip if no type hint or is a built-in type
-            if (! $propertyType || $propertyType->isBuiltin()) {
+            if (!$propertyType || $propertyType->isBuiltin()) {
                 continue;
             }
 
@@ -179,11 +180,11 @@ abstract class AbstractUIService
             // Only process UI component types
             if (str_starts_with($typeName, 'App\\Services\\UI\\Components\\')) {
                 $componentName = $property->getName();
-                $component     = $this->container->findByName($componentName);
+                $component = $this->container->findByName($componentName);
 
                 if ($component) {
                     $property->setValue($this, $component);
-                } elseif (! $propertyType->allowsNull()) {
+                } elseif (!$propertyType->allowsNull()) {
                     // Component not found and property is not nullable
                     throw new RuntimeException(
                         "Component '{$componentName}' not found in UI container. " .
@@ -212,14 +213,14 @@ abstract class AbstractUIService
         // Get current UI state
         $this->newUI = $this->container->toJson();
 
-        if (! $reload) {
+        if (!$reload) {
             // Store updated UI
             $this->storeUI($this->container);
         }
 
-        $diff          = $this->buildDiffResponse($reload);
+        $diff = $this->buildDiffResponse($reload);
         $reloadMessage = $reload ? '🔄 RELOAD' : '📝 NO RELOAD';
-        $reloadedIds   = implode(', ', array_keys($diff));
+        $reloadedIds = implode(', ', array_keys($diff));
         // UIDebug::debug("UI Diff Response ({$reloadMessage})", $reload ? $reloadedIds : $diff);
 
         $storageVariables = $this->getStorageVariables();
@@ -236,8 +237,8 @@ abstract class AbstractUIService
     protected function buildDiffResponse(bool $reload = false): array
     {
         $diff = $reload ?
-        UIDiffer::compare([], $this->newUI) :
-        UIDiffer::compare($this->oldUI, $this->newUI);
+            UIDiffer::compare([], $this->newUI) :
+            UIDiffer::compare($this->oldUI, $this->newUI);
 
         $result = [];
         foreach ($diff as $componentId => $changes) {
@@ -284,9 +285,9 @@ abstract class AbstractUIService
             return $cachedUI;
         }
 
-        $current_class      = static::class;
+        $current_class = static::class;
         $current_class_slug = strtolower(str_replace('\\', '_', $current_class));
-        $container          = UIBuilder::container($current_class_slug, $current_class)
+        $container = UIBuilder::container($current_class_slug, $current_class)
             ->parent($parent)
             ->padding(30)
             ->layout(LayoutType::VERTICAL)
@@ -330,16 +331,16 @@ abstract class AbstractUIService
      */
     private function reconstructContainerFromJson(array $jsonUI): UIContainer
     {
-        $components    = [];
+        $components = [];
         $rootContainer = null;
 
         // UIDebug::debug("Reconstructing UI Container from JSON", $jsonUI);
 
         // First pass: instantiate all components
         foreach ($jsonUI as $id => $component) {
-            $type      = $component['type'];
+            $type = $component['type'];
             $className = $this->mapTypeToClass($type);
-            if (! $className) {
+            if (!$className) {
                 throw new RuntimeException("Unknown component type '{$type}'.");
             }
             $components[$id] = $className::deserialize($id, $component);
@@ -353,11 +354,11 @@ abstract class AbstractUIService
                 $rootContainer = $component;
             }
 
-            if (! $parentId) {
+            if (!$parentId) {
                 throw new RuntimeException("Component '{$id}' has no parent defined.");
             }
 
-            if (! $parentId || ! isset($components[$parentId])) {
+            if (!$parentId || !isset($components[$parentId])) {
                 continue;
             }
 
@@ -369,7 +370,7 @@ abstract class AbstractUIService
             $component->postConnect();
         }
 
-        if (! $rootContainer) {
+        if (!$rootContainer) {
             throw new RuntimeException("No root container found in UI JSON.");
         }
 
@@ -381,21 +382,21 @@ abstract class AbstractUIService
     private function mapTypeToClass(string $type): ?string
     {
         return match ($type) {
-            'label'           => LabelBuilder::class,
-            'button'          => ButtonBuilder::class,
-            'input'           => InputBuilder::class,
-            'select'          => SelectBuilder::class,
-            'checkbox'        => CheckboxBuilder::class,
-            'card'            => CardBuilder::class,
-            'table'           => TableBuilder::class,
-            'container'       => UIContainer::class,
-            'tablerow'        => TableRowBuilder::class,
-            'tablecell'       => TableCellBuilder::class,
+            'label' => LabelBuilder::class,
+            'button' => ButtonBuilder::class,
+            'input' => InputBuilder::class,
+            'select' => SelectBuilder::class,
+            'checkbox' => CheckboxBuilder::class,
+            'card' => CardBuilder::class,
+            'table' => TableBuilder::class,
+            'container' => UIContainer::class,
+            'tablerow' => TableRowBuilder::class,
+            'tablecell' => TableCellBuilder::class,
             'tableheadercell' => TableHeaderCellBuilder::class,
-            'form'            => FormBuilder::class,
-            'tableheaderrow'  => TableHeaderRowBuilder::class,
-            'menudropdown'    => MenuDropdownBuilder::class,
-            'default'         => null,
+            'form' => FormBuilder::class,
+            'tableheaderrow' => TableHeaderRowBuilder::class,
+            'menudropdown' => MenuDropdownBuilder::class,
+            'default' => null,
         };
     }
 
@@ -426,7 +427,8 @@ abstract class AbstractUIService
      * @return void
      */
     public function onResetService(): void
-    {}
+    {
+    }
 
     /**
      * Get the service component ID
@@ -468,7 +470,7 @@ abstract class AbstractUIService
      */
     public function getStorageVariables(): array
     {
-        $storage    = [];
+        $storage = [];
         $reflection = new ReflectionClass($this);
         $properties = $reflection->getProperties(ReflectionProperty::IS_PROTECTED);
 
@@ -476,11 +478,11 @@ abstract class AbstractUIService
             $propertyName = $property->getName();
             if (str_starts_with($propertyName, 'store_')) {
                 $propertyType = $property->getType();
-                if ($propertyType && ! $propertyType->allowsNull()) {
-                    $typeName    = $propertyType->getName();
+                if ($propertyType && !$propertyType->allowsNull()) {
+                    $typeName = $propertyType->getName();
                     $isPrimitive = in_array($typeName, ['int', 'float', 'string', 'bool', 'array']);
                     if ($isPrimitive) {
-                        $value                  = $property->getValue($this);
+                        $value = $property->getValue($this);
                         $storage[$propertyName] = $value;
                     }
                 }
@@ -488,6 +490,14 @@ abstract class AbstractUIService
         }
 
         return $storage;
+    }
+
+    /**
+     * Generic handler for 'close_modal' action
+     */
+    public function onCloseModal(array $params): void
+    {
+        $this->closeModal();
     }
 
     /**
@@ -502,26 +512,49 @@ abstract class AbstractUIService
         ]);
     }
 
-    protected function toast(string $message,
+    /**
+     * Requests to front to renderize a toast type message.
+     *
+     * @param string $message
+     * @param string $type
+     * @param int $duration
+     * @param string $openEffect
+     * @param string $showEffect
+     * @param string $closeEffect
+     * @param string $position
+     * @return void
+     */
+    protected function toast(
+        string $message,
         string $type = 'info',
         int $duration = 5000,
         string $openEffect = 'fade',
         string $showEffect = 'bounce',
         string $closeEffect = 'fade',
-        string $position = 'top-right'): void {
+        string $position = 'top-right'
+    ): void {
         $this->uiChanges()->add([
             'toast' => [
-                'message'      => $message,
-                'type'         => $type,
-                'duration'     => $duration,
-                'open_effect'  => $openEffect,
-                'show_effect'  => $showEffect,
+                'message' => $message,
+                'type' => $type,
+                'duration' => $duration,
+                'open_effect' => $openEffect,
+                'show_effect' => $showEffect,
                 'close_effect' => $closeEffect,
-                'position'     => $position,
+                'position' => $position,
             ],
         ]);
     }
 
+    /**
+     * Requests to front to perform a redirect to the given URL.
+     *
+     * If no URL is provided, it will use Laravel's intended redirect
+     * (the previous URL or the default URL if none).
+     *
+     * @param string|null $url The URL to redirect to, or null to use intended redirect
+     * @return void
+     */
     protected function redirect(?string $url = null): void
     {
         // If no URL provided, use Laravel's intended redirect (previous URL or default)
@@ -531,6 +564,13 @@ abstract class AbstractUIService
 
         $this->uiChanges()->add([
             'redirect' => $url,
+        ]);
+    }
+
+    protected function updateModal(array $content): void
+    {
+        $this->uiChanges()->add([
+            'update_modal' => $content,
         ]);
     }
 }
