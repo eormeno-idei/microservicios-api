@@ -77,7 +77,7 @@ class RegisterDialogService
 
         // Role select
         $registerContainer->add(
-            UIBuilder::select('role')
+            UIBuilder::select('roles')
                 ->label('Role')
                 ->options([
                     ['value' => 'user', 'label' => 'User'],

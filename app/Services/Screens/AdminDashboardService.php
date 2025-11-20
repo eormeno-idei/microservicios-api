@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Screens;
 
+use App\Services\UI\Support\HttpClient;
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Enums\LayoutType;
@@ -64,7 +65,14 @@ class AdminDashboardService extends AbstractUIService
     public function onSubmitRegister(array $params): void
     {
         UIDebug::info('New user registered', $params);
-        $this->closeModal();
+        $params['roles'] = [$params['roles']];
+        $response = HttpClient::post('users.store', $params);
+        $status = $response['status'] ?? 'success';
+        $message = $response['message'] ?? 'User registered successfully';
+        $this->toast($message, $status);
+        if ($status === 'success') {
+            $this->closeModal();
+        }
     }
 
     public function onCloseModal(array $params): void

@@ -129,6 +129,7 @@ class UserController extends Controller
         }
 
         return response()->json([
+            'status' => 'success',
             'message' => 'Usuario creado exitosamente',
             'data' => $user->load('roles'),
         ], 201);
@@ -153,7 +154,7 @@ class UserController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['sometimes', 'confirmed', Password::defaults()],
-            'roles' => ['sometimes', 'array'],
+            'roles' => ['sometimes', 'string', 'array'],
             'roles.*' => ['exists:roles,name'],
         ]);
 

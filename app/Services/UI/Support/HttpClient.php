@@ -21,6 +21,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->get($url, $queryParams);
 
@@ -36,6 +38,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->post($url, $data);
 
@@ -51,6 +55,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->put($url, $data);
 
@@ -66,6 +72,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->patch($url, $data);
 
@@ -81,6 +89,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->delete($url, $data);
 
@@ -96,6 +106,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         $response = Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->send($method, $url, ['json' => $data]);
 
@@ -111,6 +123,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         return Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->get($url, $queryParams);
     }
@@ -124,6 +138,8 @@ class HttpClient
         $auth_token = UIStateManager::getAuthToken();
 
         return Http::withHeaders([
+            "Content-Type" => "application/json",
+            "Accept" => "application/json",
             'Authorization' => "Bearer $auth_token"
         ])->post($url, $data);
     }
