@@ -33,7 +33,7 @@ class AdminDashboardService extends AbstractUIService
             ->gap("12px");
 
         $search = UIBuilder::input('search_users')
-            ->placeholder('Buscar usuario...')
+            ->placeholder('Search users...')
             ->width('300px')
             ->autocomplete('off');
 
@@ -46,12 +46,12 @@ class AdminDashboardService extends AbstractUIService
         $toolbar->add($search)->add($addBtn);
         $container->add($toolbar);
 
-        $table = UIBuilder::table('users_table')
-            ->pagination(7)
+        $users_table = UIBuilder::table('users_table')
+            ->pagination(10)
             ->dataModel(UserApiTableModel::class)
-            ->rowMinHeight(50);
+            ->rowMinHeight(60);
 
-        $container->add($table);
+        $container->add($users_table);
     }
 
     public function onAddUserClicked(array $params): void
