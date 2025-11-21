@@ -1,11 +1,10 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\Support\HttpClient;
 use App\Services\UI\UIBuilder;
-use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
+use App\Services\UI\Support\HttpClient;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\TableBuilder;
@@ -63,14 +62,32 @@ class AdminDashboardService extends AbstractUIService
 
     public function onSubmitRegister(array $params): void
     {
-        // UIDebug::info('New user registered', $params);
         $params['roles'] = [$params['roles']];
         $response = HttpClient::post('users.store', $params);
         $status = $response['status'] ?? 'success';
         $message = $response['message'] ?? 'User registered successfully';
-        $this->toast($message, $status);
+
         if ($status === 'success') {
+            $this->toast($message, 'success');
             $this->closeModal();
+        } else {
+            $this->toast($message, 'error');
+
+            // Update modal inputs with validation errors
+            $errors = $response['errors'] ?? [];
+
+            if (!empty($errors)) {
+                $modalUpdates = [];
+
+                foreach ($errors as $fieldName => $messages) {
+                    // Concatenate all error messages for the field
+                    $modalUpdates[$fieldName] = [
+                        'error' => implode(' ', $messages)
+                    ];
+                }
+
+                $this->updateModal($modalUpdates);
+            }
         }
     }
 

@@ -1665,6 +1665,7 @@ class UIRenderer {
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
+        console.log('📨 Received UI update:', uiUpdate);
         // console.log('📦 Processing UI updates:', uiUpdate);
 
         // Handle storage updates if present
@@ -1702,8 +1703,15 @@ class UIRenderer {
             return; // Don't process as regular updates
         }
 
+        // Check for update_modal (modal component updates)
+        if (uiUpdate.update_modal) {
+            updateModalComponents(uiUpdate.update_modal);
+            // Don't return - continue processing other updates like toast
+        }
+
         // Check for special actions
         if (uiUpdate.action) {
+            console.log('🎬 Action detected:', uiUpdate.action);
             switch (uiUpdate.action) {
                 case 'show_modal':
                     if (uiUpdate.modal) {
@@ -2236,6 +2244,54 @@ function closeModal() {
     document.body.classList.remove('modal-open');
 
     console.log('✅ Modal closed');
+}
+
+/**
+ * Update components inside modal
+ * @param {Object} updates - Object with component names as keys and their updates as values
+ */
+function updateModalComponents(updates) {
+    const modalContainer = document.getElementById('modal');
+
+    if (!modalContainer) {
+        console.error('❌ Modal container not found');
+        return;
+    }
+
+    // First, clear all existing errors in modal inputs
+    const allInputGroups = modalContainer.querySelectorAll('.ui-input-group');
+    allInputGroups.forEach(inputGroup => {
+        if (globalRenderer) {
+            globalRenderer.updateComponent(inputGroup, { error: null });
+        }
+    });
+
+    // Iterate through each field update
+    for (const [fieldName, changes] of Object.entries(updates)) {
+        // Find the input group by looking for an input with id matching the field name
+        // The input id is set to the component name in InputComponent.render()
+        const input = modalContainer.querySelector(`input[id="${fieldName}"]`);
+
+        if (!input) {
+            console.warn(`⚠️ Input field "${fieldName}" not found in modal`);
+            continue;
+        }
+
+        // Get the input's wrapper (ui-input-group) which is the component container
+        const inputGroup = input.closest('.ui-input-group');
+
+        if (!inputGroup) {
+            console.warn(`⚠️ Input group not found for field "${fieldName}"`);
+            continue;
+        }
+
+        // Apply the changes using the existing updateComponent logic
+        if (globalRenderer) {
+            globalRenderer.updateComponent(inputGroup, changes);
+        } else {
+            console.error('❌ Global renderer not available');
+        }
+    }
 }
 
 /**
