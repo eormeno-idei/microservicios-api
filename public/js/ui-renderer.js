@@ -393,6 +393,10 @@ class InputComponent extends UIComponent {
         input.disabled = this.config.disabled || false;
         input.readonly = this.config.readonly || false;
 
+        if (this.config.autocomplete) {
+            input.setAttribute('autocomplete', this.config.autocomplete);
+        }
+
         if (this.config.name) {
             input.name = this.config.name;
             input.id = this.config.name;

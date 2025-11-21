@@ -34,7 +34,8 @@ class AdminDashboardService extends AbstractUIService
 
         $search = UIBuilder::input('search_users')
             ->placeholder('Buscar usuario...')
-            ->width('300px');
+            ->width('300px')
+            ->autocomplete('off');
 
         $addBtn = UIBuilder::button('add_user_btn')
             ->label('Add user')
@@ -69,6 +70,7 @@ class AdminDashboardService extends AbstractUIService
 
         if ($status === 'success') {
             $this->toast($message, 'success');
+            $this->users_table->updateTableData();
             $this->closeModal();
         } else {
             $this->toast($message, 'error');

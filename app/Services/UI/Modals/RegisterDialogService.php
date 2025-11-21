@@ -5,6 +5,7 @@ namespace App\Services\UI\Modals;
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\UIChangesCollector;
 
 /**
  * Register Dialog Service
@@ -18,7 +19,7 @@ class RegisterDialogService
     {
         $dialog = new self();
         $format = $dialog->getUI(...$params);
-        $uiChanges = app('App\Services\UI\UIChangesCollector');
+        $uiChanges = app(UIChangesCollector::class);
         $uiChanges->add($format);
     }
 
@@ -39,7 +40,7 @@ class RegisterDialogService
         $registerContainer = UIBuilder::container('register_dialog')
             ->parent('modal')
             ->shadow(false)
-            ->padding('30px');
+            ->padding('20px');
 
         // Name input
         $registerContainer->add(
@@ -47,6 +48,7 @@ class RegisterDialogService
                 ->label('Full Name')
                 ->placeholder('Enter your full name')
                 ->required(true)
+                ->autocomplete('off')
         );
 
         // Email input
@@ -55,6 +57,7 @@ class RegisterDialogService
                 ->label('Email')
                 ->placeholder('Enter your email')
                 ->required(true)
+                ->autocomplete('off')
         );
 
         // Password input
@@ -64,6 +67,7 @@ class RegisterDialogService
                 ->type('password')
                 ->placeholder('Enter your password (min 8 characters)')
                 ->required(true)
+                ->autocomplete('new-password')
         );
 
         // Password confirmation
@@ -73,6 +77,7 @@ class RegisterDialogService
                 ->type('password')
                 ->placeholder('Confirm your password')
                 ->required(true)
+                ->autocomplete('new-password')
         );
 
         // Role select

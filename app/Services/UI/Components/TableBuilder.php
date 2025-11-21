@@ -9,7 +9,7 @@ use App\Services\UI\DataTable\AbstractDataTableModel;
 
 /**
  * Table Builder
- * 
+ *
  * A table with fixed dimensions (rows × columns) where:
  * - Structure is defined upfront
  * - All cells are initially empty
@@ -44,7 +44,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Create a new table
-     * 
+     *
      * @param string|null $name Table name
      * @param int $rows Number of data rows (0 for dynamic)
      * @param int $cols Number of columns (0 for dynamic)
@@ -111,13 +111,11 @@ class TableBuilder extends UIComponent
         return $this;
     }
 
-
-
     /**
      * Update table data for the current page
      * Clears existing rows and fills them with data from the current page
      */
-    private function updateTableData(): void
+    public function updateTableData(): void
     {
         $model = $this->getModel();
         if (!$model) {
@@ -159,7 +157,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get the data model instance
-     * 
+     *
      * @return AbstractDataTableModel|null
      */
     public function getModel(): ?AbstractDataTableModel
@@ -175,7 +173,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get the current configuration
-     * 
+     *
      * @return array
      */
     public function getConfig(): array
@@ -246,10 +244,10 @@ class TableBuilder extends UIComponent
 
     /**
      * Reconstruct the rowBuilders array from rowsContainer's children
-     * 
+     *
      * After deserialization, $rowBuilders is empty so we need to rebuild it
      * by iterating through the rowsContainer's children.
-     * 
+     *
      * @return void
      */
     private function reconstructRowBuilders(): void
@@ -273,13 +271,13 @@ class TableBuilder extends UIComponent
 
     /**
      * Reconstruct the cells matrix from the component hierarchy
-     * 
+     *
      * Iterates through rows stored in $rowBuilders and extracts their cells
      * to rebuild the $this->cells two-dimensional array.
-     * 
+     *
      * This is called after deserialization when the component tree is fully
      * reconnected, ensuring we have access to all cell components.
-     * 
+     *
      * @return void
      */
     private function reconstructCellsMatrix(): void
@@ -308,7 +306,7 @@ class TableBuilder extends UIComponent
     /**
      * Create and return a header row for this table
      * Only one header row is allowed per table
-     * 
+     *
      * @param string|null $name Optional name for the header row
      * @return TableHeaderRowBuilder The header row builder
      */
@@ -327,7 +325,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get the header row if it exists
-     * 
+     *
      * @return TableHeaderRowBuilder|null
      */
     public function getHeaderRow(): ?TableHeaderRowBuilder
@@ -338,7 +336,7 @@ class TableBuilder extends UIComponent
     /**
      * Create a new table row associated with this table
      * Automatically adds the row to the table
-     * 
+     *
      * @param string|null $name Optional name for the row
      * @return TableRowBuilder The new row builder
      */
@@ -351,7 +349,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Add a row component to this table
-     * 
+     *
      * @param TableRowBuilder $row The row to add
      * @return self For method chaining
      */
@@ -364,7 +362,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get the rows container
-     * 
+     *
      * @return UIContainer
      */
     public function getRowsContainer(): UIContainer
@@ -404,7 +402,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Fill the header row with data
-     * 
+     *
      * @param array $data Array of header values (strings)
      * @return self
      */
@@ -430,7 +428,7 @@ class TableBuilder extends UIComponent
     /**
      * Clear all data rows (set all cells to empty strings)
      * This is useful for pagination or when reloading data
-     * 
+     *
      * @return self
      */
     public function clearRows(): self
@@ -446,7 +444,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Fill a data row with values
-     * 
+     *
      * @param int $row Row index (0-based)
      * @param array $data Array of cell data
      *                    - string: text content
@@ -491,10 +489,10 @@ class TableBuilder extends UIComponent
 
     /**
      * Get the cell ID for a specific row and column
-     * 
+     *
      * Format: tableId_row_col
      * Example: 88001_0_1 (table 88001, row 0, col 1)
-     * 
+     *
      * @param int $row Row index (0-based)
      * @param int $col Column index (0-based)
      * @return int Cell ID
@@ -514,7 +512,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get a specific cell builder
-     * 
+     *
      * @param int $row Row index (0-based)
      * @param int $col Column index (0-based)
      * @return TableCellBuilder
@@ -535,11 +533,11 @@ class TableBuilder extends UIComponent
 
     /**
      * Edit the content of a specific cell
-     * 
+     *
      * This is a convenience method to quickly update a cell's text content.
      * For more complex cell modifications (buttons, images, etc.), use getCell()
      * and modify the cell builder directly.
-     * 
+     *
      * @param int $row Row index (0-based)
      * @param int $col Column index (0-based)
      * @param string $text New text content for the cell
@@ -554,7 +552,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set the table title
-     * 
+     *
      * @param string $title The table title
      * @return self
      */
@@ -565,7 +563,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set the table alignment within its parent container
-     * 
+     *
      * @param string $align Alignment: 'left', 'center', or 'right'
      * @return self
      */
@@ -580,7 +578,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set minimum height for all rows
-     * 
+     *
      * @param int $height Minimum height in pixels
      * @return self
      */
@@ -596,7 +594,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set width constraints for a specific column
-     * 
+     *
      * @param int $col Column index (0-based)
      * @param int|null $minWidth Minimum width in pixels (null = no min)
      * @param int|null $maxWidth Maximum width in pixels (null = no max)
@@ -633,7 +631,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set width constraints for all columns at once
-     * 
+     *
      * @param array $widths Array of width configs: [[min, max], [min, max], ...]
      * @return self
      */
@@ -650,7 +648,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Set pagination page size. If perPage is 0, pagination is disabled.
-     * 
+     *
      * @param int $perPage Number of items per page
      * @return self
      */
@@ -674,7 +672,7 @@ class TableBuilder extends UIComponent
      * - getColumns(): array of column definitions
      * - getPaginationInfo(): pagination information
      * - getFormattedPageData(): formatted data for current page
-     * 
+     *
      * @param mixed $dataModel The data model instance
      * @return self
      */
@@ -745,7 +743,7 @@ class TableBuilder extends UIComponent
 
     /**
      * Get table dimensions
-     * 
+     *
      * @return array ['rows' => int, 'cols' => int]
      */
     public function getDimensions(): array
