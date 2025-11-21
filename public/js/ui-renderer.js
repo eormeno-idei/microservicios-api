@@ -1979,9 +1979,7 @@ class UIRenderer {
                         input.classList.remove('ui-input-error');
                     }
                 }
-            }
-
-            // Options (selects)
+            }            // Options (selects)
             if (changes.options !== undefined) {
                 const select = element.querySelector('select') || (element.tagName === 'SELECT' ? element : null);
                 if (select) {

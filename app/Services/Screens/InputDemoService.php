@@ -5,6 +5,7 @@ use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 
 /**
@@ -66,6 +67,14 @@ class InputDemoService extends AbstractUIService
         );
     }
 
+    protected function postLoadUI(): void
+    {
+        $this->input_text->value('')->error(null);
+        $this->lbl_result
+            ->text('Result will appear here')
+            ->style('default');
+    }
+
     /**
      * Handle "Validate" button click
      *
@@ -77,19 +86,25 @@ class InputDemoService extends AbstractUIService
      */
     public function onGetValue(array $params): void
     {
+        UIDebug::info('Validate button clicked', $params);
         $inputValue = trim($params['input_text'] ?? '');
 
         // Clear previous error
         $this->input_text->error(null);
 
         if (empty($inputValue)) {
-            $this->input_text->error('Name is required');
-            $this->lbl_result->text('❌ Please fix the error above')->style('danger');
-        } elseif (strlen($inputValue) < 3) {
-            $this->input_text->error('Name must be at least 3 characters');
-            $this->lbl_result->text('❌ Please fix the error above')->style('danger');
+            $this->displayError('Name is required');
+        } elseif (\strlen($inputValue) < 3) {
+            $this->displayError('Name must be at least 3 characters');
         } else {
             $this->lbl_result->text("✅ Valid name: \"{$inputValue}\"")->style('success');
         }
+    }
+
+    private function displayError(string $message): void
+    {
+        $this->input_text->error($message);
+        $this->toast($message, 'error');
+        $this->lbl_result->text('❌ Please fix the error above')->style('danger');
     }
 }

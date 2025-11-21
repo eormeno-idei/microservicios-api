@@ -65,6 +65,15 @@ class FormDemoService extends AbstractUIService
         );
     }
 
+    protected function postLoadUI(): void
+    {
+        $this->input_name->value("")->error(null);
+        $this->input_email->value("")->error(null);
+        $this->lbl_result
+            ->text('Fill the form to continue')
+            ->style('secondary');
+    }
+
     /**
      * Handle form submission with validation
      * Reads input values from frontend parameters (sent by collectContextValues)
