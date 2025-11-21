@@ -38,6 +38,10 @@ class InputBuilder extends UIComponent
             'icon_position' => 'left',
             'style' => 'default',
             'size' => 'medium',
+            'on_input' => null,
+            'on_change' => null,
+            'on_enter' => null,
+            'debounce' => null,
         ];
     }
 
@@ -315,5 +319,61 @@ class InputBuilder extends UIComponent
     public function size(string $size): self
     {
         return $this->setConfig('size', $size);
+    }
+
+    /**
+     * Set action to trigger on input event (while typing)
+     *
+     * @param string $action Action name to call
+     * @param array $parameters Additional parameters to send
+     * @return self For method chaining
+     */
+    public function onInput(string $action, array $parameters = []): self
+    {
+        return $this->setConfig('on_input', [
+            'action' => $action,
+            'parameters' => $parameters,
+        ]);
+    }
+
+    /**
+     * Set action to trigger on change event (after blur)
+     *
+     * @param string $action Action name to call
+     * @param array $parameters Additional parameters to send
+     * @return self For method chaining
+     */
+    public function onChange(string $action, array $parameters = []): self
+    {
+        return $this->setConfig('on_change', [
+            'action' => $action,
+            'parameters' => $parameters,
+        ]);
+    }
+
+    /**
+     * Set action to trigger when Enter key is pressed
+     *
+     * @param string $action Action name to call
+     * @param array $parameters Additional parameters to send
+     * @return self For method chaining
+     */
+    public function onEnter(string $action, array $parameters = []): self
+    {
+        return $this->setConfig('on_enter', [
+            'action' => $action,
+            'parameters' => $parameters,
+        ]);
+    }
+
+    /**
+     * Set debounce time (in milliseconds) for onInput event
+     *
+     * @param int $ms Milliseconds to wait before triggering action
+     * @return self For method chaining
+     */
+    public function debounce(int $ms): self
+    {
+        return $this->setConfig('debounce', $ms);
     }
 }

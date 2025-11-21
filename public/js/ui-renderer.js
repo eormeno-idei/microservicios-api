@@ -406,6 +406,9 @@ class InputComponent extends UIComponent {
         if (this.config.minlength) input.minLength = this.config.minlength;
         if (this.config.pattern) input.pattern = this.config.pattern;
 
+        // Event handlers
+        this.attachInputEvents(input);
+
         inputWrapper.appendChild(input);
 
         // Add error icon with tooltip if error exists
@@ -421,6 +424,88 @@ class InputComponent extends UIComponent {
         group.appendChild(inputWrapper);
 
         return this.applyCommonAttributes(group);
+    }
+
+    attachInputEvents(input) {
+        const componentId = this.config._id || parseInt(this.id);
+
+        // onInput event (while typing) - with debounce support
+        if (this.config.on_input) {
+            const debounceTime = this.config.debounce || 0;
+            let debounceTimer = null;
+
+            input.addEventListener('input', (e) => {
+                if (debounceTimer) {
+                    clearTimeout(debounceTimer);
+                }
+
+                debounceTimer = setTimeout(() => {
+                    this.triggerAction(
+                        this.config.on_input.action,
+                        { ...this.config.on_input.parameters, value: e.target.value }
+                    );
+                }, debounceTime);
+            });
+        }
+
+        // onChange event (after blur)
+        if (this.config.on_change) {
+            input.addEventListener('change', (e) => {
+                this.triggerAction(
+                    this.config.on_change.action,
+                    { ...this.config.on_change.parameters, value: e.target.value }
+                );
+            });
+        }
+
+        // onEnter event (when Enter key is pressed)
+        if (this.config.on_enter) {
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this.triggerAction(
+                        this.config.on_enter.action,
+                        { ...this.config.on_enter.parameters, value: e.target.value }
+                    );
+                }
+            });
+        }
+    }
+
+    async triggerAction(action, parameters) {
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+            const usimStorage = localStorage.getItem('usim') || '';
+
+            const response = await fetch('/api/ui-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    component_id: componentId,
+                    event: 'input',
+                    action: action,
+                    parameters: parameters,
+                    storage: usimStorage,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result && Object.keys(result).length > 0) {
+                if (globalRenderer) {
+                    globalRenderer.handleUIUpdate(result);
+                }
+            }
+        } catch (error) {
+            console.error('Input action error:', error);
+        }
     }
 }
 

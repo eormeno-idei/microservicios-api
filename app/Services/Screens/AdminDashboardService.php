@@ -35,7 +35,9 @@ class AdminDashboardService extends AbstractUIService
         $search = UIBuilder::input('search_users')
             ->placeholder('Search users...')
             ->width('300px')
-            ->autocomplete('off');
+            ->autocomplete('off')
+            ->onInput('search_users', [])
+            ->debounce(500);
 
         $addBtn = UIBuilder::button('add_user_btn')
             ->label('Add user')
@@ -98,5 +100,11 @@ class AdminDashboardService extends AbstractUIService
     {
         $page = $params['page'] ?? 1;
         $this->users_table->page($page);
+    }
+
+    public function onSearchUsers(array $params): void
+    {
+        $search = $params['value'] ?? '';
+
     }
 }
