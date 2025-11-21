@@ -260,7 +260,7 @@ class ButtonComponent extends UIComponent {
         // Check if we're inside a modal first
         const modalElement = buttonElement.closest('#modal');
         let container;
-        
+
         if (modalElement) {
             // If inside modal, use the modal as the container to collect all inputs from the entire modal
             container = modalElement;
@@ -268,14 +268,14 @@ class ButtonComponent extends UIComponent {
             // For non-modal contexts, find all parent containers from closest to furthest
             const allContainers = [];
             let currentElement = buttonElement.parentElement;
-            
+
             while (currentElement && currentElement !== document.body) {
                 if (currentElement.classList.contains('ui-container')) {
                     allContainers.push(currentElement);
                 }
                 currentElement = currentElement.parentElement;
             }
-            
+
             // Try each container from closest to furthest until we find one with inputs
             for (const potentialContainer of allContainers) {
                 const hasInputs = potentialContainer.querySelectorAll('input, textarea, select').length > 0;
@@ -284,7 +284,7 @@ class ButtonComponent extends UIComponent {
                     break;
                 }
             }
-            
+
             // If no container with inputs found, use the furthest container or document
             if (!container) {
                 container = allContainers[allContainers.length - 1] || document;
@@ -374,8 +374,18 @@ class InputComponent extends UIComponent {
             group.appendChild(label);
         }
 
+        // Create input wrapper for input + error icon
+        const inputWrapper = document.createElement('div');
+        inputWrapper.className = 'ui-input-wrapper';
+
         const input = document.createElement('input');
         input.className = 'ui-input';
+
+        // Add error class if error exists
+        if (this.config.error) {
+            input.classList.add('ui-input-error');
+        }
+
         input.type = this.config.input_type || 'text';
         input.placeholder = this.config.placeholder || '';
         input.value = this.config.value || '';
@@ -392,7 +402,19 @@ class InputComponent extends UIComponent {
         if (this.config.minlength) input.minLength = this.config.minlength;
         if (this.config.pattern) input.pattern = this.config.pattern;
 
-        group.appendChild(input);
+        inputWrapper.appendChild(input);
+
+        // Add error icon with tooltip if error exists
+        if (this.config.error) {
+            const errorIcon = document.createElement('span');
+            errorIcon.className = 'ui-input-error-icon';
+            errorIcon.innerHTML = '⚠️';
+            errorIcon.setAttribute('data-tooltip', this.config.error);
+            errorIcon.title = this.config.error; // Fallback tooltip
+            inputWrapper.appendChild(errorIcon);
+        }
+
+        group.appendChild(inputWrapper);
 
         return this.applyCommonAttributes(group);
     }
@@ -591,7 +613,7 @@ class CheckboxComponent extends UIComponent {
     /**
      * Handle checkbox change event
      * Sends the attempted new state to backend for validation
-     * 
+     *
      * @param {string} action - The action name (snake_case)
      * @param {boolean} checked - The new checked state the user attempted
      */
@@ -1363,12 +1385,12 @@ class UIRenderer {
 
         for (const key of componentIds) {
             const config = this.data[key];
-            
+
             // Skip special keys that are not UI components
             if (key === 'storage' || key === 'action') {
                 continue;
             }
-            
+
             if (config._id !== undefined) {
                 internalIdToKey.set(config._id, key);
                 // console.log(`  🔗 Mapped _id ${config._id} -> JSON key "${key}"`);
@@ -1381,7 +1403,7 @@ class UIRenderer {
             if (id === 'storage' || id === 'action') {
                 continue;
             }
-            
+
             const config = this.data[id];
             // console.log(`  🏗️ Creating component type="${config.type}" id="${id}"`, config);
             const component = ComponentFactory.create(id, config);
@@ -1402,7 +1424,7 @@ class UIRenderer {
             if (id === 'storage' || id === 'action') {
                 continue;
             }
-            
+
             const component = this.components.get(id);
             if (!component) continue;
 
@@ -1563,7 +1585,7 @@ class UIRenderer {
 
     /**
      * Show toast notification
-     * 
+     *
      * @param {object} toastConfig - Toast configuration
      */
     showToast(toastConfig) {
@@ -1589,7 +1611,7 @@ class UIRenderer {
         // Create toast element with position-aware classes
         const toast = document.createElement('div');
         toast.className = `toast toast-${type} toast-open-${open_effect} toast-show-${show_effect} toast-position-${position}`;
-        
+
         // Toast icon based on type
         const icons = {
             success: '✅',
@@ -1618,10 +1640,10 @@ class UIRenderer {
         const closeToast = () => {
             toast.classList.remove('toast-open');
             toast.classList.add(`toast-close-${close_effect}`);
-            
+
             setTimeout(() => {
                 toast.remove();
-                
+
                 // Remove container if empty
                 if (toastContainer.children.length === 0) {
                     toastContainer.remove();
@@ -1858,14 +1880,14 @@ class UIRenderer {
 
                     // Re-render menu content
                     const menuContent = element.querySelector('.menu-dropdown-content');
-                    
+
                     if (menuContent) {
                         // Clear existing content
                         menuContent.innerHTML = '';
 
                         // Re-render all items with new permissions
                         const items = component.config.items || [];
-                        
+
                         items.forEach(item => {
                             const itemElement = component.renderMenuItem(item);
                             menuContent.appendChild(itemElement);
@@ -1926,6 +1948,36 @@ class UIRenderer {
                 } else {
                     const input = element.querySelector('input, textarea');
                     if (input) input.value = changes.value;
+                }
+            }
+
+            // Error state (inputs)
+            if (changes.error !== undefined) {
+                const inputWrapper = element.querySelector('.ui-input-wrapper');
+                const input = element.querySelector('input');
+
+                if (inputWrapper && input) {
+                    // Remove existing error icon if any
+                    const existingIcon = inputWrapper.querySelector('.ui-input-error-icon');
+                    if (existingIcon) {
+                        existingIcon.remove();
+                    }
+
+                    if (changes.error) {
+                        // Add error state
+                        input.classList.add('ui-input-error');
+
+                        // Create and add error icon
+                        const errorIcon = document.createElement('span');
+                        errorIcon.className = 'ui-input-error-icon';
+                        errorIcon.innerHTML = '⚠️';
+                        errorIcon.setAttribute('data-tooltip', changes.error);
+                        errorIcon.title = changes.error;
+                        inputWrapper.appendChild(errorIcon);
+                    } else {
+                        // Remove error state
+                        input.classList.remove('ui-input-error');
+                    }
                 }
             }
 
@@ -2330,7 +2382,7 @@ window.closeModal = closeModal;
 class MenuDropdownComponent extends UIComponent {
     /**
      * Check if an item is visible based on permissions
-     * 
+     *
      * @param {object} item - Menu item
      * @param {array} permissions - Array of user permissions
      * @returns {boolean} - True if item should be visible
@@ -2359,7 +2411,7 @@ class MenuDropdownComponent extends UIComponent {
 
     /**
      * Check if a submenu has any visible children (recursive)
-     * 
+     *
      * @param {array} submenu - Array of submenu items
      * @param {array} permissions - Array of user permissions
      * @returns {boolean} - True if at least one child is visible
@@ -2500,14 +2552,14 @@ class MenuDropdownComponent extends UIComponent {
         // because width is already applied to the dropdown content
         const originalWidth = this.config.width;
         delete this.config.width;
-        
+
         const result = this.applyCommonAttributes(menuContainer);
-        
+
         // Restore width to config for future use
         if (originalWidth) {
             this.config.width = originalWidth;
         }
-        
+
         return result;
     }
 
@@ -2744,7 +2796,7 @@ async function loadMenuUI() {
         if (globalRenderer) {
             // Merge menu data
             Object.assign(globalRenderer.data, uiData);
-            
+
             // Sort components by _order field (preserves backend order)
             const entries = Object.entries(uiData)
                 .filter(([id]) => id !== 'storage' && id !== 'action')
@@ -2753,26 +2805,26 @@ async function loadMenuUI() {
                     const orderB = b[1]._order || 999;
                     return orderA - orderB;
                 });
-            
+
             // Separate top-level (parent='menu') from children
             const topLevel = entries.filter(([, config]) => config.parent === 'menu');
             const children = entries.filter(([, config]) => config.parent !== 'menu');
-            
+
             // Combine: top-level first (sorted by _order), then children
             const components = [...topLevel, ...children];
-            
+
             // Create and add menu components to globalRenderer AND render them
             for (const [id, config] of components) {
                 const component = ComponentFactory.create(id, config);
                 if (component) {
                     // Add to global registry
                     globalRenderer.components.set(id, component);
-                    
+
                     // Render and mount component
                     const element = component.render();
                     if (element) {
                         let parentEl;
-                        
+
                         // Find parent element by data-component-id or by DOM id
                         if (config.parent === 'menu') {
                             parentEl = menuContainer;
@@ -2784,7 +2836,7 @@ async function loadMenuUI() {
                                 parentEl = document.getElementById(config.parent);
                             }
                         }
-                        
+
                         if (parentEl) {
                             parentEl.appendChild(element);
                         }
@@ -2805,7 +2857,7 @@ async function loadMenuUI() {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadDemoUI();  // Load main UI first to create globalRenderer
     await loadMenuUI();  // Then load menu and merge into globalRenderer
-    
+
     // Check for pending toast after page load
     const pendingToast = sessionStorage.getItem('pendingToast');
     if (pendingToast) {

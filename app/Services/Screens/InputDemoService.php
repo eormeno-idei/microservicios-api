@@ -2,6 +2,7 @@
 namespace App\Services\Screens;
 
 use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\UIBuilder;
@@ -14,12 +15,14 @@ use App\Services\UI\UIBuilder;
  * - Reading input value from frontend
  * - Updating input value from backend
  * - Label updates based on input
+ * - Error state with tooltip
  *
  * Uses AbstractUIService for automatic event lifecycle management.
  * Event handlers only need to modify components, no return needed.
  */
 class InputDemoService extends AbstractUIService
 {
+    protected InputBuilder $input_text;
     protected LabelBuilder $lbl_result;
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
@@ -33,23 +36,24 @@ class InputDemoService extends AbstractUIService
 
         $container->add(
             UIBuilder::label('lbl_instruction')
-                ->text('📝 Type something in the input below and click "Get Value"')
+                ->text('📝 Enter a name with at least 3 characters and click "Validate"')
                 ->style('info')
                 ->width('100%')
         );
 
         $container->add(
             UIBuilder::input('input_text')
-                ->placeholder('Enter your text here...')
+                ->label('Your Name')
+                ->placeholder('Enter your name here...')
                 ->value('')
-                ->required(false)
+                ->required(true)
                 ->type('text')
                 ->width('100%')
         );
 
         $container->add(
             UIBuilder::button('btn_get_value')
-                ->label('Get Value')
+                ->label('Validate')
                 ->action('get_value')
                 ->style('primary')
         );
@@ -63,9 +67,9 @@ class InputDemoService extends AbstractUIService
     }
 
     /**
-     * Handle "Get Value" button click
+     * Handle "Validate" button click
      *
-     * Reads the input value sent from frontend and displays it in the result label.
+     * Validates the input and shows errors using the error() method with tooltip.
      * No return needed - AbstractUIService handles diff calculation and response.
      *
      * @param array $params Event parameters (should include 'input_text' from input)
@@ -73,12 +77,19 @@ class InputDemoService extends AbstractUIService
      */
     public function onGetValue(array $params): void
     {
-        $inputValue = $params['input_text'] ?? '';
+        $inputValue = trim($params['input_text'] ?? '');
+
+        // Clear previous error
+        $this->input_text->error(null);
 
         if (empty($inputValue)) {
-            $this->lbl_result->text('⚠️ Input is empty!')->style('warning');
+            $this->input_text->error('Name is required');
+            $this->lbl_result->text('❌ Please fix the error above')->style('danger');
+        } elseif (strlen($inputValue) < 3) {
+            $this->input_text->error('Name must be at least 3 characters');
+            $this->lbl_result->text('❌ Please fix the error above')->style('danger');
         } else {
-            $this->lbl_result->text("✅ You typed: \"$inputValue\"")->style('success');
+            $this->lbl_result->text("✅ Valid name: \"{$inputValue}\"")->style('success');
         }
     }
 }

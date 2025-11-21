@@ -4,7 +4,7 @@ namespace App\Services\UI\Components;
 
 /**
  * Builder for Input UI components
- * 
+ *
  * Modern and powerful input component with comprehensive validation,
  * help text, error messages, tooltips, and extensive customization options.
  */
@@ -32,6 +32,7 @@ class InputBuilder extends UIComponent
             'accept' => null,
             'help_text' => null,
             'error_message' => null,
+            'error' => null,
             'tooltip' => null,
             'icon' => null,
             'icon_position' => 'left',
@@ -42,7 +43,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the input type
-     * 
+     *
      * @param string $type The input type (text, number, email, password, tel, url, search, date, datetime-local, time, month, week, color, range, file, hidden)
      * @return self For method chaining
      */
@@ -53,7 +54,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the label text
-     * 
+     *
      * @param string $label The label text
      * @return self For method chaining
      */
@@ -64,7 +65,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the placeholder text
-     * 
+     *
      * @param string $placeholder The placeholder text
      * @return self For method chaining
      */
@@ -75,7 +76,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the input value
-     * 
+     *
      * @param mixed $value The input value
      * @return self For method chaining
      */
@@ -86,7 +87,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Mark the input as required
-     * 
+     *
      * @param bool $required True if required, false otherwise
      * @return self For method chaining
      */
@@ -97,7 +98,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Disable the input
-     * 
+     *
      * @param bool $disabled True to disable, false otherwise
      * @return self For method chaining
      */
@@ -108,7 +109,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Make the input readonly
-     * 
+     *
      * @param bool $readonly True for readonly, false otherwise
      * @return self For method chaining
      */
@@ -119,7 +120,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Enable autofocus on this input
-     * 
+     *
      * @param bool $autofocus True to autofocus, false otherwise
      * @return self For method chaining
      */
@@ -130,7 +131,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the autocomplete attribute
-     * 
+     *
      * @param string $autocomplete The autocomplete value (e.g., 'email', 'name', 'tel', 'off')
      * @return self For method chaining
      */
@@ -141,7 +142,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the maximum length
-     * 
+     *
      * @param int $maxlength Maximum number of characters
      * @return self For method chaining
      */
@@ -152,7 +153,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the minimum length
-     * 
+     *
      * @param int $minlength Minimum number of characters
      * @return self For method chaining
      */
@@ -163,7 +164,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the minimum value (for number, date, time inputs)
-     * 
+     *
      * @param mixed $min Minimum value
      * @return self For method chaining
      */
@@ -174,7 +175,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the maximum value (for number, date, time inputs)
-     * 
+     *
      * @param mixed $max Maximum value
      * @return self For method chaining
      */
@@ -185,7 +186,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the step value (for number, range inputs)
-     * 
+     *
      * @param mixed $step The step value
      * @return self For method chaining
      */
@@ -196,7 +197,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set a regex pattern for validation
-     * 
+     *
      * @param string $pattern Regular expression pattern
      * @return self For method chaining
      */
@@ -207,7 +208,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Enable multiple file selection (for file inputs)
-     * 
+     *
      * @param bool $multiple True to allow multiple files, false otherwise
      * @return self For method chaining
      */
@@ -218,7 +219,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set accepted file types (for file inputs)
-     * 
+     *
      * @param string $accept Comma-separated list of file types (e.g., 'image/*', '.pdf,.doc')
      * @return self For method chaining
      */
@@ -229,7 +230,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set help text (displayed below the input)
-     * 
+     *
      * @param string $helpText Help text to guide the user
      * @return self For method chaining
      */
@@ -240,7 +241,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set error message (displayed when validation fails)
-     * 
+     *
      * @param string $errorMessage Error message text
      * @return self For method chaining
      */
@@ -250,8 +251,20 @@ class InputBuilder extends UIComponent
     }
 
     /**
+     * Set or clear error state with message
+     * Shows an error icon with tooltip next to the input
+     *
+     * @param string|null $error Error message to display, or null to clear error
+     * @return self For method chaining
+     */
+    public function error(?string $error): self
+    {
+        return $this->setConfig('error', $error);
+    }
+
+    /**
      * Set a tooltip
-     * 
+     *
      * @param string $tooltip Tooltip text
      * @return self For method chaining
      */
@@ -262,7 +275,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set an icon
-     * 
+     *
      * @param string $icon Icon name
      * @return self For method chaining
      */
@@ -273,7 +286,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the icon position
-     * 
+     *
      * @param string $position Icon position ('left' or 'right')
      * @return self For method chaining
      */
@@ -284,7 +297,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the input style
-     * 
+     *
      * @param string $style Style name (default, primary, success, warning, danger)
      * @return self For method chaining
      */
@@ -295,7 +308,7 @@ class InputBuilder extends UIComponent
 
     /**
      * Set the input size
-     * 
+     *
      * @param string $size Size (small, medium, large)
      * @return self For method chaining
      */

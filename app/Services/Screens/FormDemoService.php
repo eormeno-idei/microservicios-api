@@ -1,12 +1,12 @@
 <?php
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
 use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\ButtonBuilder;
+use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\UIBuilder;
+use App\Services\UI\Components\ButtonBuilder;
 
 class FormDemoService extends AbstractUIService
 {
@@ -75,29 +75,35 @@ class FormDemoService extends AbstractUIService
         $name  = trim($params['input_name'] ?? '');
         $email = trim($params['input_email'] ?? '');
 
-        // Validation errors array
-        $errors = [];
+        // Clear previous errors
+        $this->input_name->error(null);
+        $this->input_email->error(null);
+
+        // Validation flags
+        $hasErrors = false;
 
         // Validate name
         if (empty($name)) {
-            $errors[] = 'Name is required';
+            $this->input_name->error('Name is required');
+            $hasErrors = true;
         } elseif (strlen($name) < 2) {
-            $errors[] = 'Name must be at least 2 characters';
+            $this->input_name->error('Name must be at least 2 characters');
+            $hasErrors = true;
         }
 
         // Validate email
         if (empty($email)) {
-            $errors[] = 'Email is required';
+            $this->input_email->error('Email is required');
+            $hasErrors = true;
         } elseif (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors[] = 'Email is invalid';
+            $this->input_email->error('Email is invalid');
+            $hasErrors = true;
         }
 
-        // Show errors or success
-        if (! empty($errors)) {
-            $errorMessage = "❌ Validation errors:\n" . implode("\n", array_map(fn($e) => "  • $e", $errors));
-
+        // Show result
+        if ($hasErrors) {
             $this->lbl_result
-                ->text($errorMessage)
+                ->text('❌ Please fix the errors above')
                 ->style('danger');
         } else {
             $this->lbl_result
