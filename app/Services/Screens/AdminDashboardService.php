@@ -57,6 +57,7 @@ class AdminDashboardService extends AbstractUIService
     public function onAddUserClicked(array $params): void
     {
         RegisterDialogService::open(
+            fakeData: true,
             callerServiceId: $this->getServiceComponentId()
         );
     }
@@ -70,7 +71,7 @@ class AdminDashboardService extends AbstractUIService
 
         if ($status === 'success') {
             $this->toast($message, 'success');
-            $this->users_table->updateTableData();
+            $this->users_table->refresh();
             $this->closeModal();
         } else {
             $this->toast($message, 'error');

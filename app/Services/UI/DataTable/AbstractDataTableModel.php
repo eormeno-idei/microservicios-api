@@ -94,10 +94,7 @@ abstract class AbstractDataTableModel
      */
     public function getTotalItems(): int
     {
-        if ($this->totalItems === null) {
-            $this->totalItems = $this->countTotal();
-        }
-        return $this->totalItems;
+        return $this->countTotal();
     }
 
     /**

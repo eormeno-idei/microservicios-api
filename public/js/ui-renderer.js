@@ -2054,6 +2054,113 @@ class UIRenderer {
                 }
             }
 
+            // Pagination (tables) - Update pagination info and controls
+            if (changes.pagination !== undefined || changes.total_items !== undefined) {
+                const paginationDiv = element.querySelector('.ui-pagination');
+                if (paginationDiv) {
+                    const pagination = changes.pagination || {};
+                    const currentPage = pagination.current_page || 1;
+                    const perPage = pagination.per_page || 10;
+                    const totalItems = changes.total_items || pagination.total_items || 0;
+                    const totalPages = pagination.total_pages || Math.ceil(totalItems / perPage);
+                    const canNext = pagination.can_next !== undefined ? pagination.can_next : (currentPage < totalPages);
+                    const canPrev = pagination.can_prev !== undefined ? pagination.can_prev : (currentPage > 1);
+
+                    // Update info text
+                    const infoDiv = paginationDiv.querySelector('.ui-pagination-info');
+                    if (infoDiv) {
+                        const start = (currentPage - 1) * perPage + 1;
+                        const end = Math.min(currentPage * perPage, totalItems);
+                        infoDiv.textContent = `Showing ${start}-${end} of ${totalItems} items`;
+                    }
+
+                    // Update controls
+                    const controlsDiv = paginationDiv.querySelector('.ui-pagination-controls');
+                    if (controlsDiv) {
+                        const component = globalRenderer?.components?.get(String(changes._id));
+
+                        // Clear all controls and rebuild
+                        controlsDiv.innerHTML = '';
+
+                        // Re-create loading indicator
+                        const loadingDiv = document.createElement('div');
+                        loadingDiv.className = 'ui-pagination-loading';
+                        loadingDiv.style.display = 'none';
+                        loadingDiv.style.marginLeft = '16px';
+                        loadingDiv.style.alignItems = 'center';
+                        loadingDiv.style.gap = '8px';
+                        loadingDiv.innerHTML = `
+                            <span class="spinner" style="
+                                display: inline-block;
+                                width: 16px;
+                                height: 16px;
+                                border: 2px solid #f3f3f3;
+                                border-top: 2px solid #3498db;
+                                border-radius: 50%;
+                                animation: spin 1s linear infinite;
+                            "></span>
+                        `;
+                        controlsDiv.appendChild(loadingDiv);
+                        controlsDiv.paginationLoading = loadingDiv;
+
+                        // Previous button
+                        const prevBtn = document.createElement('button');
+                        prevBtn.className = 'ui-pagination-button';
+                        prevBtn.textContent = '« Previous';
+                        prevBtn.disabled = !canPrev;
+                        if (component) {
+                            prevBtn.addEventListener('click', () => component.changePage(currentPage - 1, paginationDiv));
+                        }
+                        controlsDiv.appendChild(prevBtn);
+
+                        // Page number buttons
+                        if (component && component.getPageNumbers) {
+                            const pages = component.getPageNumbers(currentPage, totalPages);
+                            pages.forEach(page => {
+                                if (page === '...') {
+                                    const ellipsis = document.createElement('span');
+                                    ellipsis.textContent = '...';
+                                    ellipsis.style.padding = '0 8px';
+                                    controlsDiv.appendChild(ellipsis);
+                                } else {
+                                    const pageBtn = document.createElement('button');
+                                    pageBtn.className = 'ui-pagination-button';
+                                    if (page === currentPage) {
+                                        pageBtn.classList.add('active');
+                                    }
+                                    pageBtn.textContent = page;
+                                    pageBtn.addEventListener('click', () => component.changePage(page, paginationDiv));
+                                    controlsDiv.appendChild(pageBtn);
+                                }
+                            });
+                        }
+
+                        // Next button
+                        const nextBtn = document.createElement('button');
+                        nextBtn.className = 'ui-pagination-button';
+                        nextBtn.textContent = 'Next »';
+                        nextBtn.disabled = !canNext;
+                        if (component) {
+                            nextBtn.addEventListener('click', () => component.changePage(currentPage + 1, paginationDiv));
+                        }
+                        controlsDiv.appendChild(nextBtn);
+                    }
+
+                    // Update component config
+                    if (component) {
+                        if (changes.pagination) {
+                            component.config.pagination = changes.pagination;
+                        }
+                        if (changes.total_items !== undefined) {
+                            component.config.total_items = changes.total_items;
+                            if (component.config.pagination) {
+                                component.config.pagination.total_items = changes.total_items;
+                            }
+                        }
+                    }
+                }
+            }
+
             // console.log(`✅ Component ${changes._id} updated successfully`);
         } catch (error) {
             console.error(`❌ Error updating component ${changes._id}:`, error);

@@ -6,6 +6,7 @@ use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\UIChangesCollector;
+use App\Services\UI\Support\FakeDataHelper;
 
 /**
  * Register Dialog Service
@@ -34,8 +35,22 @@ class RegisterDialogService
     public function getUI(
         string $submitAction = 'submit_register',
         ?string $cancelAction = 'close_modal',
+        bool $fakeData = false,
         ?int $callerServiceId = null
     ): array {
+        $name = '';
+        $email = '';
+        $password = '';
+        $password_confirmation = '';
+        $role = 'user';
+        if ($fakeData) {
+            $userData = FakeDataHelper::userData(['user', 'admin']);
+            $name = $userData['name'];
+            $email = $userData['email'];
+            $password = $userData['password'];
+            $password_confirmation = $userData['password_confirmation'];
+            $role = $userData['role'];
+        }
         // Main container for the modal
         $registerContainer = UIBuilder::container('register_dialog')
             ->parent('modal')
@@ -48,6 +63,7 @@ class RegisterDialogService
                 ->label('Full Name')
                 ->placeholder('Enter your full name')
                 ->required(true)
+                ->value($name)
                 ->autocomplete('off')
         );
 
@@ -57,6 +73,7 @@ class RegisterDialogService
                 ->label('Email')
                 ->placeholder('Enter your email')
                 ->required(true)
+                ->value($email)
                 ->autocomplete('off')
         );
 
@@ -67,6 +84,7 @@ class RegisterDialogService
                 ->type('password')
                 ->placeholder('Enter your password (min 8 characters)')
                 ->required(true)
+                ->value($password)
                 ->autocomplete('new-password')
         );
 
@@ -77,6 +95,7 @@ class RegisterDialogService
                 ->type('password')
                 ->placeholder('Confirm your password')
                 ->required(true)
+                ->value($password_confirmation)
                 ->autocomplete('new-password')
         );
 
@@ -87,9 +106,8 @@ class RegisterDialogService
                 ->options([
                     ['value' => 'user', 'label' => 'User'],
                     ['value' => 'admin', 'label' => 'Admin'],
-                    ['value' => 'moderator', 'label' => 'Moderator'],
                 ])
-                ->value('user')
+                ->value($role)
                 ->required(true)
         );
 

@@ -3,6 +3,7 @@
 namespace App\Services\UI\Components;
 
 use App\Services\UI\DataTable\UsersDataTableModel;
+use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Facades\Log;
 use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\DataTable\AbstractDataTableModel;
@@ -90,8 +91,12 @@ class TableBuilder extends UIComponent
         ];
     }
 
-    public function page(int $page): self
+    public function page(?int $page): self
     {
+        if ($page === null) {
+            $pagination = $this->config['pagination'];
+            $page = $pagination['current_page'];
+        }
         $pagination = $this->config['pagination'];
 
         if ($page < 1) {
@@ -111,11 +116,17 @@ class TableBuilder extends UIComponent
         return $this;
     }
 
+
+    public function refresh(): void
+    {
+        $this->page(null);
+    }
+
     /**
      * Update table data for the current page
      * Clears existing rows and fills them with data from the current page
      */
-    public function updateTableData(): void
+    private function updateTableData(): void
     {
         $model = $this->getModel();
         if (!$model) {
