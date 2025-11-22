@@ -31,17 +31,15 @@ fi
 
 # Check if port 8000 is already in use
 if netstat -tuln 2>/dev/null | grep -q ":8000 " || ss -tuln 2>/dev/null | grep -q ":8000 "; then
-    echo "Server is already running on port 8000"
-    echo "Opening browser to http://127.0.0.1:8000"
-    if grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
-        # WSL - use Windows command
+    echo "✓ Server already running on port 8000"
+    if [ -n "$BROWSER" ]; then
+        "$BROWSER" "http://127.0.0.1:8000" 2>/dev/null || true
+    elif grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
         cmd.exe /c start "http://127.0.0.1:8000"
     elif command -v xdg-open > /dev/null; then
-        firefox "http://127.0.0.1:8000" &
-    elif command -v start > /dev/null; then
-        start "http://127.0.0.1:8000"
+        xdg-open "http://127.0.0.1:8000" &
     else
-        echo "Cannot detect the web browser to launch automatically"
+        echo "  → http://127.0.0.1:8000"
     fi
     exit 0
 fi
@@ -49,18 +47,23 @@ fi
 # Clear cache before starting the server
 echo "Clearing cache..."
 php artisan cache:clear
+php artisan config:clear
+php artisan route:clear
+php artisan view:clear
 
 # Open browser to the demo page
 echo "Opening browser to http://127.0.0.1:8000"
-if grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
+if [ -n "$BROWSER" ]; then
+    # Dev container - use $BROWSER variable set by VS Code
+    "$BROWSER" "http://127.0.0.1:8000" 2>/dev/null || echo "✓ Server ready at http://127.0.0.1:8000"
+elif grep -q Microsoft /proc/version 2>/dev/null || [ -n "$WSL_DISTRO_NAME" ]; then
     # WSL - use Windows command
     cmd.exe /c start "http://127.0.0.1:8000"
 elif command -v xdg-open > /dev/null; then
-    firefox "http://127.0.0.1:8000" &
-elif command -v start > /dev/null; then
-    start "http://127.0.0.1:8000"
+    xdg-open "http://127.0.0.1:8000" &
 else
-    echo "Cannot detect the web browser to launch automatically"
+    echo "✓ Server ready at http://127.0.0.1:8000"
+    echo "  Open this URL manually in your browser"
 fi
 
 # Start the Laravel server (this will block the terminal)

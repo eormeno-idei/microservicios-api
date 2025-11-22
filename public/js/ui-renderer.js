@@ -2151,6 +2151,9 @@ class UIRenderer {
                     const canNext = pagination.can_next !== undefined ? pagination.can_next : (currentPage < totalPages);
                     const canPrev = pagination.can_prev !== undefined ? pagination.can_prev : (currentPage > 1);
 
+                    // Get component reference once for all operations
+                    const component = globalRenderer?.components?.get(String(changes._id));
+
                     // Update info text
                     const infoDiv = paginationDiv.querySelector('.ui-pagination-info');
                     if (infoDiv) {
@@ -2162,7 +2165,11 @@ class UIRenderer {
                     // Update controls
                     const controlsDiv = paginationDiv.querySelector('.ui-pagination-controls');
                     if (controlsDiv) {
-                        const component = globalRenderer?.components?.get(String(changes._id));
+                        // If component not found, skip interactive controls
+                        if (!component) {
+                            console.warn(`Component ${changes._id} not found in registry for pagination update`);
+                            return;
+                        }
 
                         // Clear all controls and rebuild
                         controlsDiv.innerHTML = '';
