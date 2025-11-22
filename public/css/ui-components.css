@@ -578,6 +578,22 @@ body {
     width: 100px;
 }
 
+/* First column - add left padding */
+.ui-table-row .ui-table-cell:first-child,
+.ui-table-header-row .ui-table-header-cell:first-child {
+    padding-left: 24px !important;
+}
+
+/* Hide action buttons by default, show on row hover */
+.ui-table-row .ui-table-cell .ui-button {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.ui-table-row:hover .ui-table-cell .ui-button {
+    opacity: 1;
+}
+
 /* Zebra striping for better readability */
 .ui-table-row:nth-child(even) {
     background: #f8f9fa;

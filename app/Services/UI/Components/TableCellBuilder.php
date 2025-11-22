@@ -6,7 +6,7 @@ use App\Services\UI\Enums\Align;
 
 /**
  * Builder for Table Cell UI components
- * 
+ *
  * Represents a cell in a table row. This component must be associated with a TableRow
  * and can contain either simple text or a single child component.
  */
@@ -20,7 +20,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Create a new table cell
-     * 
+     *
      * @param TableRowBuilder $row The parent row this cell belongs to
      * @param string|null $name Optional name for the cell
      */
@@ -37,6 +37,7 @@ class TableCellBuilder extends UIComponent
             'align' => null,
             'url_image' => null,
             'button' => null,
+            'buttons' => null,  // Multiple buttons
             'column' => null,  // Column index for ordering
             'min_width' => null,  // Minimum width in pixels
             'max_width' => null,  // Maximum width in pixels
@@ -65,7 +66,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set the column index (for ordering)
-     * 
+     *
      * @param int $column Column index (0-based)
      * @return self
      */
@@ -77,7 +78,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set width constraints for the cell
-     * 
+     *
      * @param int|null $minWidth Minimum width in pixels
      * @param int|null $maxWidth Maximum width in pixels
      * @return self
@@ -95,7 +96,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set padding for the cell
-     * 
+     *
      * @param int $padding Padding in pixels for more compact cells
      * @return self For method chaining
      */
@@ -107,7 +108,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set simple text content for the cell
-     * 
+     *
      * @param string|int|float|null $text The text content
      * @return self For method chaining
      */
@@ -127,7 +128,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set horizontal alignment for the cell content
-     * 
+     *
      * @param Align $align The alignment (left, center, right)
      * @return self For method chaining
      */
@@ -138,7 +139,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Set button configuration for the cell
-     * 
+     *
      * @param array $button Button configuration with keys: label, action, style, parameters
      * @return self For method chaining
      */
@@ -148,8 +149,19 @@ class TableCellBuilder extends UIComponent
     }
 
     /**
+     * Set multiple buttons configuration for the cell
+     *
+     * @param array $buttons Array of button configurations
+     * @return self For method chaining
+     */
+    public function buttons(array $buttons): self
+    {
+        return $this->setConfig('buttons', $buttons);
+    }
+
+    /**
      * Set image URL for the cell
-     * 
+     *
      * @param string $url Image URL
      * @param string|null $alt Alt text for the image
      * @param string|null $width Image width
@@ -175,7 +187,7 @@ class TableCellBuilder extends UIComponent
      * Add a child component to this cell
      * Only one child component is allowed per cell
      * Note: Containers are not allowed as children to prevent recursion issues
-     * 
+     *
      * @param UIComponent $component The component to add
      * @return self For method chaining
      */
@@ -197,7 +209,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Get the parent row
-     * 
+     *
      * @return TableRowBuilder
      */
     public function getRow(): TableRowBuilder
@@ -207,7 +219,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Get the child component if any
-     * 
+     *
      * @return UIComponent|null
      */
     public function getChild(): ?UIComponent
@@ -217,7 +229,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Includes the child component in the flat JSON structure
      */
     /**
@@ -269,7 +281,7 @@ class TableCellBuilder extends UIComponent
 
     /**
      * Exclude keys from JSON output
-     * 
+     *
      * @return array List of keys to exclude
      */
     protected function getExcludedJsonKeys(): array

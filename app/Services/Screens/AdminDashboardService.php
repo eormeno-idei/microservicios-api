@@ -103,6 +103,24 @@ class AdminDashboardService extends AbstractUIService
         }
     }
 
+    public function onDeleteUser(array $params): void
+    {
+        $userId = $params['user_id'] ?? null;
+        if (!$userId) {
+            $this->toast('User ID is required for deletion', 'error');
+            return;
+        }
+
+        $response = HttpClient::delete(
+            "users.destroy",
+            routeParams: ['user' => $userId]
+        );
+        $status = $response['status'] ?? 'error';
+        $message = $response['message'] ?? 'Failed to delete user';
+        $this->toast($message, $status);
+        $this->users_table->refresh();
+    }
+
     public function onChangePage(array $params): void
     {
         $page = $params['page'] ?? 1;

@@ -20,7 +20,8 @@ class UserApiTableModel extends AbstractDataTableModel
             'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
             'role' => ['label' => 'Role', 'width' => [100, 100]],
             'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
-            'actions' => ['label' => 'Actions', 'width' => [150, 150]],
+            'edit' => ['label' => '', 'width' => [50, 50]],
+            'delete' => ['label' => '', 'width' => [50, 50]],
         ];
     }
 
@@ -86,16 +87,26 @@ class UserApiTableModel extends AbstractDataTableModel
         foreach ($users as $index => $user) {
 
             $formatted[] = [
-                // 'id' => $user['id'],
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'email_verified' => $user['email_verified'] ? '✅' : '⚠️',
                 'roles' => $user['roles'],
                 'updated_at' => $user['updated_at'],
-                'actions' => [
+                'edit' => [
                     'button' => [
                         'label' => "✏️",
                         'action' => 'edit_user',
+                        'style' => 'secondary',
+                        'parameters' => [
+                            'user_id' => $user['id'],
+                        ]
+                    ]
+                ],
+                'delete' => [
+                    'button' => [
+                        'label' => "🗑️",
+                        'action' => 'delete_user',
+                        'style' => 'danger',
                         'parameters' => [
                             'user_id' => $user['id'],
                         ]

@@ -66,10 +66,14 @@ class HttpClient
 
     /**
      * Execute GET request
+     *
+     * @param string $route Route name
+     * @param array $queryParams Query parameters
+     * @param array $routeParams Route parameters (e.g., ['user' => 123] for /users/{user})
      */
-    public static function get(string $route, array $queryParams = []): array
+    public static function get(string $route, array $queryParams = [], array $routeParams = []): array
     {
-        $url = route($route);
+        $url = route($route, $routeParams);
 
         \Log::info('🌐 HttpClient GET: ' . $url, $queryParams);
 
@@ -83,10 +87,14 @@ class HttpClient
 
     /**
      * Execute POST request
+     *
+     * @param string $route Route name
+     * @param array $data Request body data
+     * @param array $routeParams Route parameters (e.g., ['user' => 123] for /users/{user})
      */
-    public static function post(string $route, array $data = []): array
+    public static function post(string $route, array $data = [], array $routeParams = []): array
     {
-        $url = route($route);
+        $url = route($route, $routeParams);
 
         $response = Http::withHeaders(self::getHeaders())
             ->post($url, $data);
@@ -96,10 +104,14 @@ class HttpClient
 
     /**
      * Execute PUT request
+     *
+     * @param string $route Route name
+     * @param array $data Request body data
+     * @param array $routeParams Route parameters (e.g., ['user' => 123] for /users/{user})
      */
-    public static function put(string $route, array $data = []): array
+    public static function put(string $route, array $data = [], array $routeParams = []): array
     {
-        $url = route($route);
+        $url = route($route, $routeParams);
 
         $response = Http::withHeaders(self::getHeaders())
             ->put($url, $data);
@@ -109,10 +121,14 @@ class HttpClient
 
     /**
      * Execute PATCH request
+     *
+     * @param string $route Route name
+     * @param array $data Request body data
+     * @param array $routeParams Route parameters (e.g., ['user' => 123] for /users/{user})
      */
-    public static function patch(string $route, array $data = []): array
+    public static function patch(string $route, array $data = [], array $routeParams = []): array
     {
-        $url = route($route);
+        $url = route($route, $routeParams);
 
         $response = Http::withHeaders(self::getHeaders())
             ->patch($url, $data);
@@ -122,10 +138,14 @@ class HttpClient
 
     /**
      * Execute DELETE request
+     *
+     * @param string $route Route name
+     * @param array $data Request body data (optional)
+     * @param array $routeParams Route parameters (e.g., ['user' => 123] for /users/{user})
      */
-    public static function delete(string $route, array $data = []): array
+    public static function delete(string $route, array $data = [], array $routeParams = []): array
     {
-        $url = route($route);
+        $url = route($route, $routeParams);
 
         $response = Http::withHeaders(self::getHeaders())
             ->delete($url, $data);
