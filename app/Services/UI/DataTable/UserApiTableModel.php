@@ -31,19 +31,50 @@ class UserApiTableModel extends AbstractDataTableModel
 
     protected function countTotal(): int
     {
-        return HttpClient::get('users.count')['data']['count'] ?? 0;
+        $searchTerm = $this->getSearchTerm();
+        $query = [];
+        if ($searchTerm) {
+            $query['search'] = $searchTerm;
+        }
+        return HttpClient::get('users.count', $query)['data']['count'] ?? 0;
+    }
+
+    public function setSearchTerm(string|null $searchTerm): void
+    {
+        UIStateManager::storeKeyValue(
+            'user_table_search',
+            $searchTerm
+        );
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        return UIStateManager::getKeyValue(
+            'user_table_search'
+        );
+    }
+
+    public function clearSearch(): void
+    {
+        UIStateManager::clearKeyValue(
+            'user_table_search'
+        );
     }
 
     public function getPageData(): array
     {
         $paginationData = $this->tableBuilder->getPaginationData();
+        $searchTerm = $this->getSearchTerm();
+        $query = [];
+        if ($searchTerm) {
+            $query['search'] = $searchTerm;
+        }
         $currentPage = $paginationData['current_page'];
         $perPage = $paginationData['per_page'];
+        $query['per_page'] = $perPage;
+        $query['page'] = $currentPage;
 
-        $data = HttpClient::get('users.index', [
-            'per_page' => $perPage,
-            'page' => $currentPage,
-        ]);
+        $data = HttpClient::get('users.index', $query);
         return $data['data']['users'] ?? [];
     }
 

@@ -12,8 +12,6 @@ use App\Services\UI\Components\TableBuilder;
  */
 abstract class AbstractDataTableModel
 {
-    protected ?int $totalItems = null;
-
     protected TableBuilder $tableBuilder;
 
     public function __construct(TableBuilder $tableBuilder)
@@ -107,6 +105,19 @@ abstract class AbstractDataTableModel
     protected function countTotal(): int
     {
         return count($this->getAllData());
+    }
+
+    public function setSearchTerm(?string $searchTerm): void
+    {
+    }
+
+    public function clearSearch(): void
+    {
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        return null;
     }
 
     /**

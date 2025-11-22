@@ -11,6 +11,7 @@ use App\Services\UI\AbstractUIService;
 use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Support\UIStateManager;
 
 class LoginService extends AbstractUIService
 {
@@ -100,6 +101,9 @@ class LoginService extends AbstractUIService
         $this->store_token = $response['data']['token'] ?? '';
         $this->store_email = $email;
         $this->store_password = $password;
+
+        // Store token in UIStateManager for HttpClient
+        UIStateManager::setAuthToken($this->store_token);
 
         $user = User::where('email', $email)->first();
         Auth::login($user);

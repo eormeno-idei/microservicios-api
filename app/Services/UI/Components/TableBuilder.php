@@ -116,6 +116,25 @@ class TableBuilder extends UIComponent
         return $this;
     }
 
+    public function setSearchTerm(string $search): self
+    {
+        $model = $this->getModel();
+        if ($model) {
+            $model->setSearchTerm($search === '' ? null : $search);
+            // Reset to first page on new search
+            $this->page(1);
+        }
+        return $this;
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        $model = $this->getModel();
+        if ($model) {
+            return $model->getSearchTerm();
+        }
+        return null;
+    }
 
     public function refresh(): void
     {

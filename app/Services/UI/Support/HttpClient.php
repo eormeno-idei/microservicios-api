@@ -17,11 +17,51 @@ class HttpClient
      */
     private static function getHeaders(): array
     {
-        return [
+        // Try to get token from current request or session
+        $token = request()->bearerToken()
+                 ?? session('auth_token')
+                 ?? UIStateManager::getAuthToken();
+
+        // Get client ID from cookie to maintain UI state
+        $clientId = request()->cookie(UIStateManager::CLIENT_ID_COOKIE);
+
+        \Log::info('🔑 HttpClient auth', [
+            'token' => substr($token ?? 'NULL', 0, 20) . '...',
+            'clientId' => $clientId
+        ]);
+
+        $headers = [
             "Content-Type" => "application/json",
             "Accept" => "application/json",
-            'Authorization' => "Bearer " . UIStateManager::getAuthToken()
+            'Authorization' => "Bearer " . $token
         ];
+
+        // Pass client ID as cookie header
+        if ($clientId) {
+            $headers['Cookie'] = UIStateManager::CLIENT_ID_COOKIE . '=' . $clientId;
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Get cookie jar from current request
+     */
+    private static function getCookieJar(): \GuzzleHttp\Cookie\CookieJar
+    {
+        $cookies = new \GuzzleHttp\Cookie\CookieJar();
+
+        // Copy all cookies from the current request
+        foreach (request()->cookies as $name => $value) {
+            $cookies->setCookie(new \GuzzleHttp\Cookie\SetCookie([
+                'Name' => $name,
+                'Value' => $value,
+                'Domain' => request()->getHost(),
+                'Path' => '/',
+            ]));
+        }
+
+        return $cookies;
     }
 
     /**
@@ -31,8 +71,12 @@ class HttpClient
     {
         $url = route($route);
 
+        \Log::info('🌐 HttpClient GET: ' . $url, $queryParams);
+
         $response = Http::withHeaders(self::getHeaders())
             ->get($url, $queryParams);
+
+        \Log::info('📡 Response status: ' . $response->status());
 
         return $response->json();
     }

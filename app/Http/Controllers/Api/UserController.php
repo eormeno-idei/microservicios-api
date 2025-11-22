@@ -33,9 +33,13 @@ class UserController extends Controller
         $perPage = $validated['per_page'] ?? 15;
         $sortBy = $validated['sort_by'] ?? 'created_at';
         $sortDirection = $validated['sort_direction'] ?? 'desc';
+        $search = $validated['search'] ?? null;
+        if ($search === '') {
+            $search = null;
+        }
 
         $query = User::with('roles')
-            ->when($request->search, function ($query, $search) {
+            ->when($search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%")
                     ->orWhere('email', 'like', "%{$search}%");
             });
@@ -92,9 +96,19 @@ class UserController extends Controller
         ]);
     }
 
-    public function count(): JsonResponse
+    public function count(Request $request): JsonResponse
     {
-        $totalUsers = User::count();
+        $search = $request->query('search', null);
+        if ($search === '') {
+            $search = null;
+        }
+
+        $totalUsers = User::when($search, function ($query, $search) {
+            $query->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+        })->count();
+
+        UIDebug::info("Total users count with search term: " . ($search ?? 'null') . " is " . $totalUsers);
 
         return response()->json([
             'status' => 'success',

@@ -181,7 +181,6 @@ class UIStateManager
     public static function clear(string $serviceClass): bool
     {
         $cacheKey = self::getCacheKey($serviceClass);
-        // Cache::clear(); // TODO: Remove this line after testing
         return Cache::forget($cacheKey);
     }
 
@@ -189,7 +188,6 @@ class UIStateManager
     {
         $cacheKey = self::getCacheKey(prefix: 'ui_auth_token');
         Cache::put($cacheKey, $token, self::DEFAULT_TTL);
-        // UIDebug::info("Stored auth token '$token' in cache with key: $cacheKey");
         return true;
     }
 
@@ -197,8 +195,26 @@ class UIStateManager
     {
         $cacheKey = self::getCacheKey(prefix: 'ui_auth_token');
         $token = Cache::get($cacheKey);
-        // UIDebug::warning("Retrieved auth token '$token' from cache with key: $cacheKey");
         return $token;
+    }
+
+    public static function storeKeyValue(string $key, mixed $value): bool
+    {
+        $cacheKey = self::getCacheKey(prefix: "ui_key_{$key}");
+        Cache::put($cacheKey, $value, self::DEFAULT_TTL);
+        return true;
+    }
+
+    public static function getKeyValue(string $key): mixed
+    {
+        $cacheKey = self::getCacheKey(prefix: "ui_key_{$key}");
+        return Cache::get($cacheKey);
+    }
+
+    public static function clearKeyValue(string $key): bool
+    {
+        $cacheKey = self::getCacheKey(prefix: "ui_key_{$key}");
+        return Cache::forget($cacheKey);
     }
 
     private static function getCallerServiceInfo(): string

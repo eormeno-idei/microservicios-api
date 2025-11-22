@@ -1,6 +1,7 @@
 <?php
 namespace App\Services\Screens;
 
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
@@ -56,6 +57,12 @@ class AdminDashboardService extends AbstractUIService
         $container->add($users_table);
     }
 
+    protected function postLoadUI(): void
+    {
+        $search_users = $this->users_table->getSearchTerm();
+        $this->search_users->value($search_users);
+    }
+
     public function onAddUserClicked(array $params): void
     {
         RegisterDialogService::open(
@@ -106,5 +113,10 @@ class AdminDashboardService extends AbstractUIService
     {
         $search = $params['value'] ?? '';
 
+        // Set search term
+        $this->users_table->setSearchTerm($search);
+
+        // Reset to page 1 when searching
+        $this->users_table->page(1);
     }
 }
