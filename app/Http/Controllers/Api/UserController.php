@@ -8,6 +8,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
@@ -170,8 +171,10 @@ class UserController extends Controller
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['sometimes', 'confirmed', Password::defaults()],
-            'roles' => ['sometimes', 'string', 'array'],
+            'roles' => ['sometimes', 'array'],
             'roles.*' => ['exists:roles,name'],
+            "send_reset_email" => ['sometimes', 'boolean'],
+            "send_verification_email" => ['sometimes', 'boolean'],
         ]);
 
         if (isset($validated['password'])) {
@@ -184,7 +187,21 @@ class UserController extends Controller
             $user->syncRoles($validated['roles']);
         }
 
+        if (!empty($validated['send_reset_email'])) {
+            // Send password reset email
+            $token = PasswordBroker::createToken($user);
+            $user->sendPasswordResetNotification($token);
+        }
+
+        if (!empty($validated['send_verification_email'])) {
+            // Mark email as unverified and send verification email
+            $user->email_verified_at = null;
+            $user->save();
+            $user->sendEmailVerificationNotification();
+        }
+
         return response()->json([
+            'status' => 'success',
             'message' => 'Usuario actualizado exitosamente',
             'data' => $user->fresh()->load('roles'),
         ]);

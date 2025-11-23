@@ -124,13 +124,13 @@ class AdminDashboardService extends AbstractUIService
 
     public function onSubmitUpdateUser(array $params): void
     {
-        UIDebug::info("Updating user with params", $params);
         $userId = $params['user_id'] ?? null;
         if (!$userId) {
             $this->toast('User ID is required for update', 'error');
             return;
         }
-        $params['roles'] = [$params['roles']];
+        $params['roles'] = ["$params[roles]",];
+        UIDebug::info("Updating user with params", $params);
         $response = HttpClient::put(
             "users.update",
             $params,
