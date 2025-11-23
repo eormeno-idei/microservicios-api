@@ -155,6 +155,8 @@ class UserController extends Controller
     public function show(User $user): JsonResponse
     {
         return response()->json([
+            'status' => 'success',
+            'message' => "Usuario $user->name recuperado exitosamente",
             'data' => $user->load('roles'),
         ]);
     }
@@ -193,11 +195,19 @@ class UserController extends Controller
      */
     public function destroy(User $user): JsonResponse
     {
+        // Delete the user if it is different from the currently authenticated user
+        if (auth()->id() === $user->id) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se puede eliminar el usuario autenticado actualmente',
+            ], 403);
+        }
+
         $user->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Usuario eliminado exitosamente',
+            'message' => "Usuario $user->name eliminado exitosamente",
         ]);
     }
 }

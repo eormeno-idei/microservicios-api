@@ -1,8 +1,9 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
+use App\Services\UI\Support\UIDebug;
+use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Support\HttpClient;
@@ -11,6 +12,7 @@ use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\TableBuilder;
 use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\DataTable\UserApiTableModel;
+use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
 
 class AdminDashboardService extends AbstractUIService
@@ -105,6 +107,26 @@ class AdminDashboardService extends AbstractUIService
 
     public function onDeleteUser(array $params): void
     {
+        $user = HttpClient::get(
+            "users.show",
+            routeParams: ['user' => $params['user_id']]
+        )['data'] ?? null;
+        if (!$user) {
+            $this->toast('User not found', 'error');
+            return;
+        }
+        ConfirmDialogService::open(
+            type: DialogType::WARNING,
+            title: "Delete User",
+            message: "Are you sure you want to delete user '{$user['name']}'?",
+            confirmAction: 'confirm_delete_user',
+            confirmParams: ['user_id' => $params['user_id']],
+            callerServiceId: $this->getServiceComponentId()
+        );
+    }
+
+    public function onConfirmDeleteUser(array $params): void
+    {
         $userId = $params['user_id'] ?? null;
         if (!$userId) {
             $this->toast('User ID is required for deletion', 'error');
@@ -119,6 +141,7 @@ class AdminDashboardService extends AbstractUIService
         $message = $response['message'] ?? 'Failed to delete user';
         $this->toast($message, $status);
         $this->users_table->refresh();
+        $this->closeModal();
     }
 
     public function onChangePage(array $params): void
