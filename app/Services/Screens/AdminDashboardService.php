@@ -13,6 +13,7 @@ use App\Services\UI\Components\TableBuilder;
 use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\DataTable\UserApiTableModel;
 use App\Services\UI\Modals\ConfirmDialogService;
+use App\Services\UI\Modals\EditUserDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
 
 class AdminDashboardService extends AbstractUIService
@@ -79,6 +80,64 @@ class AdminDashboardService extends AbstractUIService
         $response = HttpClient::post('users.store', $params);
         $status = $response['status'] ?? 'success';
         $message = $response['message'] ?? 'User registered successfully';
+
+        if ($status === 'success') {
+            $this->toast($message, 'success');
+            $this->users_table->refresh();
+            $this->closeModal();
+        } else {
+            $this->toast($message, 'error');
+
+            // Update modal inputs with validation errors
+            $errors = $response['errors'] ?? [];
+
+            if (!empty($errors)) {
+                $modalUpdates = [];
+
+                foreach ($errors as $fieldName => $messages) {
+                    // Concatenate all error messages for the field
+                    $modalUpdates[$fieldName] = [
+                        'error' => implode(' ', $messages)
+                    ];
+                }
+
+                $this->updateModal($modalUpdates);
+            }
+        }
+    }
+
+    public function onEditUser(array $params): void
+    {
+        $user = HttpClient::get(
+            "users.show",
+            routeParams: ['user' => $params['user_id']]
+        )['data'] ?? null;
+        if (!$user) {
+            $this->toast('User not found', 'error');
+            return;
+        }
+        EditUserDialogService::open(
+            user: $user,
+            callerServiceId: $this->getServiceComponentId()
+        );
+    }
+
+    public function onSubmitUpdateUser(array $params): void
+    {
+        UIDebug::info("Updating user with params", $params);
+        $userId = $params['user_id'] ?? null;
+        if (!$userId) {
+            $this->toast('User ID is required for update', 'error');
+            return;
+        }
+        $params['roles'] = [$params['roles']];
+        $response = HttpClient::put(
+            "users.update",
+            $params,
+            routeParams: ['user' => $userId]
+        );
+        $status = $response['status'] ?? 'success';
+        $message = $response['message'] ?? 'User updated successfully';
 
         if ($status === 'success') {
             $this->toast($message, 'success');
