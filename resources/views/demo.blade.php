@@ -18,10 +18,12 @@
     <button id="reset-btn" onclick="location.href='?reset=true'">Reset</button>
 
     <script>
-        // Pass demo name from Laravel to JavaScript
+        // Pass service name from Laravel to JavaScript
         window.DEMO_NAME = '{{ $demo }}';
         window.RESET_DEMO = {{ $reset ? 'true' : 'false' }};
         window.MENU_SERVICE = 'demo-menu';
+        window.PARAMS = @json($params ?? []);
+        window.QUERY_PARAMS = new URLSearchParams(window.location.search);
     </script>
     <script src="{{ asset('js/ui-renderer.js') }}"></script>
 </body>

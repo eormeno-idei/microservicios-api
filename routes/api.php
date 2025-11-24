@@ -87,6 +87,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
  * PUT    /api/users/{user}    -> update  (Actualiza un usuario completo)
  * PATCH  /api/users/{user}    -> update  (Actualiza parcialmente un usuario)
  * DELETE /api/users/{user}    -> destroy (Elimina un usuario)
+ * GET    /api/users/count     -> count   (Cuenta el número total de usuarios)
  *
  * Todas las rutas requieren:
  * - Autenticación mediante token de Sanctum

@@ -31,6 +31,18 @@ Route::get('/login', function () {
     ]);
 })->name('login');
 
+Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => 'email-verified',
+        'params' => [
+            'id' => $id,
+            'hash' => $hash
+        ],
+        'reset' => $reset
+    ]);
+})->middleware('signed')->name('verification.notice');
+
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::get('/admin/dashboard', function () {
@@ -51,8 +63,6 @@ Route::get('/demo/{demo}', function (string $demo) {
         'reset' => $reset
     ]);
 })->name('demo');
-
-
 
 // Demo UI API routes - Unified controller for all demo services
 Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');

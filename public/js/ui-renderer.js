@@ -2001,7 +2001,7 @@ class UIRenderer {
                                 return isVisible && component.hasVisibleChildren(item.submenu, permissions);
                             }
                             return isVisible;
-                });                        // Hide/show entire menu
+                        });                        // Hide/show entire menu
                         menuContainer.style.display = hasVisibleItems ? '' : 'none';
 
                         // Close menu if it was open
@@ -2300,14 +2300,41 @@ async function loadDemoUI(demoName = null) {
     try {
         // Use demo name from window global (set by Laravel) or parameter
         const demo = demoName || window.DEMO_NAME || 'button-demo';
-        const resetQuery = window.RESET_DEMO ? '?reset=true' : '';
+
+        // Build query parameters string
+        const urlParams = new URLSearchParams();
+
+        // Add reset parameter if needed
+        if (window.RESET_DEMO) {
+            urlParams.append('reset', 'true');
+        }
+
+        // Add any existing query parameters from window.QUERY_PARAMS
+        if (window.QUERY_PARAMS && window.QUERY_PARAMS.toString()) {
+            // Merge existing params into urlParams
+            for (const [key, value] of window.QUERY_PARAMS.entries()) {
+                urlParams.append(key, value);
+            }
+        }
+
+        // Get the parameters from the URL
+        const params = window.PARAMS || {};
+        // si hay params, los añadimos a urlParams
+        for (const [key, value] of Object.entries(params)) {
+            urlParams.append(key, value);
+        }
+
+        // Build final query string (with ? prefix if there are params)
+        const queryString = urlParams.toString() ? `?${urlParams.toString()}` : '';
+
+        console.log('🚀 Initializing demo UI:', demo, queryString);
 
         const usimStorage = localStorage.getItem('usim') || '';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        console.log(`Fetching UI data from /api/${demo}${resetQuery}...`);
+        console.log(`Fetching UI data from /api/${demo}${queryString}...`);
 
-        const response = await fetch(`/api/${demo}${resetQuery}`, {
+        const response = await fetch(`/api/${demo}${queryString}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',

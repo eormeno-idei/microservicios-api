@@ -2,7 +2,6 @@
 namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
-use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
@@ -130,7 +129,6 @@ class AdminDashboardService extends AbstractUIService
             return;
         }
         $params['roles'] = ["$params[roles]",];
-        UIDebug::info("Updating user with params", $params);
         $response = HttpClient::put(
             "users.update",
             $params,
