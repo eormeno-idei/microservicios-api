@@ -4,7 +4,7 @@ namespace App\Services\UI\Components;
 
 /**
  * Builder for Card UI components
- * 
+ *
  * Modern and versatile card component with support for headers, content,
  * images, actions, and various styling options. Perfect for displaying
  * structured content in an attractive container.
@@ -19,39 +19,39 @@ class CardBuilder extends UIComponent
             'subtitle' => null,
             'description' => null,
             'content' => null, // HTML content
-            
+
             // Image
             'image' => null, // Image URL
             'image_position' => 'top', // top, bottom, left, right, background
             'image_alt' => null,
             'image_fit' => 'cover', // cover, contain, fill, scale-down
-            
+
             // Header
             'header' => null, // Custom header content
             'show_header' => true,
-            
+
             // Footer/Actions
             'footer' => null, // Custom footer content
             'show_footer' => true,
             'actions' => [], // Array of button configurations
-            
+
             // Visual style
             'style' => 'default', // default, outlined, elevated, flat, gradient
             'variant' => 'standard', // standard, compact, expanded, media
             'size' => 'medium', // small, medium, large
             'elevation' => 'medium', // none, low, medium, high
-            
+
             // Layout
             'orientation' => 'vertical', // vertical, horizontal
             'content_padding' => 'medium', // none, small, medium, large
             'border_radius' => 'medium', // none, small, medium, large, round
-            
+
             // Colors and theming
             'background_color' => null,
             'border_color' => null,
             'text_color' => null,
             'theme' => null, // primary, secondary, success, warning, danger, info
-            
+
             // Interaction
             'clickable' => false,
             'hover_effect' => true,
@@ -59,12 +59,12 @@ class CardBuilder extends UIComponent
             'parameters' => [],
             'url' => null, // URL for navigation
             'target' => '_self', // Link target
-            
+
             // Badge/Status
             'badge' => null,
             'badge_position' => 'top-right', // top-left, top-right, bottom-left, bottom-right
             'status' => null, // Status indicator
-            
+
             // Accessibility
             'aria_label' => null,
             'role' => 'article', // article, button, link, etc.
@@ -73,7 +73,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set the card title
-     * 
+     *
      * @param string $title Card title
      * @return self
      */
@@ -84,7 +84,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set the card subtitle
-     * 
+     *
      * @param string $subtitle Card subtitle
      * @return self
      */
@@ -95,7 +95,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set the card description
-     * 
+     *
      * @param string $description Card description
      * @return self
      */
@@ -106,7 +106,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card content (HTML)
-     * 
+     *
      * @param string $content HTML content
      * @return self
      */
@@ -117,7 +117,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card image
-     * 
+     *
      * @param string $imageUrl Image URL
      * @param string $position Image position (top, bottom, left, right, background)
      * @param string $alt Alt text for accessibility
@@ -132,7 +132,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card style
-     * 
+     *
      * @param string $style Style variant (default, outlined, elevated, flat, gradient)
      * @return self
      */
@@ -143,7 +143,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card size
-     * 
+     *
      * @param string $size Size variant (small, medium, large)
      * @return self
      */
@@ -154,7 +154,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card elevation/shadow
-     * 
+     *
      * @param string $elevation Elevation level (none, low, medium, high)
      * @return self
      */
@@ -165,7 +165,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set card theme
-     * 
+     *
      * @param string $theme Theme color (primary, secondary, success, warning, danger, info)
      * @return self
      */
@@ -176,7 +176,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Make card clickable with action
-     * 
+     *
      * @param string $action Action to trigger
      * @param array $parameters Action parameters
      * @return self
@@ -190,7 +190,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Make card clickable with URL navigation
-     * 
+     *
      * @param string $url URL to navigate to
      * @param string $target Link target (_self, _blank, etc.)
      * @return self
@@ -204,7 +204,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Add action buttons to card footer
-     * 
+     *
      * @param array $actions Array of button configurations
      * @return self
      */
@@ -214,8 +214,8 @@ class CardBuilder extends UIComponent
     }
 
     /**
-     * Add a single action button
-     * 
+     * Add an action button to the card footer
+     *
      * @param string $label Button label
      * @param string $action Action to trigger
      * @param array $parameters Action parameters
@@ -224,6 +224,15 @@ class CardBuilder extends UIComponent
      */
     public function addAction(string $label, string $action, array $parameters = [], string $style = 'primary'): self
     {
+        // Inject caller service ID if not already present
+        if (!isset($parameters['_caller_service_id'])) {
+            // Get the service class that's calling this component
+            $serviceClass = $this->detectCallingService();
+            // Get the service ID (offset) for that class
+            $serviceId = $this->getServiceIdFromClass($serviceClass);
+            $parameters['_caller_service_id'] = $serviceId;
+        }
+
         $currentActions = $this->config['actions'] ?? [];
         $currentActions[] = [
             'label' => $label,
@@ -235,8 +244,48 @@ class CardBuilder extends UIComponent
     }
 
     /**
+     * Detect the calling service class from the stack trace
+     *
+     * @return string Service class name
+     */
+    private function detectCallingService(): string
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 15);
+
+        // Look for the first class outside UI namespace
+        foreach ($trace as $frame) {
+            if (
+                isset($frame['class']) &&
+                !str_starts_with($frame['class'], 'App\\Services\\UI\\')
+            ) {
+                return $frame['class'];
+            }
+        }
+
+        return 'default';
+    }
+
+    /**
+     * Get the base service ID for a service class
+     *
+     * @param string $serviceClass Full service class name
+     * @return int Service base ID (offset)
+     */
+    private function getServiceIdFromClass(string $serviceClass): int
+    {
+        if ($serviceClass === 'default') {
+            return 0;
+        }
+
+        // Calculate offset (same logic as UIIdGenerator::getContextOffset)
+        $hash = abs(crc32($serviceClass));
+        $segment = $hash % 9999; // 9999 segments (not 500)
+        return $segment * 10000;
+    }
+
+    /**
      * Set card badge
-     * 
+     *
      * @param string $badge Badge text or icon
      * @param string $position Badge position
      * @return self
@@ -249,7 +298,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set horizontal orientation
-     * 
+     *
      * @return self
      */
     public function horizontal(): self
@@ -259,7 +308,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set vertical orientation
-     * 
+     *
      * @return self
      */
     public function vertical(): self
@@ -269,7 +318,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Enable hover effects
-     * 
+     *
      * @param bool $enabled Whether to enable hover effects
      * @return self
      */
@@ -280,7 +329,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set compact variant
-     * 
+     *
      * @return self
      */
     public function compact(): self
@@ -291,7 +340,7 @@ class CardBuilder extends UIComponent
 
     /**
      * Set expanded variant
-     * 
+     *
      * @return self
      */
     public function expanded(): self

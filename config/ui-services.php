@@ -41,5 +41,7 @@ return [
     \App\Services\Screens\LoginService::class,
     // Servicio de dashboard admin
     \App\Services\Screens\AdminDashboardService::class,
+    // Servicio de verificación de email
+    \App\Services\Screens\EmailVerifiedService::class,
 
 ];
