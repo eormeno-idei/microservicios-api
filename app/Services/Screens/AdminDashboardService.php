@@ -69,6 +69,7 @@ class AdminDashboardService extends AbstractUIService
     {
         RegisterDialogService::open(
             fakeData: true,
+            askForRole: true,
             callerServiceId: $this->getServiceComponentId()
         );
     }

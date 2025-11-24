@@ -1,12 +1,12 @@
 <?php
 namespace App\Services\UI\Modals;
 
-use App\Services\UI\Contracts\UIModal;
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\TimeUnit;
 use App\Services\UI\Enums\DialogType;
 use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\TimeUnit;
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\UIBuilder;
+use App\Services\UI\Contracts\UIModal;
+use App\Services\UI\UIChangesCollector;
 
 /**
  * Dialog Service
@@ -22,7 +22,7 @@ class ConfirmDialogService implements UIModal
     {
         $dialog = new self();
         $format = $dialog->getUI(...$params);
-        $uiChanges = app('App\Services\UI\UIChangesCollector');
+        $uiChanges = app(UIChangesCollector::class);
         $uiChanges->add($format);
     }
 
@@ -55,7 +55,7 @@ class ConfirmDialogService implements UIModal
     {
         // Extract dialog type (default to CONFIRM for backward compatibility)
         $type = $params['type'] ?? DialogType::CONFIRM;
-        if (is_string($type)) {
+        if (\is_string($type)) {
             $type = DialogType::from($type);
         }
 
@@ -63,7 +63,7 @@ class ConfirmDialogService implements UIModal
         $title           = $params['title'] ?? 'Diálogo';
         $message         = $params['message'] ?? '¿Está seguro?';
         $icon            = $params['icon'] ?? $type->getDefaultIcon();
-        $confirmAction   = $params['confirmAction'] ?? 'confirm';
+        $confirmAction   = $params['confirmAction'] ?? 'close_modal';
         $confirmParams   = $params['confirmParams'] ?? [];
         $confirmLabel    = $params['confirmLabel'] ?? $type->getDefaultConfirmLabel();
         $cancelAction    = $params['cancelAction'] ?? 'close_modal';

@@ -36,6 +36,7 @@ class RegisterDialogService
         string $submitAction = 'submit_register',
         ?string $cancelAction = 'close_modal',
         bool $fakeData = false,
+        bool $askForRole = false,
         ?int $callerServiceId = null
     ): array {
         $name = '';
@@ -99,17 +100,27 @@ class RegisterDialogService
                 ->autocomplete('new-password')
         );
 
-        // Role select
-        $registerContainer->add(
-            UIBuilder::select('roles')
-                ->label('Role')
-                ->options([
-                    ['value' => 'user', 'label' => 'User'],
-                    ['value' => 'admin', 'label' => 'Admin'],
-                ])
-                ->value($role)
-                ->required(true)
-        );
+        if ($askForRole) {
+
+            // Role select
+            $registerContainer->add(
+                UIBuilder::select('roles')
+                    ->label('Role')
+                    ->options([
+                        ['value' => 'user', 'label' => 'User'],
+                        ['value' => 'admin', 'label' => 'Admin'],
+                    ])
+                    ->value($role)
+                    ->required(true)
+            );
+
+            // Checkbox for sending verification email
+            $registerContainer->add(
+                UIBuilder::checkbox('send_verification_email')
+                    ->label('Send verification email')
+                    ->checked(true)
+            );
+        }
 
         // Buttons container
         $buttonsContainer = UIBuilder::container('register_buttons')

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -109,8 +110,6 @@ class UserController extends Controller
                 ->orWhere('email', 'like', "%{$search}%");
         })->count();
 
-        UIDebug::info("Total users count with search term: " . ($search ?? 'null') . " is " . $totalUsers);
-
         return response()->json([
             'status' => 'success',
             'message' => 'Conteo de usuarios recuperado exitosamente',
@@ -131,6 +130,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'roles' => ['sometimes', 'array'],
             'roles.*' => ['exists:roles,name'],
+            "send_verification_email" => ['sometimes', 'boolean'],
         ]);
 
         $user = User::create([
@@ -143,10 +143,28 @@ class UserController extends Controller
             $user->assignRole($validated['roles']);
         }
 
+        if (!empty($validated['send_verification_email'])) {
+            event(new Registered($user));
+        }
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Obtener permisos del usuario
+        $permissions = $user->getAllPermissions()->pluck('name')->toArray();
+
         return response()->json([
             'status' => 'success',
             'message' => 'Usuario creado exitosamente',
-            'data' => $user->load('roles'),
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'roles' => $user->getRoleNames(),
+                    'permissions' => $permissions,
+                ],
+                'token' => $token,
+            ]
         ], 201);
     }
 

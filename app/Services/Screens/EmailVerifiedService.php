@@ -52,8 +52,6 @@ class EmailVerifiedService extends AbstractUIService
         $id = request()->route('id');
         $hash = request()->route('hash');
 
-        UIDebug::info('Verifying email with ID: ' . $id . ' and Hash: ' . $hash);
-
         if (!$id || !$hash) {
             $this->errorMessage = 'Enlace de verificación inválido. Faltan parámetros requeridos.';
             $this->verificationStatus = 'error';

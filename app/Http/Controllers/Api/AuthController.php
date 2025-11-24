@@ -3,19 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
-use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\UI\Support\UIDebug;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -130,6 +128,7 @@ class AuthController extends Controller
             'message' => 'Sesión cerrada exitosamente'
         ]);
     }
+
     public function verifyEmail(Request $request)
     {
         $user = User::find($request->route('id'));
@@ -177,6 +176,7 @@ class AuthController extends Controller
             'message' => 'Email verified successfully'
         ], 200);
     }
+
     public function resendVerificationEmail(Request $request)
     {
         if ($request->user()->hasVerifiedEmail()) {

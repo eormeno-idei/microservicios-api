@@ -10,7 +10,10 @@ use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\UI\Support\HttpClient;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIBuilder;
+use Http;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -153,17 +156,8 @@ class DemoMenuService extends AbstractUIService
             message: "Sistema de componentes UI v1.0\n
             Desarrollado con Laravel y componentes modulares.\n
             Soporta: Tables, Modals, Forms, Menus y más.",
-            confirmAction: 'close_about_dialog',
             callerServiceId: $serviceId
         );
-    }
-
-    /**
-     * Handler to close about dialog
-     */
-    public function onCloseAboutDialog(array $params): void
-    {
-        $this->closeModal();
     }
 
     /**
@@ -178,28 +172,38 @@ class DemoMenuService extends AbstractUIService
     }
 
     /**
-     * Handler to close register dialog
-     */
-    public function onCloseRegisterDialog(array $params): void
-    {
-        $this->closeModal();
-    }
-
-    /**
      * Handler to submit register (receives form data)
      */
     public function onSubmitRegister(array $params): void
     {
-        // TODO: Validate and create user
-        // For now, just show a success message
-        $name                 = $params['register_name'] ?? '';
-        $email                = $params['register_email'] ?? '';
-        $password             = $params['register_password'] ?? '';
-        $passwordConfirmation = $params['register_password_confirmation'] ?? '';
+        $params['roles'] = ['user'];
+        $params['send_verification_email'] = true;
+        $response = HttpClient::post('users.store', $params);
+        $status = $response['status'];
+        $message = $response['message'];
 
-        // Here you would call the API /api/register with the data
-        // For now, just close the modal
-        $this->closeModal();
+        if ($status === 'success') {
+            $this->toast($message, 'success');
+            $this->closeModal();
+        } else {
+            $this->toast($message, 'error');
+
+            // Update modal inputs with validation errors
+            $errors = $response['errors'] ?? [];
+
+            if (!empty($errors)) {
+                $modalUpdates = [];
+
+                foreach ($errors as $fieldName => $messages) {
+                    // Concatenate all error messages for the field
+                    $modalUpdates[$fieldName] = [
+                        'error' => implode(' ', $messages)
+                    ];
+                }
+
+                $this->updateModal($modalUpdates);
+            }
+        }
     }
 
     /**
