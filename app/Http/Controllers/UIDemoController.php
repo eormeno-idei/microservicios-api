@@ -10,7 +10,8 @@ class UIDemoController extends Controller
 {
 
     public function __construct(protected UIChangesCollector $uiChanges)
-    {}
+    {
+    }
 
     /**
      * Show UI for the specified demo service
@@ -21,8 +22,9 @@ class UIDemoController extends Controller
      */
     public function show(string $demo): JsonResponse
     {
-        $reset  = request()->query('reset', false);
+        $reset = request()->query('reset', false);
         $parent = request()->query('parent', "main");
+        $allQueryParams = request()->query();
 
         $incomingStorage = request()->storage;
 
@@ -34,9 +36,9 @@ class UIDemoController extends Controller
         $serviceClass = "App\\Services\\Screens\\{$serviceName}";
 
         // Check if service class exists
-        if (! class_exists($serviceClass)) {
+        if (!class_exists($serviceClass)) {
             return response()->json([
-                'error'   => 'Demo service not found',
+                'error' => 'Demo service not found',
                 'service' => $serviceName,
             ], 404);
         }
@@ -47,22 +49,19 @@ class UIDemoController extends Controller
         // This allows dependency injection to work
         $service = app($serviceClass);
 
-        // Inject incoming storage values into the service
-        // $service->injectStorageValues($incomingStorage);
-
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {
-            // Log::info("Resetting stored UI for demo service: {$serviceName}");
             $service->clearStoredUI();
             $service->onResetService();
         }
 
-        $service->initializeEventContext($incomingStorage);
+        $service->initializeEventContext(
+            incomingStorage: $incomingStorage,
+            queryParams: $allQueryParams
+        );
         $service->finalizeEventContext(reload: true);
 
         $result = $this->uiChanges->all();
-        // $ui     = $service->getUI($parent);
-        // UIDebug::info("UI Demo Service Response", $result);
         return response()->json($result);
     }
 }

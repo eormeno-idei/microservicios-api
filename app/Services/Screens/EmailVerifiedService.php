@@ -3,6 +3,7 @@
 namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Support\HttpClient;
@@ -50,6 +51,8 @@ class EmailVerifiedService extends AbstractUIService
         // Obtener parámetros de la URL (id y hash)
         $id = request()->route('id');
         $hash = request()->route('hash');
+
+        UIDebug::info('Verifying email with ID: ' . $id . ' and Hash: ' . $hash);
 
         if (!$id || !$hash) {
             $this->errorMessage = 'Enlace de verificación inválido. Faltan parámetros requeridos.';

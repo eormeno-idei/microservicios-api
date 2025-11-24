@@ -59,6 +59,11 @@ abstract class AbstractUIService
      */
     protected ?array $newUI = null;
 
+    /**
+     * Query parameters from the request
+     */
+    protected array $queryParams = [];
+
     protected function uiChanges(): UIChangesCollector
     {
         return app(UIChangesCollector::class);
@@ -89,10 +94,12 @@ abstract class AbstractUIService
      * @param array $incomingStorage Storage data from frontend (decrypted)
      * @return void
      */
-    public function initializeEventContext(array $incomingStorage = [], bool $debug = false): void
+    public function initializeEventContext(array $incomingStorage = [], array $queryParams = [], bool $debug = false): void
     {
         $this->container = $this->getUIContainer($debug);
         $this->oldUI = $this->container->toJson();
+
+        $this->queryParams = $queryParams;
 
         // Inject storage values into protected properties (store_* variables)
         $this->injectStorageValues($incomingStorage);

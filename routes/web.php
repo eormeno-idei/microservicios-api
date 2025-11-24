@@ -31,14 +31,10 @@ Route::get('/login', function () {
     ]);
 })->name('login');
 
-Route::get('/email/verify/{id}/{hash}', function ($id, $hash) {
+Route::get('/email/verify/{id}/{hash}', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
         'demo' => 'email-verified',
-        'params' => [
-            'id' => $id,
-            'hash' => $hash
-        ],
         'reset' => $reset
     ]);
 })->middleware('signed')->name('verification.notice');

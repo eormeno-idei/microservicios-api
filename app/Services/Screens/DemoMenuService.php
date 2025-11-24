@@ -169,18 +169,12 @@ class DemoMenuService extends AbstractUIService
     /**
      * Handler for Register form
      */
-    public function onShowRegisterForm(array $params): array
+    public function onShowRegisterForm(array $params): void
     {
-        $serviceId = $this->getServiceComponentId();
-
-        $registerService = app(RegisterDialogService::class);
-        $modalUI         = $registerService->getUI(
+        RegisterDialogService::open(
             submitAction: 'submit_register',
-            cancelAction: 'close_register_dialog',
-            callerServiceId: $serviceId
+            callerServiceId: $this->getServiceComponentId()
         );
-
-        return $modalUI;
     }
 
     /**

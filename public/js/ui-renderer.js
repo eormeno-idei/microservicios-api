@@ -1754,8 +1754,6 @@ class UIRenderer {
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
-        console.log('📨 Received UI update:', uiUpdate);
-        // console.log('📦 Processing UI updates:', uiUpdate);
 
         // Handle storage updates if present
         if (uiUpdate.storage) {
@@ -2327,13 +2325,8 @@ async function loadDemoUI(demoName = null) {
         // Build final query string (with ? prefix if there are params)
         const queryString = urlParams.toString() ? `?${urlParams.toString()}` : '';
 
-        console.log('🚀 Initializing demo UI:', demo, queryString);
-
         const usimStorage = localStorage.getItem('usim') || '';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-        console.log(`Fetching UI data from /api/${demo}${queryString}...`);
-
         const response = await fetch(`/api/${demo}${queryString}`, {
             method: 'GET',
             headers: {

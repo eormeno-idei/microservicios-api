@@ -18,11 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->web(prepend: [
-            \App\Http\Middleware\DecryptUsimStorage::class,
+            \App\Http\Middleware\PrepareUIContext::class,
         ]);
 
         $middleware->api(prepend: [
-            \App\Http\Middleware\DecryptUsimStorage::class,
+            \App\Http\Middleware\PrepareUIContext::class,
         ]);
 
         // Registrar alias de middleware de Spatie Permission

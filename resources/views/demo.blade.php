@@ -17,12 +17,26 @@
     </div>
     <button id="reset-btn" onclick="location.href='?reset=true'">Reset</button>
 
+    @php
+        // Obtener todos los parámetros de ruta automáticamente
+        $routeParams = request()->route()->parameters();
+
+        // Crear un array con prefijo "route_" para diferenciarlos de query params
+        $prefixedRouteParams = [];
+        foreach ($routeParams as $key => $value) {
+            $prefixedRouteParams["route_$key"] = $value;
+        }
+
+        // Combinar con params manuales si existen (para compatibilidad)
+        $allParams = array_merge($prefixedRouteParams, $params ?? []);
+    @endphp
+
     <script>
         // Pass service name from Laravel to JavaScript
         window.DEMO_NAME = '{{ $demo }}';
         window.RESET_DEMO = {{ $reset ? 'true' : 'false' }};
         window.MENU_SERVICE = 'demo-menu';
-        window.PARAMS = @json($params ?? []);
+        window.PARAMS = @json($allParams);
         window.QUERY_PARAMS = new URLSearchParams(window.location.search);
     </script>
     <script src="{{ asset('js/ui-renderer.js') }}"></script>

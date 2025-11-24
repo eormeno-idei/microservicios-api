@@ -25,11 +25,6 @@ class HttpClient
         // Get client ID from cookie to maintain UI state
         $clientId = request()->cookie(UIStateManager::CLIENT_ID_COOKIE);
 
-        \Log::info('🔑 HttpClient auth', [
-            'token' => substr($token ?? 'NULL', 0, 20) . '...',
-            'clientId' => $clientId
-        ]);
-
         $headers = [
             "Content-Type" => "application/json",
             "Accept" => "application/json",
@@ -75,12 +70,8 @@ class HttpClient
     {
         $url = route($route, $routeParams);
 
-        \Log::info('🌐 HttpClient GET: ' . $url, $queryParams);
-
         $response = Http::withHeaders(self::getHeaders())
             ->get($url, $queryParams);
-
-        \Log::info('📡 Response status: ' . $response->status());
 
         return $response->json();
     }

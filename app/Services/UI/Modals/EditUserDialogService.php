@@ -38,7 +38,6 @@ class EditUserDialogService
         array $user = null,
         ?int $callerServiceId = null
     ): array {
-        UIDebug::info("Building Edit User Dialog UI", $user);
         $name = $user ? $user['name'] : '';
         $email = $user ? $user['email'] : '';
         $role = $user ? $user['roles'][0]['name'] ?? 'user' : 'user';

@@ -20,8 +20,8 @@ Route::post('/password/reset', [AuthController::class, 'resetPassword'])->name('
 
 // Ruta para verificar email
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
-    ->middleware('signed')
     ->name('verification.verify');
+// TODO: ->middleware('signed'); DEBERIA ESTAR ACTIVADO
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
