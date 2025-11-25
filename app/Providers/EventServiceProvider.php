@@ -2,13 +2,13 @@
 // app/Providers/EventServiceProvider.php
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use App\Events\UsimEvent;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Event;
 use App\Listeners\UsimEventDispatcher;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
