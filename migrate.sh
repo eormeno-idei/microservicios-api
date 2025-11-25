@@ -29,21 +29,14 @@ if [[ "$*" == *"-r"* ]]; then
         rm -f database/database.sqlite
     fi
 
-    php artisan migrate --force --seed
 fi
 
-# DB_PATH="database/database.sqlite"
+php artisan migrate --force --seed
 
-# if [ -f "$DB_PATH" ]; then
-#   rm "$DB_PATH"
-# fi
-
-# php artisan migrate --force --seed
-
-# status=$?
-# if [ $status -ne 0 ]; then
-#   echo "Error durante la migración o el seed. Código de salida: $status"
-#   exit $status
-# fi
+status=$?
+if [ $status -ne 0 ]; then
+    echo "Error durante la migración o el seed. Código de salida: $status"
+    exit $status
+fi
 
 echo "Migración y seed completados con éxito."
