@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Carbon;
 
-class CustomVerifyEmailNotification extends Notification
+class CustomVerifyEmailNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -19,7 +19,8 @@ class CustomVerifyEmailNotification extends Notification
      */
     public function __construct()
     {
-        //
+        // Set queue name for email notifications
+        $this->onQueue('emails');
     }
 
     /**
