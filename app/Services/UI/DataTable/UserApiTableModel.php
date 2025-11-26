@@ -20,8 +20,8 @@ class UserApiTableModel extends AbstractDataTableModel
             'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
             'role' => ['label' => 'Role', 'width' => [100, 100]],
             'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
-            'edit' => ['label' => '', 'width' => [50, 50]],
-            'delete' => ['label' => '', 'width' => [50, 50]],
+            'edit' => ['label' => '', 'width' => [25, 25]],
+            'delete' => ['label' => '', 'width' => [25, 25]],
         ];
     }
 

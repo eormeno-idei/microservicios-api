@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
-use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password as PasswordBroker;
 use Illuminate\Validation\Rules\Password;
@@ -15,11 +13,27 @@ use Illuminate\Validation\Rules\Password;
 class UserController extends Controller
 {
     /**
+     * Apply search filter to query
+     */
+    private function applySearchFilter($query, ?string $search)
+    {
+        return $query->when($search, function ($query, $search) {
+            $query->where(function ($query) use ($search) {
+                $query->where('users.name', 'like', "%{$search}%")
+                    ->orWhere('users.email', 'like', "%{$search}%")
+                    ->orWhereHas('roles', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    });
+            });
+        });
+    }
+
+    /**
      * Display a listing of users.
      *
      * Query params:
      * - per_page: items per page (default: 15)
-     * - search: search by name or email
+     * - search: search by name, email or role
      * - sort_by: name|email|roles (default: created_at)
      * - sort_direction: asc|desc (default: desc)
      */
@@ -28,28 +42,27 @@ class UserController extends Controller
         $validated = $request->validate([
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'search' => ['sometimes', 'string', 'max:255'],
-            'sort_by' => ['sometimes', 'in:name,email,roles,created_at'],
+            'sort_by' => ['sometimes', 'in:name,email,roles,updated_at'],
             'sort_direction' => ['sometimes', 'in:asc,desc'],
         ]);
 
         $perPage = $validated['per_page'] ?? 15;
-        $sortBy = $validated['sort_by'] ?? 'created_at';
+        $sortBy = $validated['sort_by'] ?? 'updated_at';
         $sortDirection = $validated['sort_direction'] ?? 'desc';
         $search = $validated['search'] ?? null;
         if ($search === '') {
             $search = null;
         }
 
-        $query = User::with('roles')
-            ->when($search, function ($query, $search) {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            });
+        $query = User::with('roles');
+        $this->applySearchFilter($query, $search);
 
-        // Ordenamiento especial para roles
+        // Ordenamiento
         if ($sortBy === 'roles') {
-            $query->withCount('roles')
-                ->orderBy('roles_count', $sortDirection);
+            $query->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                ->select('users.*', 'roles.name as role_name')
+                ->orderBy('roles.name', $sortDirection);
         } else {
             $query->orderBy($sortBy, $sortDirection);
         }
@@ -84,15 +97,7 @@ class UserController extends Controller
                     'current_page' => $users->currentPage(),
                     'total_pages' => $users->lastPage(),
                     'per_page' => $users->perPage(),
-                    'total_items' => $users->total(),
-                    'from' => $users->firstItem(),
-                    'to' => $users->lastItem(),
-                ],
-                'links' => [
-                    'first' => $users->url(1),
-                    'last' => $users->url($users->lastPage()),
-                    'prev' => $users->previousPageUrl(),
-                    'next' => $users->nextPageUrl(),
+                    'total_items' => $users->total()
                 ],
             ]
         ]);
@@ -105,10 +110,9 @@ class UserController extends Controller
             $search = null;
         }
 
-        $totalUsers = User::when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
-        })->count();
+        $query = User::query();
+        $this->applySearchFilter($query, $search);
+        $totalUsers = $query->count();
 
         return response()->json([
             'status' => 'success',
