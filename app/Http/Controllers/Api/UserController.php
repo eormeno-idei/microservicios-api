@@ -144,7 +144,7 @@ class UserController extends Controller
         }
 
         if (!empty($validated['send_verification_email'])) {
-            event(new Registered($user));
+            $user->sendEmailVerificationNotification();
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;

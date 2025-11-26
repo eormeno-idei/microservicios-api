@@ -27,11 +27,14 @@ class UserSeeder extends Seeder
 
     private function createConfigUser(string $prefix, string $role)
     {
-        $firstName = env("{$prefix}_FIRST_NAME", 'User');
-        $lastName =  env("{$prefix}_LAST_NAME", $role);
+        $configKey = strtolower($prefix);
+        $userConfig = config("users.{$configKey}");
+
+        $firstName = $userConfig['first_name'];
+        $lastName = $userConfig['last_name'];
         $fullName = trim($firstName . ' ' . $lastName);
-        $email = env("{$prefix}_EMAIL");
-        $password = env("{$prefix}_PASSWORD");
+        $email = $userConfig['email'];
+        $password = $userConfig['password'];
 
         $user = User::firstOrCreate(
             ['email' => $email],

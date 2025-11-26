@@ -3,10 +3,11 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class ResetPasswordNotification extends Notification
+class ResetPasswordNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -21,6 +22,9 @@ class ResetPasswordNotification extends Notification
     public function __construct($token)
     {
         $this->token = $token;
+
+        // Set queue name for email notifications
+        $this->onQueue('emails');
     }
 
     /**

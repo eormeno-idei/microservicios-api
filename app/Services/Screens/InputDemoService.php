@@ -1,12 +1,11 @@
 <?php
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
 use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\InputBuilder;
 use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\UIBuilder;
 
 /**
  * Input Demo Service
@@ -86,7 +85,6 @@ class InputDemoService extends AbstractUIService
      */
     public function onGetValue(array $params): void
     {
-        UIDebug::info('Validate button clicked', $params);
         $inputValue = trim($params['input_text'] ?? '');
 
         // Clear previous error

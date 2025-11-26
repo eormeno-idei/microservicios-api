@@ -68,5 +68,24 @@ php artisan view:clear
 
 # Start the Laravel server (this will block the terminal)
 echo "Starting Laravel server..."
+
+# Start queue worker in background
+echo "Starting queue worker in background..."
+php artisan queue:work --queue=default,emails --tries=3 --timeout=90 --sleep=3 > storage/logs/queue-worker.log 2>&1 &
+QUEUE_PID=$!
+echo "Queue worker started with PID: $QUEUE_PID"
+
+# Function to cleanup on exit
+cleanup() {
+    echo ""
+    echo "Stopping queue worker..."
+    kill $QUEUE_PID 2>/dev/null
+    exit 0
+}
+
+# Trap SIGINT (Ctrl+C) and SIGTERM
+trap cleanup SIGINT SIGTERM
+
+# Start Octane server
 # php artisan serve
 php artisan octane:start --watch --host=0.0.0.0 --port=8000
