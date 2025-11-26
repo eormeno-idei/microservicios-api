@@ -7,7 +7,7 @@ use App\Services\UI\Enums\FontWeight;
 
 /**
  * Builder for Table Header Cell UI components
- * 
+ *
  * Represents a header cell in a table header row. This component must be associated with a TableHeaderRow.
  * Header cells can be sortable and trigger actions for sorting.
  */
@@ -18,7 +18,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Create a new table header cell
-     * 
+     *
      * @param TableHeaderRowBuilder|null $headerRow The parent header row this cell belongs to
      * @param string|null $name Optional name for the cell
      */
@@ -37,6 +37,7 @@ class TableHeaderCellBuilder extends UIComponent
             'align' => null,
             'width' => null,
             'action' => null,
+            'parameters' => null,
             'tooltip' => null,
             'color' => null,
             'background_color' => null,
@@ -50,7 +51,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set the header text
-     * 
+     *
      * @param string $text The header text
      * @return self For method chaining
      */
@@ -61,7 +62,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Make this header sortable
-     * 
+     *
      * @param bool $sortable True if sortable
      * @return self For method chaining
      */
@@ -72,7 +73,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set the sort direction
-     * 
+     *
      * @param string|null $direction Sort direction ('asc', 'desc', or null)
      * @return self For method chaining
      */
@@ -86,7 +87,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set horizontal alignment for the header content
-     * 
+     *
      * @param Align $align The alignment (left, center, right)
      * @return self For method chaining
      */
@@ -97,7 +98,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set the column width
-     * 
+     *
      * @param string $width Width value (e.g., '200px', '20%')
      * @return self For method chaining
      */
@@ -108,7 +109,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set width constraints (min and max) for the header cell
-     * 
+     *
      * @param int|null $minWidth Minimum width in pixels
      * @param int|null $maxWidth Maximum width in pixels
      * @return self
@@ -126,7 +127,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set the action to trigger when header is clicked (for sorting)
-     * 
+     *
      * @param string $action Action name
      * @return self For method chaining
      */
@@ -137,7 +138,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set tooltip text
-     * 
+     *
      * @param string $tooltip Tooltip text
      * @return self For method chaining
      */
@@ -148,7 +149,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set the column index for this cell (for ordering)
-     * 
+     *
      * @param int $column The column index (0-based)
      * @return self For method chaining
      */
@@ -159,7 +160,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set text color
-     * 
+     *
      * @param string $color Color value (e.g., '#333', 'red')
      * @return self For method chaining
      */
@@ -170,7 +171,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set background color
-     * 
+     *
      * @param string $backgroundColor Background color value
      * @return self For method chaining
      */
@@ -181,7 +182,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set font weight
-     * 
+     *
      * @param FontWeight $fontWeight Font weight
      * @return self For method chaining
      */
@@ -192,7 +193,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Set how many columns this header cell spans
-     * 
+     *
      * @param int $span Number of columns to span (default: 1)
      * @return self For method chaining
      */
@@ -206,7 +207,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Get the parent header row
-     * 
+     *
      * @return TableHeaderRowBuilder
      */
     public function getHeaderRow(): TableHeaderRowBuilder
@@ -259,7 +260,7 @@ class TableHeaderCellBuilder extends UIComponent
 
     /**
      * Exclude 'name' from JSON output
-     * 
+     *
      * @return array List of keys to exclude
      */
     protected function getExcludedJsonKeys(): array

@@ -59,8 +59,8 @@ class UserController extends Controller
 
         // Ordenamiento
         if ($sortBy === 'roles') {
-            $query->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
-                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            $query->leftJoin('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->leftJoin('roles', 'model_has_roles.role_id', '=', 'roles.id')
                 ->select('users.*', 'roles.name as role_name')
                 ->orderBy('roles.name', $sortDirection);
         } else {

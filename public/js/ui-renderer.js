@@ -1217,6 +1217,30 @@ class TableHeaderCellComponent extends UIComponent {
             cell.style.textAlign = this.config.align;
         }
 
+        // Make clickable if has action
+        if (this.config.action) {
+            cell.style.cursor = 'pointer';
+            cell.style.userSelect = 'none';
+            cell.style.transition = 'background-color 0.2s ease, opacity 0.2s ease';
+            cell.style.opacity = '0.7';
+
+            cell.addEventListener('click', () => {
+                this.handleHeaderClick(this.config.action, this.config.parameters || {});
+            });
+
+            // Add hover effect
+            cell.addEventListener('mouseenter', () => {
+                cell.style.backgroundColor = '#1976d2';
+                cell.style.color = '#ffffff';
+                cell.style.opacity = '1';
+            });
+            cell.addEventListener('mouseleave', () => {
+                cell.style.backgroundColor = '';
+                cell.style.color = '';
+                cell.style.opacity = '0.7';
+            });
+        }
+
         // Apply width constraints
         // For table-layout: fixed, we use width instead of min/max
         if (this.config.min_width || this.config.max_width) {
@@ -1231,6 +1255,42 @@ class TableHeaderCellComponent extends UIComponent {
         }
 
         return this.applyCommonAttributes(cell);
+    }
+
+    async handleHeaderClick(action, parameters) {
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+            const componentId = this.config._id || parseInt(this.id);
+            const usimStorage = localStorage.getItem('usim') || '';
+
+            const response = await fetch('/api/ui-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-USIM-Storage': usimStorage,
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    component_id: componentId,
+                    event: 'click',
+                    action: action,
+                    parameters: parameters,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result && Object.keys(result).length > 0) {
+                if (globalRenderer) {
+                    globalRenderer.handleUIUpdate(result);
+                }
+            }
+        } catch (error) {
+            console.error('Error handling header click:', error);
+        }
     }
 }
 

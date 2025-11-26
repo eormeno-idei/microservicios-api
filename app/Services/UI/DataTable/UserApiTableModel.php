@@ -2,6 +2,7 @@
 
 namespace App\Services\UI\DataTable;
 
+use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\HttpClient;
 use App\Services\UI\Support\UIStateManager;
 
@@ -18,7 +19,7 @@ class UserApiTableModel extends AbstractDataTableModel
             'name' => ['label' => 'Name', 'width' => [400, 400]],
             'email' => ['label' => 'Email', 'width' => [350, 350]],
             'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
-            'role' => ['label' => 'Role', 'width' => [100, 100]],
+            'roles' => ['label' => 'Roles', 'width' => [100, 100]],
             'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
             'edit' => ['label' => '', 'width' => [25, 25]],
             'delete' => ['label' => '', 'width' => [25, 25]],
@@ -65,6 +66,8 @@ class UserApiTableModel extends AbstractDataTableModel
     public function getPageData(): array
     {
         $paginationData = $this->tableBuilder->getPaginationData();
+        $sortBy = $this->tableBuilder->getSortColumn();
+        $sortDirection = $this->tableBuilder->getSortDirection();
         $searchTerm = $this->getSearchTerm();
         $query = [];
         if ($searchTerm) {
@@ -74,6 +77,14 @@ class UserApiTableModel extends AbstractDataTableModel
         $perPage = $paginationData['per_page'];
         $query['per_page'] = $perPage;
         $query['page'] = $currentPage;
+        if ($sortBy) {
+            $query['sort_by'] = $sortBy;
+        }
+        if ($sortDirection) {
+            $query['sort_direction'] = $sortDirection;
+        }
+
+        UIDebug::info("Fetching users page data", $query);
 
         $data = HttpClient::get('users.index', $query);
         return $data['data']['users'] ?? [];

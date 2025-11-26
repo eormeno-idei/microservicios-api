@@ -88,6 +88,8 @@ class TableBuilder extends UIComponent
             'rows' => 0,
             'cols' => 0,
             'align' => 'left', // Alignment: left, center, right
+            'sort_column' => null,
+            'sort_direction' => 'asc', // asc or desc
         ];
     }
 
@@ -134,6 +136,31 @@ class TableBuilder extends UIComponent
             return $model->getSearchTerm();
         }
         return null;
+    }
+
+    public function sortedBy(?string $column, ?string $direction = 'asc'): self
+    {
+        if ($column !== null) {
+            $column = strtolower(str_replace(' ', '_', $column));
+
+            // Toggle direction if sorting by the same column
+            if ($column === $this->config['sort_column']) {
+                $direction = $this->config['sort_direction'] === 'asc' ? 'desc' : 'asc';
+            }
+        }
+        $this->setConfig('sort_column', $column);
+        $this->setConfig('sort_direction', $direction);
+        return $this;
+    }
+
+    public function getSortColumn(): ?string
+    {
+        return $this->config['sort_column'];
+    }
+
+    public function getSortDirection(): ?string
+    {
+        return $this->config['sort_direction'];
     }
 
     public function refresh(): void
@@ -223,7 +250,7 @@ class TableBuilder extends UIComponent
         $perPage = $pagination['per_page'];
 
         $pagination['total_items'] = $totalItems;
-        $pagination['total_pages'] = (int)ceil($totalItems / $perPage);
+        $pagination['total_pages'] = (int) ceil($totalItems / $perPage);
         $pagination['can_next'] = $currentPage < $pagination['total_pages'];
         $pagination['can_prev'] = $currentPage > 1;
 
@@ -446,9 +473,17 @@ class TableBuilder extends UIComponent
 
         $cells = $headerRow->getCells();
 
+        // Generate action name from table name
+        $tableName = $this->name ?? 'table';
+        $actionName = $tableName . '_column_clicked';
+
         for ($col = 0; $col < min(count($data), $this->cols); $col++) {
             if (isset($cells[$col])) {
-                $cells[$col]->text($data[$col]);
+                $columnText = $data[$col];
+                $cells[$col]
+                    ->text($columnText)
+                    ->action($actionName)
+                    ->setConfig('parameters', ['column_text' => $columnText]);
             }
         }
 
@@ -497,7 +532,7 @@ class TableBuilder extends UIComponent
 
             if (is_string($value) || is_numeric($value)) {
                 // Simple text (string or number)
-                $cell->text((string)$value)->padding(4); // Compact padding for text cells
+                $cell->text((string) $value)->padding(4); // Compact padding for text cells
             } elseif (is_array($value)) {
                 if (isset($value['text'])) {
                     $cell->text($value['text'])->padding(4); // Compact padding for text cells
@@ -744,8 +779,12 @@ class TableBuilder extends UIComponent
 
             // Fill header row
             if ($columns) {
-                $headers = array_column($columns, 'label');
-                $this->fillHeaderRow($headers);
+                // Convert columns to array format for fillHeaderRow
+                $headerData = [];
+                foreach ($columns as $key => $column) {
+                    $headerData[] = is_array($column) ? $column['label'] : $column;
+                }
+                $this->fillHeaderRow($headerData);
             }
 
             // Fill data rows

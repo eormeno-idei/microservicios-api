@@ -53,6 +53,7 @@ class AdminDashboardService extends AbstractUIService
 
         $users_table = UIBuilder::table('users_table')
             ->pagination(7)
+            ->sortedBy('name')
             ->dataModel(UserApiTableModel::class)
             ->rowMinHeight(60);
 
@@ -72,6 +73,16 @@ class AdminDashboardService extends AbstractUIService
             askForRole: true,
             callerServiceId: $this->getServiceComponentId()
         );
+    }
+
+    public function onUsersTableColumnClicked(array $params): void
+    {
+        $column = $params['column_text'] ?? '';
+        if (!$column) {
+            return;
+        }
+        $this->users_table->sortedBy($column);
+        $this->users_table->page(1);
     }
 
     public function onSubmitRegister(array $params): void
@@ -110,7 +121,7 @@ class AdminDashboardService extends AbstractUIService
     {
         $user = HttpClient::get(
             "users.show",
-            routeParams: ['user' => $params['user_id']]
+        routeParams: ['user' => $params['user_id']]
         )['data'] ?? null;
         if (!$user) {
             $this->toast('User not found', 'error');
@@ -167,7 +178,7 @@ class AdminDashboardService extends AbstractUIService
     {
         $user = HttpClient::get(
             "users.show",
-            routeParams: ['user' => $params['user_id']]
+        routeParams: ['user' => $params['user_id']]
         )['data'] ?? null;
         if (!$user) {
             $this->toast('User not found', 'error');
