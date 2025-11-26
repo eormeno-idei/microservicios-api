@@ -120,14 +120,14 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
-     * Create a submenu structure
+     * Add a submenu item
      *
      * @param string $label Parent item label
-     * @param string|null $icon Parent icon
      * @param callable $callback Callback to build submenu items
+     * @param string|null $icon Parent icon
      * @return self
      */
-    public function submenu(string $label, ?string $icon = null, callable $callback): self
+    public function submenu(string $label, callable $callback, ?string $icon = null): self
     {
         $submenuBuilder = new self($label . '_submenu');
         $callback($submenuBuilder);

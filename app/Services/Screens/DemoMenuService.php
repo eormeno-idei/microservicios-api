@@ -82,7 +82,7 @@ class DemoMenuService extends AbstractUIService
         }
 
         $menu->separator();
-        $menu->submenu('Demos', '🎮', function ($submenu) {
+        $menu->submenu('Demos', function ($submenu) {
             $submenu->link('Demo UI', '/demo/demo-ui', '🎨');
             $submenu->link('Table Demo', '/demo/table-demo', '📊');
             $submenu->link('Modal Demo', '/demo/modal-demo', '🪟');
@@ -91,7 +91,7 @@ class DemoMenuService extends AbstractUIService
             $submenu->link('Input Demo', '/demo/input-demo', '⌨️');
             $submenu->link('Select Demo', '/demo/select-demo', '📋');
             $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
-        });
+        }, '🎮');
     }
 
     private function buildUserMenu(): MenuDropdownBuilder
