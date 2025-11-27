@@ -77,7 +77,7 @@ class AdminDashboardService extends AbstractUIService
 
     public function onUsersTableColumnClicked(array $params): void
     {
-        $column = $params['column_text'] ?? '';
+        $column = $params['sort_by'] ?? null;
         if (!$column) {
             return;
         }

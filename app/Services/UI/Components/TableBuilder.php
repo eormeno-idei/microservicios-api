@@ -460,7 +460,9 @@ class TableBuilder extends UIComponent
     /**
      * Fill the header row with data
      *
-     * @param array $data Array of header values (strings)
+     * @param array $data Array of header cell data with keys:
+     *                   - 'label': string, the header text
+     *                   - 'sort_by': string|null, the column to sort by when clicked
      * @return self
      */
     public function fillHeaderRow(array $data): self
@@ -479,11 +481,12 @@ class TableBuilder extends UIComponent
 
         for ($col = 0; $col < min(count($data), $this->cols); $col++) {
             if (isset($cells[$col])) {
-                $columnText = $data[$col];
+                $columnText = $data[$col]['label'] ?? '';
+                $sortBy = $data[$col]['sort_by'] ?? null;
                 $cells[$col]
                     ->text($columnText)
                     ->action($actionName)
-                    ->setConfig('parameters', ['column_text' => $columnText]);
+                    ->setConfig('parameters', ['column_text' => $columnText, 'sort_by' => $sortBy]);
             }
         }
 
@@ -782,7 +785,12 @@ class TableBuilder extends UIComponent
                 // Convert columns to array format for fillHeaderRow
                 $headerData = [];
                 foreach ($columns as $key => $column) {
-                    $headerData[] = is_array($column) ? $column['label'] : $column;
+                    $label = \is_array($column) ? $column['label'] : $column;
+                    $sortBy = \is_array($column) ? ($column['sort_by'] ?? null) : null;
+                    $headerData[] = [
+                        'label' => $label,
+                        'sort_by' => $sortBy
+                    ];
                 }
                 $this->fillHeaderRow($headerData);
             }

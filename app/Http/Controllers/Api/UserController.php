@@ -42,7 +42,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'search' => ['sometimes', 'string', 'max:255'],
-            'sort_by' => ['sometimes', 'in:name,email,roles,updated_at'],
+            'sort_by' => ['sometimes', 'in:name,email,roles,email_verified_at,updated_at'],
             'sort_direction' => ['sometimes', 'in:asc,desc'],
         ]);
 

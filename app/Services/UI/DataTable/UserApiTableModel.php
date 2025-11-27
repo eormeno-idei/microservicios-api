@@ -16,11 +16,11 @@ class UserApiTableModel extends AbstractDataTableModel
     public function getColumns(): array
     {
         return [
-            'name' => ['label' => 'Name', 'width' => [400, 400]],
-            'email' => ['label' => 'Email', 'width' => [350, 350]],
-            'email_verified' => ['label' => 'Verified', 'width' => [100, 100]],
-            'roles' => ['label' => 'Roles', 'width' => [100, 100]],
-            'updated_at' => ['label' => 'Updated', 'width' => [200, 200]],
+            'name' => ['label' => 'Name', 'width' => [400, 400], 'sort_by' => 'name'],
+            'email' => ['label' => 'Email', 'width' => [350, 350], 'sort_by' => 'email'],
+            'email_verified' => ['label' => 'Verified', 'width' => [100, 100], 'sort_by' => 'email_verified_at'],
+            'roles' => ['label' => 'Role', 'width' => [100, 100], 'sort_by' => 'roles'],
+            'updated_at' => ['label' => 'Updated', 'width' => [200, 200], 'sort_by' => 'updated_at'],
             'edit' => ['label' => '', 'width' => [25, 25]],
             'delete' => ['label' => '', 'width' => [25, 25]],
         ];
@@ -83,8 +83,6 @@ class UserApiTableModel extends AbstractDataTableModel
         if ($sortDirection) {
             $query['sort_direction'] = $sortDirection;
         }
-
-        UIDebug::info("Fetching users page data", $query);
 
         $data = HttpClient::get('users.index', $query);
         return $data['data']['users'] ?? [];
