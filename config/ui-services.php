@@ -36,6 +36,7 @@ return [
     \App\Services\Screens\TableDemoService::class,
     \App\Services\Screens\ModalDemoService::class,
     \App\Services\Screens\DemoMenuService::class,
+    \App\Services\Screens\UploaderDemoService::class,
 
     // Servicio de login
     \App\Services\Screens\LoginService::class,

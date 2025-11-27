@@ -13,10 +13,11 @@ use App\Services\UI\Components\CheckboxBuilder;
 use App\Services\UI\Components\FormBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\CardBuilder;
+use App\Services\UI\Components\UploaderBuilder;
 
 /**
  * Factory class for creating UI components
- * 
+ *
  * Provides static methods to create various UI component builders.
  * These builders use a fluent API for configuring components.
  */
@@ -24,7 +25,7 @@ class UIBuilder
 {
     /**
      * Create a new button component
-     * 
+     *
      * @param string|null $name an optional semantic name for the button
      * @return ButtonBuilder
      */
@@ -35,7 +36,7 @@ class UIBuilder
 
     /**
      * Create a new label component
-     * 
+     *
      * @param string|null $name an optional semantic name for the label
      * @return LabelBuilder
      */
@@ -46,7 +47,7 @@ class UIBuilder
 
     /**
      * Create a new table component
-     * 
+     *
      * @param string|null $name The optional semantic name for the table
      * @param int $rows Number of data rows (0 for dynamic table)
      * @param int $cols Number of columns (0 for dynamic table)
@@ -59,7 +60,7 @@ class UIBuilder
 
     /**
      * Create a new table row component
-     * 
+     *
      * @param TableBuilder $table The parent table this row belongs to
      * @param string|null $name The optional semantic name for the row
      * @return TableRowBuilder
@@ -71,7 +72,7 @@ class UIBuilder
 
     /**
      * Create a new input component
-     * 
+     *
      * @param string|null $name The optional semantic name for the input
      * @return InputBuilder
      */
@@ -82,7 +83,7 @@ class UIBuilder
 
     /**
      * Create a new select component
-     * 
+     *
      * @param string|null $name The optional semantic name for the select
      * @return SelectBuilder
      */
@@ -93,7 +94,7 @@ class UIBuilder
 
     /**
      * Create a new checkbox component
-     * 
+     *
      * @param string|null $name The optional semantic name for the checkbox
      * @return CheckboxBuilder
      */
@@ -104,7 +105,7 @@ class UIBuilder
 
     /**
      * Create a new form component
-     * 
+     *
      * @param string|null $name The optional semantic name for the form
      * @return FormBuilder
      */
@@ -115,7 +116,7 @@ class UIBuilder
 
     /**
      * Create a new container component
-     * 
+     *
      * @param string|null $name The optional semantic name for the container
      * @return UIContainer
      */
@@ -126,7 +127,7 @@ class UIBuilder
 
     /**
      * Create a new menu dropdown component
-     * 
+     *
      * @param string $name The semantic name for the menu
      * @return MenuDropdownBuilder
      */
@@ -137,12 +138,23 @@ class UIBuilder
 
     /**
      * Create a new card component
-     * 
+     *
      * @param string|null $name The optional semantic name for the card
      * @return CardBuilder
      */
     public static function card(?string $name = null): CardBuilder
     {
         return new CardBuilder($name);
+    }
+
+    /**
+     * Create a new uploader component
+     *
+     * @param string|null $name The optional semantic name for the uploader
+     * @return UploaderBuilder
+     */
+    public static function uploader(?string $name = null): UploaderBuilder
+    {
+        return new UploaderBuilder($name);
     }
 }

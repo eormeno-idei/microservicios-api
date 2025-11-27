@@ -15,6 +15,7 @@ use App\Services\UI\Components\TableHeaderCellBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableRowBuilder;
 use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Components\UploaderBuilder;
 use App\Services\UI\Enums\LayoutType;
 use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\UIDiffer;
@@ -403,6 +404,7 @@ abstract class AbstractUIService
             'form' => FormBuilder::class,
             'tableheaderrow' => TableHeaderRowBuilder::class,
             'menudropdown' => MenuDropdownBuilder::class,
+            'uploader' => UploaderBuilder::class,
             'default' => null,
         };
     }

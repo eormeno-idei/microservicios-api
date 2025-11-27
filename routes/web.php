@@ -5,6 +5,7 @@ use App\Http\Controllers\UIDemoController;
 use App\Http\Controllers\UIEventController;
 use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\DocumentationController;
+use App\Http\Controllers\UploadController;
 
 // Log viewer routes (MUST be before dynamic demo route)
 Route::prefix('logs')->group(function () {
@@ -65,6 +66,10 @@ Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');
 
 // UI Event Handler
 Route::post('/api/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
+
+// Upload temporal routes (para demos)
+Route::post('/api/upload/temporary', [UploadController::class, 'uploadTemporary'])->name('upload.temporary');
+Route::delete('/api/upload/temporary/{id}', [UploadController::class, 'deleteTemporary'])->name('upload.temporary.delete');
 
 // Rutas para documentación
 Route::prefix('docs')->group(function () {

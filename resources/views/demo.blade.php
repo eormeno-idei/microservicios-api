@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Demo - {{ ucfirst(str_replace('-', ' ', $demo)) }}</title>
     <link rel="stylesheet" href="{{ asset('css/ui-components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/uploader-component.css') }}">
 </head>
 <body>
     <header id="top-menu-bar">
@@ -40,5 +41,6 @@
         window.QUERY_PARAMS = new URLSearchParams(window.location.search);
     </script>
     <script src="{{ asset('js/ui-renderer.js') }}"></script>
+    <script src="{{ asset('js/uploader-component.js') }}"></script>
 </body>
 </html>

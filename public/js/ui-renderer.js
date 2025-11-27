@@ -1506,6 +1506,8 @@ class ComponentFactory {
                 return new MenuDropdownComponent(id, config);
             case 'card':
                 return new CardComponent(id, config);
+            case 'uploader':
+                return window.UploaderComponent ? new window.UploaderComponent(id, config) : null;
             case 'storage':
                 return new StorageComponent(id, config);
             default:
@@ -1713,6 +1715,29 @@ class UIRenderer {
     }
 
     /**
+     * Clear uploaders
+     *
+     * @param {Array} uploaderIds - Array of uploader component IDs to clear
+     */
+    clearUploaders(uploaderIds) {
+        if (!Array.isArray(uploaderIds)) return;
+
+        console.log('🗑️ Attempting to clear uploaders with IDs:', uploaderIds);
+
+        uploaderIds.forEach(uploaderId => {
+            // Buscar el componente por su _id numérico
+            const component = this.components.get(String(uploaderId));
+
+            if (component && typeof component.clearFiles === 'function') {
+                console.log(`✅ Clearing uploader ID: ${uploaderId}`);
+                component.clearFiles();
+            } else {
+                console.warn(`⚠️ Uploader component not found or doesn't have clearFiles method:`, uploaderId);
+            }
+        });
+    }
+
+    /**
      * Handle storage updates - store variables in localStorage
      *
      * @param {object} storageData - Storage variables object
@@ -1823,6 +1848,11 @@ class UIRenderer {
         // Handle toast notifications if present (but only if no redirect)
         if (uiUpdate.toast && !uiUpdate.redirect) {
             this.showToast(uiUpdate.toast);
+        }
+
+        // Handle clear uploaders if present
+        if (uiUpdate.clear_uploaders) {
+            this.clearUploaders(uiUpdate.clear_uploaders);
         }
 
         // Handle redirects if present
