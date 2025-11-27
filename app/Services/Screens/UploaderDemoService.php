@@ -18,10 +18,14 @@ use Illuminate\Support\Facades\Storage;
 class UploaderDemoService extends AbstractUIService
 {
     protected UploaderBuilder $uploader_profile;
+    protected UploaderBuilder $uploader_banner;
+    protected UploaderBuilder $uploader_story;
     protected UploaderBuilder $uploader_images;
     protected UploaderBuilder $uploader_documents;
     protected LabelBuilder $lbl_result;
     protected $btn_confirm_profile;
+    protected $btn_confirm_banner;
+    protected $btn_confirm_story;
     protected $btn_confirm_images;
     protected $btn_confirm_documents;
 
@@ -44,16 +48,18 @@ class UploaderDemoService extends AbstractUIService
         // Uploader de imagen única (perfil)
         $container->add(
             UIBuilder::label('lbl_profile_title')
-                ->text('👤 Imagen de Perfil (Modo Único)')
+                ->text('👤 Imagen de Perfil (1:1 - Size 2)')
                 ->style('primary')
         );
 
         $container->add(
             UIBuilder::uploader('uploader_profile')
                 ->allowedTypes(['image/*'])
-                ->label('Selecciona tu foto de perfil')
+                ->label('Foto de perfil cuadrada - 192x192px')
                 ->maxFiles(1)
                 ->maxSize(2)
+                ->aspect('1:1')
+                ->size(2)
         );
 
         $container->add(
@@ -70,17 +76,79 @@ class UploaderDemoService extends AbstractUIService
                 ->style('secondary')
         );
 
+        // Uploader de banner (16:9)
+        $container->add(
+            UIBuilder::label('lbl_banner_title')
+                ->text('🖼️ Banner Horizontal (16:9 - Size 3)')
+                ->style('primary')
+        );
+
+        $container->add(
+            UIBuilder::uploader('uploader_banner')
+                ->allowedTypes(['image/*'])
+                ->label('Banner para posts - 256x144px')
+                ->maxFiles(1)
+                ->maxSize(3)
+                ->aspect('16:9')
+                ->size(3)
+        );
+
+        $container->add(
+            UIBuilder::button('btn_confirm_banner')
+                ->label('✅ Confirmar Banner')
+                ->style('success')
+                ->action('process_banner')
+        );
+
+        // Separador
+        $container->add(
+            UIBuilder::label('lbl_separator2')
+                ->text('───────────────────────────')
+                ->style('secondary')
+        );
+
+        // Uploader de story (9:16)
+        $container->add(
+            UIBuilder::label('lbl_story_title')
+                ->text('📱 Story Vertical (9:16 - Size 2)')
+                ->style('primary')
+        );
+
+        $container->add(
+            UIBuilder::uploader('uploader_story')
+                ->allowedTypes(['image/*'])
+                ->label('Imagen para stories - 108x192px')
+                ->maxFiles(1)
+                ->maxSize(3)
+                ->aspect('9:16')
+                ->size(2)
+        );
+
+        $container->add(
+            UIBuilder::button('btn_confirm_story')
+                ->label('✅ Confirmar Story')
+                ->style('success')
+                ->action('process_story')
+        );
+
+        // Separador
+        $container->add(
+            UIBuilder::label('lbl_separator3')
+                ->text('───────────────────────────')
+                ->style('secondary')
+        );
+
         // Uploader de imágenes
         $container->add(
             UIBuilder::label('lbl_images_title')
-                ->text('🖼️ Upload de Imágenes')
+                ->text('🖼️ Upload Múltiple de Imágenes (sin aspect ratio)')
                 ->style('primary')
         );
 
         $container->add(
             UIBuilder::uploader('uploader_images')
                 ->images()
-                ->label('Selecciona imágenes')
+                ->label('Selecciona múltiples imágenes')
                 ->maxFiles(3)
                 ->maxSize(5)
         );
@@ -94,7 +162,7 @@ class UploaderDemoService extends AbstractUIService
 
         // Separador
         $container->add(
-            UIBuilder::label('lbl_separator')
+            UIBuilder::label('lbl_separator4')
                 ->text('───────────────────────────')
                 ->style('secondary')
         );
@@ -184,6 +252,90 @@ class UploaderDemoService extends AbstractUIService
         // Limpiar uploader después de procesar
         $this->uiChanges()->add([
             'clear_uploaders' => [$this->uploader_profile->getId()]
+        ]);
+    }
+
+    /**
+     * Procesar banner
+     */
+    public function onProcessBanner(array $params): void
+    {
+        $tempIdsJson = $params['uploader_banner_temp_ids'] ?? '[]';
+        $tempIds = json_decode($tempIdsJson, true) ?: [];
+
+        if (empty($tempIds)) {
+            $this->lbl_result
+                ->text('❌ No hay banner para procesar')
+                ->style('danger');
+            return;
+        }
+
+        $file = DB::table('temporary_uploads')->where('id', $tempIds[0])->first();
+
+        if (!$file) {
+            $this->lbl_result
+                ->text('❌ Archivo temporal no encontrado')
+                ->style('danger');
+            return;
+        }
+
+        $finalPath = 'uploads/banners/' . $file->stored_filename;
+        Storage::move($file->path, $finalPath);
+        DB::table('temporary_uploads')->where('id', $file->id)->delete();
+
+        $sizeMB = round($file->size / 1024 / 1024, 2);
+        $result = "✅ Banner procesado exitosamente (16:9):\n\n";
+        $result .= "🖼️ {$file->original_filename} ({$sizeMB}MB)\n";
+        $result .= "   → {$finalPath}";
+
+        $this->lbl_result
+            ->text($result)
+            ->style('success');
+
+        $this->uiChanges()->add([
+            'clear_uploaders' => [$this->uploader_banner->getId()]
+        ]);
+    }
+
+    /**
+     * Procesar story
+     */
+    public function onProcessStory(array $params): void
+    {
+        $tempIdsJson = $params['uploader_story_temp_ids'] ?? '[]';
+        $tempIds = json_decode($tempIdsJson, true) ?: [];
+
+        if (empty($tempIds)) {
+            $this->lbl_result
+                ->text('❌ No hay story para procesar')
+                ->style('danger');
+            return;
+        }
+
+        $file = DB::table('temporary_uploads')->where('id', $tempIds[0])->first();
+
+        if (!$file) {
+            $this->lbl_result
+                ->text('❌ Archivo temporal no encontrado')
+                ->style('danger');
+            return;
+        }
+
+        $finalPath = 'uploads/stories/' . $file->stored_filename;
+        Storage::move($file->path, $finalPath);
+        DB::table('temporary_uploads')->where('id', $file->id)->delete();
+
+        $sizeMB = round($file->size / 1024 / 1024, 2);
+        $result = "✅ Story procesada exitosamente (9:16):\n\n";
+        $result .= "📱 {$file->original_filename} ({$sizeMB}MB)\n";
+        $result .= "   → {$finalPath}";
+
+        $this->lbl_result
+            ->text($result)
+            ->style('success');
+
+        $this->uiChanges()->add([
+            'clear_uploaders' => [$this->uploader_story->getId()]
         ]);
     }
 

@@ -33,6 +33,8 @@ class UploaderBuilder extends UIComponent
             'multiple' => true,
             'accept' => '*/*', // HTML accept attribute
             'action' => null, // Action name para procesar en Service
+            'aspect_ratio' => null, // '1:1', '16:9', '9:16', '4:3', etc.
+            'size_level' => 2, // 1-4 (1=128px, 2=192px, 3=256px, 4=320px base)
         ];
     }
 
@@ -89,6 +91,32 @@ class UploaderBuilder extends UIComponent
     public function action(string $action): self
     {
         return $this->setConfig('action', $action);
+    }
+
+    /**
+     * Establecer relación de aspecto esperada para el dropzone
+     *
+     * @param string $ratio Formato "width:height" (ej: '1:1', '16:9', '9:16', '4:3')
+     */
+    public function aspect(string $ratio): self
+    {
+        return $this->setConfig('aspect_ratio', $ratio);
+    }
+
+    /**
+     * Establecer nivel de tamaño del dropzone (1-4)
+     *
+     * 1 = 128px base
+     * 2 = 192px base (default)
+     * 3 = 256px base
+     * 4 = 320px base
+     *
+     * @param int $level Nivel de tamaño (1-4)
+     */
+    public function size(int $level): self
+    {
+        $level = max(1, min(4, $level)); // Clamp entre 1-4
+        return $this->setConfig('size_level', $level);
     }
 
     // ========== SHORTCUTS ==========

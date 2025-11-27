@@ -13,6 +13,9 @@ class UploaderComponent extends UIComponent {
         super(id, config);
         this.uploadedFiles = []; // Array de archivos subidos {temp_id, filename, size, type, ...}
         this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+
+        // Calcular dimensiones del dropzone según aspect_ratio y size_level
+        this.dropzoneDimensions = this.calculateDropzoneDimensions();
     }
 
     render() {
@@ -56,16 +59,37 @@ class UploaderComponent extends UIComponent {
         const dropzone = document.createElement('div');
         dropzone.className = 'ui-uploader-dropzone';
 
+        // Aplicar dimensiones personalizadas si están definidas
+        if (this.dropzoneDimensions.width) {
+            dropzone.style.width = `${this.dropzoneDimensions.width}px`;
+        }
+        if (this.dropzoneDimensions.height) {
+            dropzone.style.minHeight = `${this.dropzoneDimensions.height}px`;
+            dropzone.style.height = `${this.dropzoneDimensions.height}px`;
+        }
+
         // Contenido del dropzone (mensaje inicial)
         const dropzoneContent = document.createElement('div');
         dropzoneContent.className = 'ui-uploader-dropzone-content';
-        dropzoneContent.innerHTML = `
-            <span class="ui-uploader-icon">📁</span>
-            <p class="ui-uploader-text">Arrastra archivos aquí o haz clic para seleccionar</p>
-            <p class="ui-uploader-hint">
-                Máximo ${this.config.max_files} archivo(s) · Tamaño máximo: ${this.config.max_size}MB
-            </p>
-        `;
+
+        // Si tiene aspect ratio, mostrar solo icono animado
+        if (this.config.aspect_ratio) {
+            dropzoneContent.innerHTML = `
+                <span class="ui-uploader-icon">📁</span>
+                <p class="ui-uploader-hint-hover">
+                    Máximo ${this.config.max_files} archivo(s) · ${this.config.max_size}MB
+                </p>
+            `;
+        } else {
+            // Modo normal con texto completo
+            dropzoneContent.innerHTML = `
+                <span class="ui-uploader-icon">📁</span>
+                <p class="ui-uploader-text">Arrastra archivos aquí o haz clic para seleccionar</p>
+                <p class="ui-uploader-hint">
+                    Máximo ${this.config.max_files} archivo(s) · Tamaño máximo: ${this.config.max_size}MB
+                </p>
+            `;
+        }
         dropzone.appendChild(dropzoneContent);
 
         // File list (dentro del dropzone)
@@ -258,6 +282,11 @@ class UploaderComponent extends UIComponent {
 
     updateFileItem(item, fileData, status) {
         item.className = `ui-uploader-file-item ui-uploader-file-${status}`;
+
+        // Mantener la clase single image si aplica
+        if (this.isSingleImageMode) {
+            item.classList.add('ui-uploader-single-image');
+        }
 
         // Remover spinner
         const spinner = item.querySelector('.ui-uploader-spinner');
@@ -463,6 +492,51 @@ class UploaderComponent extends UIComponent {
         }
 
         console.log(`🗑️ Uploader ${this.id} cleared`);
+    }
+
+    /**
+     * Calcular dimensiones del dropzone según aspect_ratio y size_level
+     */
+    calculateDropzoneDimensions() {
+        const sizeLevel = this.config.size_level || 2;
+        const aspectRatio = this.config.aspect_ratio;
+
+        // Dimensiones base según size_level
+        const baseSizes = {
+            1: 128,
+            2: 192,
+            3: 256,
+            4: 320
+        };
+
+        const baseSize = baseSizes[sizeLevel] || baseSizes[2];
+
+        // Si no hay aspect ratio definido, usar dimensiones por defecto
+        if (!aspectRatio) {
+            return { width: null, height: null };
+        }
+
+        // Parsear aspect ratio (ej: "16:9", "1:1", "9:16")
+        const [widthRatio, heightRatio] = aspectRatio.split(':').map(Number);
+
+        if (!widthRatio || !heightRatio) {
+            return { width: null, height: null };
+        }
+
+        // Calcular dimensiones manteniendo el aspect ratio
+        let width, height;
+
+        if (widthRatio >= heightRatio) {
+            // Landscape o cuadrado
+            width = baseSize;
+            height = Math.round(baseSize * (heightRatio / widthRatio));
+        } else {
+            // Portrait
+            height = baseSize;
+            width = Math.round(baseSize * (widthRatio / heightRatio));
+        }
+
+        return { width, height };
     }
 }
 
