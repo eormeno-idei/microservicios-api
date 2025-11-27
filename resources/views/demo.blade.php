@@ -7,6 +7,7 @@
     <title>Demo - {{ ucfirst(str_replace('-', ' ', $demo)) }}</title>
     <link rel="stylesheet" href="{{ asset('css/ui-components.css') }}">
     <link rel="stylesheet" href="{{ asset('css/uploader-component.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/image-crop-editor.css') }}">
 </head>
 <body>
     <header id="top-menu-bar">
@@ -41,6 +42,7 @@
         window.QUERY_PARAMS = new URLSearchParams(window.location.search);
     </script>
     <script src="{{ asset('js/ui-renderer.js') }}"></script>
+    <script src="{{ asset('js/image-crop-editor.js') }}"></script>
     <script src="{{ asset('js/uploader-component.js') }}"></script>
 </body>
 </html>

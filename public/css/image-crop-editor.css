@@ -1,0 +1,217 @@
+/* ==================== Image Crop Editor Styles ==================== */
+
+/* Overlay */
+.crop-editor-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Modal */
+.crop-editor-modal {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 2rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Header */
+.crop-editor-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.crop-editor-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #1f2937;
+}
+
+.crop-editor-header p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Canvas Container */
+.crop-editor-canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    background: #f3f4f6;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    min-height: 300px;
+}
+
+.crop-editor-canvas {
+    border: 2px solid #3b82f6;
+    border-radius: 0.25rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+    height: auto;
+}
+
+/* Controls */
+.crop-editor-controls {
+    margin-bottom: 1.5rem;
+}
+
+.crop-editor-zoom-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.crop-editor-zoom-control label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #1f2937;
+    white-space: nowrap;
+}
+
+.crop-editor-zoom-slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #e5e7eb;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none; /* Safari compatibility */
+}
+
+.crop-editor-zoom-slider::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none; /* Safari compatibility */
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.crop-editor-zoom-slider::-webkit-slider-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.2);
+}
+
+.crop-editor-zoom-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.crop-editor-zoom-slider::-moz-range-thumb:hover {
+    background: #2563eb;
+    transform: scale(1.2);
+}
+
+.crop-editor-zoom-value {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #3b82f6;
+    min-width: 50px;
+    text-align: right;
+}
+
+/* Actions */
+.crop-editor-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+.crop-editor-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.crop-editor-btn-cancel {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.crop-editor-btn-cancel:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.crop-editor-btn-accept {
+    background: #10b981;
+    color: white;
+}
+
+.crop-editor-btn-accept:hover {
+    background: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .crop-editor-modal {
+        width: 95%;
+        padding: 1.5rem;
+    }
+
+    .crop-editor-canvas-container {
+        padding: 0.5rem;
+        min-height: 200px;
+    }
+
+    .crop-editor-zoom-control {
+        flex-wrap: wrap;
+    }
+
+    .crop-editor-actions {
+        flex-direction: column;
+    }
+
+    .crop-editor-btn {
+        width: 100%;
+    }
+}

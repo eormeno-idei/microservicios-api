@@ -166,8 +166,60 @@ class UploaderComponent extends UIComponent {
             if (error) {
                 this.showError(`${file.name}: ${error}`);
             } else {
-                this.uploadFile(file);
+                // Si es modo single image con aspect ratio, verificar y abrir crop editor si es necesario
+                if (this.isSingleImageMode && this.config.aspect_ratio && file.type.startsWith('image/')) {
+                    this.checkAndCropImage(file);
+                } else {
+                    this.uploadFile(file);
+                }
             }
+        });
+    }
+
+    async checkAndCropImage(file) {
+        // Cargar imagen para verificar aspect ratio
+        const img = await this.loadImageFromFile(file);
+
+        const imageAspect = img.width / img.height;
+        const [targetW, targetH] = this.config.aspect_ratio.split(':').map(Number);
+        const targetAspect = targetW / targetH;
+
+        // Tolerancia del 1% para evitar crop innecesario por diferencias mínimas
+        const tolerance = 0.01;
+        const aspectDiff = Math.abs(imageAspect - targetAspect);
+
+        if (aspectDiff > tolerance) {
+            // Aspect ratio incorrecto, abrir crop editor
+            console.log(`📐 Aspect ratio incorrecto: ${imageAspect.toFixed(2)} vs ${targetAspect.toFixed(2)}`);
+
+            if (typeof ImageCropEditor === 'undefined') {
+                console.error('ImageCropEditor no está disponible');
+                this.showError('Editor de recorte no disponible');
+                return;
+            }
+
+            new ImageCropEditor(file, this.config.aspect_ratio, (croppedFile) => {
+                // Callback con archivo recortado
+                this.uploadFile(croppedFile);
+            });
+        } else {
+            // Aspect ratio correcto, subir directamente
+            console.log(`✅ Aspect ratio correcto: ${imageAspect.toFixed(2)}`);
+            this.uploadFile(file);
+        }
+    }
+
+    loadImageFromFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = e.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
         });
     }
 
