@@ -125,7 +125,7 @@ class ProfileService extends AbstractUIService
 
         // Actualizar uploader con imagen actual (si existe)
         if ($user->profile_image) {
-            $imageUrl = \App\Services\Upload\UploadService::fileUrl('uploads/profiles/' . $user->profile_image) . '?t=' . time();
+            $imageUrl = \App\Services\Upload\UploadService::fileUrl('uploads/images/' . $user->profile_image) . '?t=' . time();
             $this->uploader_profile->existingFile($imageUrl);
         }
     }
@@ -173,13 +173,13 @@ class ProfileService extends AbstractUIService
             if ($file) {
                 try {
                     // Eliminar imagen anterior si existe
-                    if ($user->profile_image && Storage::disk('uploads')->exists('uploads/profiles/' . $user->profile_image)) {
-                        Storage::disk('uploads')->delete('uploads/profiles/' . $user->profile_image);
+                    if ($user->profile_image && Storage::disk('uploads')->exists('uploads/images/' . $user->profile_image)) {
+                        Storage::disk('uploads')->delete('uploads/images/' . $user->profile_image);
                         \Log::info('ProfileService: Imagen anterior eliminada');
                     }
 
-                    // Mover de temporal a definitivo
-                    $finalPath = 'uploads/profiles/' . $file->stored_filename;
+                    // Mover de temporal a definitivo (carpeta por tipo)
+                    $finalPath = 'uploads/images/' . $file->stored_filename;
 
                     \Log::info('ProfileService: Moviendo archivo', [
                         'from' => $file->path,

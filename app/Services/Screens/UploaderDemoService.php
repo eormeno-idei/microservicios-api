@@ -232,8 +232,8 @@ class UploaderDemoService extends AbstractUIService
             return;
         }
 
-        // Mover archivo de temporal a final
-        $finalPath = 'uploads/profiles/' . $file->stored_filename;
+        // Mover archivo de temporal a final (carpeta por tipo)
+        $finalPath = 'uploads/images/' . $file->stored_filename;
         Storage::move($file->path, $finalPath);
 
         // Limpiar temporal
@@ -279,13 +279,13 @@ class UploaderDemoService extends AbstractUIService
             return;
         }
 
-        $finalPath = 'uploads/banners/' . $file->stored_filename;
+        $finalPath = 'uploads/images/' . $file->stored_filename;
         Storage::move($file->path, $finalPath);
         DB::table('temporary_uploads')->where('id', $file->id)->delete();
 
         $sizeMB = round($file->size / 1024 / 1024, 2);
-        $result = "✅ Banner procesado exitosamente (16:9):\n\n";
-        $result .= "🖼️ {$file->original_filename} ({$sizeMB}MB)\n";
+        $result = "✅ Banner procesado exitosamente (16:9):屫n屫n";
+        $result .= "🖼️ {$file->original_filename} ({$sizeMB}MB)屫n";
         $result .= "   → {$finalPath}";
 
         $this->lbl_result
@@ -321,13 +321,13 @@ class UploaderDemoService extends AbstractUIService
             return;
         }
 
-        $finalPath = 'uploads/stories/' . $file->stored_filename;
+        $finalPath = 'uploads/images/' . $file->stored_filename;
         Storage::move($file->path, $finalPath);
         DB::table('temporary_uploads')->where('id', $file->id)->delete();
 
         $sizeMB = round($file->size / 1024 / 1024, 2);
-        $result = "✅ Story procesada exitosamente (9:16):\n\n";
-        $result .= "📱 {$file->original_filename} ({$sizeMB}MB)\n";
+        $result = "✅ Story procesada exitosamente (9:16):屫n屫n";
+        $result .= "📱 {$file->original_filename} ({$sizeMB}MB)屫n";
         $result .= "   → {$finalPath}";
 
         $this->lbl_result
