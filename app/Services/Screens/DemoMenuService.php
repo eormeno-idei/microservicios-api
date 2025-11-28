@@ -103,7 +103,7 @@ class DemoMenuService extends AbstractUIService
         $user_menu->trigger("⚙️");
         $user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
         $user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
-        $user_menu->item('Profile', 'show_profile', [], '👤', permission: 'auth');
+        $user_menu->link('Profile', '/profile', '👤', permission: 'auth');
         $user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
         return $user_menu;
     }
@@ -111,7 +111,7 @@ class DemoMenuService extends AbstractUIService
     public function onLoggedUser(array $params): void
     {
         $userName = $params['user']['name'] ?? 'User';
-        $this->user_menu->trigger("👤  " . $userName);
+        $this->user_menu->trigger("👤  $userName");
         $this->main_menu->setUserPermissions(['auth']);
         $this->user_menu->setUserPermissions(['auth']);
     }
@@ -205,22 +205,6 @@ class DemoMenuService extends AbstractUIService
                 $this->updateModal($modalUpdates);
             }
         }
-    }
-
-    /**
-     * Handler for Profile view
-     */
-    public function onShowProfile(array $params): void
-    {
-        $serviceId = $this->getServiceComponentId();
-
-        ConfirmDialogService::open(
-            type: DialogType::INFO,
-            title: "User Profile",
-            message: "Aquí se mostrará el perfil del usuario.\n(Por implementar)",
-            confirmAction: 'close_profile_dialog',
-            callerServiceId: $serviceId
-        );
     }
 
     /**
