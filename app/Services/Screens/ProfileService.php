@@ -2,17 +2,19 @@
 
 namespace App\Services\Screens;
 
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\InputBuilder;
-use App\Services\UI\Components\UploaderBuilder;
-use App\Services\UI\Components\LabelBuilder;
+use App\Events\UsimEvent;
 use App\Services\UI\UIBuilder;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Services\UI\AbstractUIService;
+use App\Services\Upload\UploadService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Password;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Components\InputBuilder;
+use App\Services\UI\Components\LabelBuilder;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Services\UI\Components\UploaderBuilder;
 
 /**
  * Profile Service
@@ -55,13 +57,6 @@ class ProfileService extends AbstractUIService
             ->value($user->email)
             ->disabled(true)
             ->width('100%');
-
-        // Agregar icono de verificación
-        if ($user->email_verified_at) {
-            $emailInput->icon('✅')->iconPosition('right')->tooltip('Email verificado');
-        } else {
-            $emailInput->icon('⚠️')->iconPosition('right')->tooltip('Email no verificado');
-        }
 
         $container->add($emailInput);
 
@@ -125,7 +120,7 @@ class ProfileService extends AbstractUIService
 
         // Actualizar uploader con imagen actual (si existe)
         if ($user->profile_image) {
-            $imageUrl = \App\Services\Upload\UploadService::fileUrl('uploads/images/' . $user->profile_image) . '?t=' . time();
+            $imageUrl = UploadService::fileUrl("uploads/images/{$user->profile_image}") . '?t=' . time();
             $this->uploader_profile->existingFile($imageUrl);
         }
     }
@@ -154,32 +149,21 @@ class ProfileService extends AbstractUIService
         $tempIdsJson = $params['uploader_profile_temp_ids'] ?? '[]';
         $tempIds = json_decode($tempIdsJson, true) ?: [];
 
-        \Log::info('ProfileService: Procesando imagen', [
-            'temp_ids_json' => $tempIdsJson,
-            'temp_ids' => $tempIds,
-        ]);
-
         if (!empty($tempIds)) {
             // Obtener archivo temporal
             $file = DB::table('temporary_uploads')
                 ->where('id', $tempIds[0])
                 ->first();
 
-            \Log::info('ProfileService: Archivo temporal', [
-                'file_found' => $file ? 'YES' : 'NO',
-                'file_path' => $file->path ?? null,
-            ]);
-
             if ($file) {
                 try {
                     // Eliminar imagen anterior si existe
-                    if ($user->profile_image && Storage::disk('uploads')->exists('uploads/images/' . $user->profile_image)) {
-                        Storage::disk('uploads')->delete('uploads/images/' . $user->profile_image);
-                        \Log::info('ProfileService: Imagen anterior eliminada');
+                    if ($user->profile_image && Storage::disk('uploads')->exists("uploads/images/{$user->profile_image}")) {
+                        Storage::disk('uploads')->delete("uploads/images/{$user->profile_image}");
                     }
 
                     // Mover de temporal a definitivo (carpeta por tipo)
-                    $finalPath = 'uploads/images/' . $file->stored_filename;
+                    $finalPath = "uploads/images/{$file->stored_filename}";
 
                     \Log::info('ProfileService: Moviendo archivo', [
                         'from' => $file->path,
@@ -219,6 +203,12 @@ class ProfileService extends AbstractUIService
 
         // Guardar cambios
         $user->save();
+        $this->input_name->error(null);
+
+        event(new UsimEvent('updated_profile', [
+            'user' => $user
+        ]));
+
 
         // Mostrar éxito
         $this->toast('Perfil actualizado exitosamente', 'success');

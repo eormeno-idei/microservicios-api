@@ -116,9 +116,12 @@ class DemoMenuService extends AbstractUIService
         $this->user_menu->setUserPermissions(['auth']);
     }
 
-    /**
-     * Handler to confirm logout
-     */
+    public function onUpdatedProfile(array $params): void
+    {
+        $userName = $params['user']['name'] ?? 'User';
+        $this->user_menu->trigger("👤  $userName");
+    }
+
     /**
      * Handler to confirm logout
      */
