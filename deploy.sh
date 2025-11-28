@@ -31,5 +31,6 @@ sudo chown -R www-data:www-data storage bootstrap/cache
 echo "Restarting services..."
 sudo systemctl restart php8.3-fpm
 sudo supervisorctl restart laravel-worker:*
+sudo supervisorctl restart laravel-scheduler:*
 
 echo "Deploy complete!"
