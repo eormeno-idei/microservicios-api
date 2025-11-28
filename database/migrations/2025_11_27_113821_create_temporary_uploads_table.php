@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('temporary_uploads', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('session_id')->index();
             $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('component_id');
             $table->string('original_filename');

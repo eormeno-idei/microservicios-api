@@ -41,9 +41,9 @@ class UploadController extends Controller
         $extension = $file->getClientOriginalExtension();
         $storedFilename = $tempId . '.' . $extension;
 
-        // Guardar en storage temporal
+        // Guardar en storage temporal (directorio único temp/)
         $path = $file->storeAs(
-            "temp/{$userId}",
+            'temp',
             $storedFilename,
             'local'
         );
@@ -56,7 +56,6 @@ class UploadController extends Controller
         // Guardar registro en BD
         DB::table('temporary_uploads')->insert([
             'id' => $tempId,
-            'session_id' => session()->getId(), // Mantener por compatibilidad
             'user_id' => $userId,
             'component_id' => $componentId,
             'original_filename' => $originalFilename,

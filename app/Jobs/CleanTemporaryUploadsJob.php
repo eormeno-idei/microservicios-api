@@ -57,52 +57,9 @@ class CleanTemporaryUploadsJob implements ShouldQueue
             }
         }
 
-        // Limpiar directorios vacíos en temp/
-        $this->cleanEmptyDirectories();
-
         Log::info('Temporary uploads cleanup completed', [
             'deleted' => $deletedCount,
             'failed' => $failedCount,
         ]);
-    }
-
-    /**
-     * Limpiar directorios vacíos en storage/app/temp/
-     */
-    private function cleanEmptyDirectories(): void
-    {
-        try {
-            $tempPath = storage_path('app/temp');
-
-            if (!is_dir($tempPath)) {
-                return;
-            }
-
-            // Listar directorios de sesión
-            $sessionDirs = scandir($tempPath);
-
-            foreach ($sessionDirs as $dir) {
-                if ($dir === '.' || $dir === '..') {
-                    continue;
-                }
-
-                $dirPath = $tempPath . '/' . $dir;
-
-                if (is_dir($dirPath)) {
-                    // Verificar si está vacío
-                    $files = scandir($dirPath);
-                    $isEmpty = count($files) <= 2; // Solo . y ..
-
-                    if ($isEmpty) {
-                        rmdir($dirPath);
-                        Log::debug("Removed empty directory: {$dir}");
-                    }
-                }
-            }
-        } catch (\Exception $e) {
-            Log::error('Failed to clean empty directories', [
-                'error' => $e->getMessage(),
-            ]);
-        }
     }
 }
