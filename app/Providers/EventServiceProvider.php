@@ -12,11 +12,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 
 class EventServiceProvider extends ServiceProvider
 {
-    protected $listen = [
-        UsimEvent::class => [
-            UsimEventDispatcher::class,
-        ],
-    ];
+    // Removed $listen array - Laravel 11 autodiscovery handles this automatically
+    // based on type-hints in Listener::handle() methods
 
     public function boot(): void
     {

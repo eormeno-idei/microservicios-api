@@ -870,6 +870,21 @@ body.modal-open #menu {
     align-items: center;
 }
 
+.menu-dropdown-trigger .trigger-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    margin: -4px 0; /* Compensar padding vertical del botón */
+}
+
+.menu-dropdown-trigger:hover .trigger-image {
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: scale(1.05);
+}
+
 .menu-dropdown-trigger .trigger-label {
     font-size: 14px;
     line-height: 1;

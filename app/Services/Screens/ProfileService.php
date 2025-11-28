@@ -27,6 +27,7 @@ use App\Services\UI\Components\UploaderBuilder;
  */
 class ProfileService extends AbstractUIService
 {
+    protected InputBuilder $input_email;
     protected InputBuilder $input_name;
     protected UploaderBuilder $uploader_profile;
 
@@ -51,25 +52,14 @@ class ProfileService extends AbstractUIService
         );
 
         // Email (readonly)
-        $emailInput = UIBuilder::input('input_email')
+        $this->input_email = UIBuilder::input('input_email')
             ->label('Email')
             ->type('email')
             ->value($user->email)
             ->disabled(true)
             ->width('100%');
 
-        $container->add($emailInput);
-
-        // Estado de verificación
-        if (!$user->email_verified_at) {
-            $container->add(
-                UIBuilder::button('btn_resend_verification')
-                    ->label('📧 Reenviar Email de Verificación')
-                    ->action('resend_verification')
-                    ->style('warning')
-                    ->width('100%')
-            );
-        }
+        $container->add($this->input_email);
 
         // Nombre
         $container->add(
@@ -116,7 +106,14 @@ class ProfileService extends AbstractUIService
         $user = Auth::user();
 
         // Actualizar inputs con datos actuales del usuario
+        $this->input_email->value($user->email ?? '');
         $this->input_name->value($user->name ?? '');
+
+        if (!$user->email_verified_at) {
+            $this->input_email->error('Email no verificado. Por favor verifica tu email.');
+        } else {
+            $this->input_email->error(null);
+        }
 
         // Actualizar uploader con imagen actual (si existe)
         if ($user->profile_image) {
@@ -165,11 +162,6 @@ class ProfileService extends AbstractUIService
                     // Mover de temporal a definitivo (carpeta por tipo)
                     $finalPath = "uploads/images/{$file->stored_filename}";
 
-                    \Log::info('ProfileService: Moviendo archivo', [
-                        'from' => $file->path,
-                        'to' => $finalPath,
-                    ]);
-
                     // Obtener contenido del archivo temporal
                     $content = Storage::disk('local')->get($file->path);
 
@@ -178,8 +170,6 @@ class ProfileService extends AbstractUIService
 
                     // Eliminar temporal
                     Storage::disk('local')->delete($file->path);
-
-                    \Log::info('ProfileService: Archivo movido exitosamente');
 
                     // Actualizar usuario
                     $user->profile_image = $file->stored_filename;
@@ -208,7 +198,6 @@ class ProfileService extends AbstractUIService
         event(new UsimEvent('updated_profile', [
             'user' => $user
         ]));
-
 
         // Mostrar éxito
         $this->toast('Perfil actualizado exitosamente', 'success');

@@ -2101,18 +2101,30 @@ class UIRenderer {
                     const triggerConfig = changes.trigger;
                     const triggerLabel = triggerConfig.label || '☰ Menu';
                     const triggerIcon = triggerConfig.icon;
+                    const triggerImage = triggerConfig.image;
+                    const triggerAlt = triggerConfig.alt || 'Menu';
                     const triggerStyle = triggerConfig.style || 'default';
 
                     // Update trigger style classes
                     triggerButton.className = 'menu-dropdown-trigger';
                     triggerButton.className += ` menu-trigger-${triggerStyle}`;
 
-                    // Build trigger content
+                    // Build trigger content (same logic as initial render)
                     let triggerContent = '';
-                    if (triggerIcon) {
-                        triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+
+                    // Image trigger (priority over icon)
+                    if (triggerImage) {
+                        triggerContent += `<img src="${triggerImage}" alt="${triggerAlt}" class="trigger-image">`;
+                        if (triggerLabel) {
+                            triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
+                        }
+                    } else {
+                        // Standard icon/label trigger
+                        if (triggerIcon) {
+                            triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+                        }
+                        triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
                     }
-                    triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
 
                     triggerButton.innerHTML = triggerContent;
                 }
@@ -2891,16 +2903,28 @@ class MenuDropdownComponent extends UIComponent {
         const triggerConfig = this.config.trigger || {};
         const triggerLabel = triggerConfig.label || '☰ Menu';
         const triggerIcon = triggerConfig.icon;
+        const triggerImage = triggerConfig.image;
+        const triggerAlt = triggerConfig.alt || 'Menu';
         const triggerStyle = triggerConfig.style || 'default';
 
         trigger.className += ` menu-trigger-${triggerStyle}`;
 
         // Build trigger content
         let triggerContent = '';
-        if (triggerIcon) {
-            triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+
+        // Image trigger (priority over icon)
+        if (triggerImage) {
+            triggerContent += `<img src="${triggerImage}" alt="${triggerAlt}" class="trigger-image">`;
+            if (triggerLabel) {
+                triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
+            }
+        } else {
+            // Standard icon/label trigger
+            if (triggerIcon) {
+                triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
+            }
+            triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
         }
-        triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
 
         trigger.innerHTML = triggerContent;
 

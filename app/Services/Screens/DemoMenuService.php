@@ -1,20 +1,20 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\MenuDropdownBuilder;
-use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
+use App\Services\UI\Support\UIDebug;
+use Illuminate\Support\Facades\Auth;
 use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\JustifyContent;
 use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\AbstractUIService;
+use App\Services\Upload\UploadService;
+use App\Services\UI\Support\HttpClient;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\Support\HttpClient;
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\UIBuilder;
-use Http;
-use Illuminate\Support\Facades\Auth;
+use App\Services\UI\Components\MenuDropdownBuilder;
 
 /**
  * Demo Menu Service
@@ -50,13 +50,33 @@ class DemoMenuService extends AbstractUIService
     {
         if (Auth::check()) {
             $user = Auth::user();
-            $this->user_menu->trigger("👤  " . $user->name);
+            $this->updateUserMenuTrigger($user);
             $this->main_menu->setUserPermissions(['auth']);
             $this->user_menu->setUserPermissions(['auth']);
         } else {
+            // Caso 1: Usuario no autenticado - trigger con icono de configuración
             $this->user_menu->trigger("⚙️");
             $this->user_menu->setUserPermissions(['no-auth']);
             $this->main_menu->setUserPermissions(['no-auth']);
+        }
+    }
+
+    /**
+     * Actualizar el trigger del menú de usuario según el estado del perfil
+     */
+    private function updateUserMenuTrigger($user): void
+    {
+        if ($user->profile_image) {
+            // Caso 3: Usuario con imagen de perfil
+            $imageUrl = UploadService::fileUrl("uploads/images/$user->profile_image");
+            $this->user_menu->triggerImage(
+                imageUrl: $imageUrl,
+                alt: $user->name,
+                label: null  // Solo imagen, sin texto
+            );
+        } else {
+            // Caso 2: Usuario sin imagen de perfil - icono + nombre
+            $this->user_menu->trigger("👤 $user->name");
         }
     }
 
@@ -110,21 +130,23 @@ class DemoMenuService extends AbstractUIService
 
     public function onLoggedUser(array $params): void
     {
-        $userName = $params['user']['name'] ?? 'User';
-        $this->user_menu->trigger("👤  $userName");
+        $user = Auth::user();
+        if ($user) {
+            $this->updateUserMenuTrigger($user);
+        }
         $this->main_menu->setUserPermissions(['auth']);
         $this->user_menu->setUserPermissions(['auth']);
     }
 
     public function onUpdatedProfile(array $params): void
     {
-        $userName = $params['user']['name'] ?? 'User';
-        $this->user_menu->trigger("👤  $userName");
-    }
-
-    /**
-     * Handler to confirm logout
-     */
+        $user = $params['user'] ?? null;
+        if ($user) {
+            $this->updateUserMenuTrigger($user);
+        }
+    }    /**
+         * Handler to confirm logout
+         */
     public function onConfirmLogout(array $params): void
     {
         // Delete Sanctum token if user is authenticated
@@ -135,7 +157,7 @@ class DemoMenuService extends AbstractUIService
         Auth::logout();
 
         // Clear storage variables
-        $this->store_token    = '';
+        $this->store_token = '';
         $this->store_password = '';
 
         // Update menu permissions

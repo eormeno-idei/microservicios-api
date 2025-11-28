@@ -173,6 +173,27 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
+     * Set an image as the trigger icon (e.g., user profile photo)
+     *
+     * @param string $imageUrl URL of the image
+     * @param string $alt Alt text for accessibility
+     * @param string|null $label Optional text label next to image
+     * @param string $style Button style
+     * @return self
+     */
+    public function triggerImage(string $imageUrl, string $alt = 'User', ?string $label = null, string $style = 'default'): self
+    {
+        $this->config['trigger'] = [
+            'image' => $imageUrl,
+            'alt'   => $alt,
+            'label' => $label,
+            'style' => $style,
+        ];
+
+        return $this;
+    }
+
+    /**
      * Set menu positioning
      *
      * @param string $position 'bottom-left', 'bottom-right', 'top-left', 'top-right'
