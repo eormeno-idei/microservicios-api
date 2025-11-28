@@ -35,6 +35,7 @@ class UploaderBuilder extends UIComponent
             'action' => null, // Action name para procesar en Service
             'aspect_ratio' => null, // '1:1', '16:9', '9:16', '4:3', etc.
             'size_level' => 2, // 1-4 (1=128px, 2=192px, 3=256px, 4=320px base)
+            'existing_file' => null, // URL de archivo existente para mostrar en preview
         ];
     }
 
@@ -180,6 +181,16 @@ class UploaderBuilder extends UIComponent
             ->allowedTypes(['video/*'])
             ->maxSize(100)
             ->maxFiles(3);
+    }
+
+    /**
+     * Establecer archivo existente para mostrar en preview
+     *
+     * @param string|null $url URL del archivo existente
+     */
+    public function existingFile(?string $url): self
+    {
+        return $this->setConfig('existing_file', $url);
     }
 
     /**

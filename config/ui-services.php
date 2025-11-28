@@ -44,5 +44,7 @@ return [
     \App\Services\Screens\AdminDashboardService::class,
     // Servicio de verificación de email
     \App\Services\Screens\EmailVerifiedService::class,
+    // Servicio de perfil de usuario
+    \App\Services\Screens\ProfileService::class,
 
 ];

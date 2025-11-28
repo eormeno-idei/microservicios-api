@@ -7,6 +7,9 @@ use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\DocumentationController;
 use App\Http\Controllers\UploadController;
 
+// Servir archivos del storage mediante endpoint personalizado
+Route::get('/files/{path}', [UploadController::class, 'serveFile'])->where('path', '.*')->name('files.serve');
+
 // Log viewer routes (MUST be before dynamic demo route)
 Route::prefix('logs')->group(function () {
     Route::get('/', [LogViewerController::class, 'index'])->name('logs.index');
@@ -50,6 +53,17 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         ]);
     })->name('admin.dashboard');
 
+});
+
+// Profile route - Usuario autenticado
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/profile', function () {
+        $reset = request()->query('reset', false);
+        return view('demo', [
+            'demo' => 'profile',
+            'reset' => $reset
+        ]);
+    })->name('profile');
 });
 
 // Demo route - Dynamic demo viewer

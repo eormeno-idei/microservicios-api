@@ -168,4 +168,15 @@ class UploadService
 
         return round($bytes / pow(1024, $power), 2) . ' ' . $units[$power];
     }
+
+    /**
+     * Generar URL para acceder a archivo almacenado
+     *
+     * @param string $path Ruta relativa en storage (ej: 'uploads/profiles/abc.jpg')
+     * @return string URL completa (ej: 'http://localhost/files/uploads/profiles/abc.jpg')
+     */
+    public static function fileUrl(string $path): string
+    {
+        return url('/files/' . ltrim($path, '/'));
+    }
 }

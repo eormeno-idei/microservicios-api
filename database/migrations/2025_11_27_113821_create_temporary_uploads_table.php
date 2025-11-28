@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('temporary_uploads', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('session_id')->index();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->string('component_id');
             $table->string('original_filename');
             $table->string('stored_filename');
@@ -24,6 +25,8 @@ return new class extends Migration
             $table->json('metadata')->nullable(); // width, height, duration, etc.
             $table->timestamp('expires_at')->index();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

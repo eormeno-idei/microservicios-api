@@ -1738,6 +1738,71 @@ class UIRenderer {
     }
 
     /**
+     * Update uploader component with new existing file
+     *
+     * @param {object} updateData - Update data with id and existing_file URL
+     */
+    updateUploader(updateData) {
+        if (!updateData || !updateData.id) return;
+
+        console.log('🔄 Updating uploader:', updateData);
+
+        const component = this.components.get(String(updateData.id));
+
+        if (component && typeof component.showExistingFile === 'function') {
+            console.log(`✅ Updating uploader ID ${updateData.id} with new image`);
+
+            // Buscar el elemento del uploader en el DOM
+            const uploaderElement = document.querySelector(`[data-component-id="${updateData.id}"]`);
+            if (!uploaderElement) {
+                console.warn(`⚠️ Uploader DOM element not found for ID:`, updateData.id);
+                return;
+            }
+
+            // Buscar o crear la lista de archivos
+            let fileList = uploaderElement.querySelector('.ui-uploader-file-list');
+            if (!fileList) {
+                fileList = document.createElement('div');
+                fileList.className = 'ui-uploader-file-list';
+                uploaderElement.appendChild(fileList);
+            }
+
+            // Limpiar archivos actuales
+            if (typeof component.clearFiles === 'function') {
+                component.clearFiles();
+            }
+
+            // Mostrar nueva imagen
+            component.showExistingFile(updateData.existing_file, fileList);
+        } else {
+            console.warn(`⚠️ Uploader component not found or doesn't support updates:`, updateData.id);
+        }
+    }
+
+    /**
+     * Set existing file on uploader component
+     *
+     * @param {object} data - Data with uploader_id and url
+     */
+    setUploaderExistingFile(data) {
+        if (!data || !data.uploader_id || !data.url) {
+            console.warn('⚠️ Invalid data for set_uploader_existing_file:', data);
+            return;
+        }
+
+        console.log('🔄 Setting existing file on uploader:', data);
+
+        const component = this.components.get(String(data.uploader_id));
+
+        if (component && typeof component.setExistingFile === 'function') {
+            console.log(`✅ Setting existing file on uploader ID ${data.uploader_id}`);
+            component.setExistingFile(data.url);
+        } else {
+            console.warn(`⚠️ Uploader component not found or doesn't support setExistingFile:`, data.uploader_id);
+        }
+    }
+
+    /**
      * Handle storage updates - store variables in localStorage
      *
      * @param {object} storageData - Storage variables object
@@ -1853,6 +1918,11 @@ class UIRenderer {
         // Handle clear uploaders if present
         if (uiUpdate.clear_uploaders) {
             this.clearUploaders(uiUpdate.clear_uploaders);
+        }
+
+        // Handle set existing file on uploaders
+        if (uiUpdate.set_uploader_existing_file) {
+            this.setUploaderExistingFile(uiUpdate.set_uploader_existing_file);
         }
 
         // Handle redirects if present

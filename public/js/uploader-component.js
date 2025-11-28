@@ -98,6 +98,11 @@ class UploaderComponent extends UIComponent {
         fileList.setAttribute('data-uploader-list', this.id);
         dropzone.appendChild(fileList);
 
+        // Si hay archivo existente, mostrarlo
+        if (this.config.existing_file) {
+            this.showExistingFile(this.config.existing_file, fileList);
+        }
+
         // Input file oculto
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -543,7 +548,43 @@ class UploaderComponent extends UIComponent {
             fileList.innerHTML = '';
         }
 
+        // Restaurar archivo existente si lo hay
+        if (this.config.existing_file) {
+            this.showExistingFile(this.config.existing_file, fileList);
+        }
+
         console.log(`🗑️ Uploader ${this.id} cleared`);
+    }
+
+    /**
+     * Mostrar archivo existente en el preview
+     */
+    showExistingFile(url, fileList) {
+        const item = document.createElement('div');
+        item.className = 'ui-uploader-file-item ui-uploader-file-existing';
+
+        if (this.isSingleImageMode) {
+            item.classList.add('ui-uploader-single-image');
+        }
+
+        const preview = document.createElement('div');
+        preview.className = 'ui-uploader-preview';
+
+        const img = document.createElement('img');
+        img.src = url;
+        img.alt = 'Imagen actual';
+        preview.appendChild(img);
+
+        item.appendChild(preview);
+        fileList.appendChild(item);
+
+        // Ocultar contenido del dropzone si es modo imagen única
+        if (this.isSingleImageMode) {
+            const dropzoneContent = document.querySelector(`[data-component-id="${this.id}"] .ui-uploader-dropzone-content`);
+            if (dropzoneContent) {
+                dropzoneContent.style.display = 'none';
+            }
+        }
     }
 
     /**
