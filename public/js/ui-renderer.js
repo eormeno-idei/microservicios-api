@@ -2246,7 +2246,28 @@ class UIRenderer {
                         input.classList.remove('ui-input-error');
                     }
                 }
-            }            // Options (selects)
+            }
+
+            // Existing file (uploader)
+            if (changes.existing_file !== undefined) {
+                // The element might be the uploader itself or a parent
+                // Try to find the uploader instance on element or within it
+                let uploaderInstance = element.uploaderInstance;
+
+                if (!uploaderInstance) {
+                    // Search for uploader instance in child elements
+                    const uploaderElement = element.querySelector('.ui-uploader-group');
+                    if (uploaderElement) {
+                        uploaderInstance = uploaderElement.uploaderInstance;
+                    }
+                }
+
+                if (uploaderInstance && typeof uploaderInstance.setExistingFile === 'function') {
+                    uploaderInstance.setExistingFile(changes.existing_file);
+                }
+            }
+
+            // Options (selects)
             if (changes.options !== undefined) {
                 const select = element.querySelector('select') || (element.tagName === 'SELECT' ? element : null);
                 if (select) {

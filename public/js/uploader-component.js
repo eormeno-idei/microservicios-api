@@ -23,6 +23,12 @@ class UploaderComponent extends UIComponent {
         container.className = 'ui-uploader-group';
         this.applyCommonAttributes(container);
 
+        // Store reference to this component instance in the DOM element
+        container.uploaderInstance = this;
+
+        // Also store the element reference in this instance
+        this.element = container;
+
         // Detectar si es modo imagen única
         this.isSingleImageMode = this.config.max_files === 1 &&
                                  this.config.allowed_types &&
@@ -588,6 +594,28 @@ class UploaderComponent extends UIComponent {
     }
 
     /**
+     * Actualizar archivo existente (usado por differ cuando cambia existing_file)
+     */
+    setExistingFile(url) {
+        // Actualizar config
+        this.config.existing_file = url;        // Limpiar archivos subidos
+        this.uploadedFiles = [];
+        this.updateHiddenInput();
+
+        // Obtener fileList
+        const fileList = document.querySelector(`[data-uploader-list="${this.id}"]`);
+        if (!fileList) {
+            console.warn('⚠️ File list not found for uploader:', this.id);
+            return;
+        }
+
+        // Limpiar contenido visual
+        fileList.innerHTML = '';
+
+
+        // Mostrar nuevo archivo existente
+        this.showExistingFile(url, fileList);
+    }    /**
      * Calcular dimensiones del dropzone según aspect_ratio y size_level
      */
     calculateDropzoneDimensions() {

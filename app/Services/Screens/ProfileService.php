@@ -177,8 +177,9 @@ class ProfileService extends AbstractUIService
                     // Limpiar temporal
                     DB::table('temporary_uploads')->where('id', $file->id)->delete();
 
-                    // NO hacer nada más - postLoadUI se encargará de mostrar la nueva imagen
-                    // cuando se guarde el usuario y se ejecute el toast
+                    $imageUrl = UploadService::fileUrl("uploads/images/{$user->profile_image}") . '?t=' . time();
+
+                    $this->uploader_profile->existingFile($imageUrl);
 
                 } catch (\Exception $e) {
                     \Log::error('ProfileService: Error moviendo archivo', [
