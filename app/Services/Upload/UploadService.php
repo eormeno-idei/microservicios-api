@@ -179,4 +179,113 @@ class UploadService
     {
         return url('/files/' . ltrim($path, '/'));
     }
+
+    /**
+     * Persistir archivo temporal a ubicación final
+     *
+     * Mueve un archivo temporal a su ubicación final, elimina el archivo anterior si existe,
+     * y limpia el registro temporal de la base de datos.
+     *
+     * @param string $tempId UUID del archivo temporal
+     * @param string $category Categoría del archivo (ej: 'images', 'documents', 'videos')
+     * @param string|null $oldFilename Nombre del archivo anterior a eliminar (solo el nombre, sin ruta)
+     * @return string|null Nombre del archivo guardado (solo nombre, sin ruta) o null si falla
+     *
+     * @example
+     * // Mover archivo temporal a uploads/images/ y eliminar imagen anterior
+     * $filename = UploadService::persistTemporaryUpload($tempId, 'images', $user->profile_image);
+     * if ($filename) {
+     *     $user->profile_image = $filename;
+     *     $user->save();
+     * }
+     */
+    public static function persistTemporaryUpload(string $tempId, string $category, ?string $oldFilename = null): ?string
+    {
+        // Obtener archivo temporal
+        $file = \DB::table('temporary_uploads')
+            ->where('id', $tempId)
+            ->first();
+
+        if (!$file) {
+            return null;
+        }
+
+        try {
+            // Eliminar archivo anterior si existe
+            if ($oldFilename) {
+                self::deleteFile($category, $oldFilename);
+            }
+
+            // Definir ruta final
+            $finalPath = "uploads/{$category}/{$file->stored_filename}";
+
+            // Mover de temporal a definitivo
+            $content = \Storage::disk('local')->get($file->path);
+            \Storage::disk('uploads')->put($finalPath, $content);
+
+            // Eliminar temporal del storage
+            \Storage::disk('local')->delete($file->path);
+
+            // Limpiar registro temporal
+            \DB::table('temporary_uploads')->where('id', $file->id)->delete();
+
+            return $file->stored_filename;
+
+        } catch (\Exception $e) {
+            \Log::error('UploadService: Error persistiendo archivo temporal', [
+                'temp_id' => $tempId,
+                'category' => $category,
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    /**
+     * Eliminar archivo del storage
+     *
+     * @param string $category Categoría del archivo (ej: 'images', 'documents')
+     * @param string $filename Nombre del archivo (sin ruta)
+     * @return bool true si se eliminó o no existía, false si hubo error
+     */
+    public static function deleteFile(string $category, string $filename): bool
+    {
+        try {
+            $path = "uploads/{$category}/{$filename}";
+
+            if (\Storage::disk('uploads')->exists($path)) {
+                return \Storage::disk('uploads')->delete($path);
+            }
+
+            return true; // No existe, consideramos éxito
+        } catch (\Exception $e) {
+            \Log::error('UploadService: Error eliminando archivo', [
+                'category' => $category,
+                'filename' => $filename,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Procesar múltiples archivos temporales (útil para uploaders con max_files > 1)
+     *
+     * @param array $tempIds Array de UUIDs de archivos temporales
+     * @param string $category Categoría de archivos
+     * @return array Array de nombres de archivos guardados
+     */
+    public static function persistMultipleTemporaryUploads(array $tempIds, string $category): array
+    {
+        $filenames = [];
+
+        foreach ($tempIds as $tempId) {
+            $filename = self::persistTemporaryUpload($tempId, $category);
+            if ($filename) {
+                $filenames[] = $filename;
+            }
+        }
+
+        return $filenames;
+    }
 }

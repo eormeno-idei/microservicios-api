@@ -115,11 +115,14 @@ class ProfileService extends AbstractUIService
             $this->input_email->error(null);
         }
 
+        $imageUrl = null;
+
         // Actualizar uploader con imagen actual (si existe)
         if ($user->profile_image) {
             $imageUrl = UploadService::fileUrl("uploads/images/{$user->profile_image}") . '?t=' . time();
-            $this->uploader_profile->existingFile($imageUrl);
         }
+
+        $this->uploader_profile->existingFile($imageUrl);
     }
 
     /**
@@ -147,48 +150,21 @@ class ProfileService extends AbstractUIService
         $tempIds = json_decode($tempIdsJson, true) ?: [];
 
         if (!empty($tempIds)) {
-            // Obtener archivo temporal
-            $file = DB::table('temporary_uploads')
-                ->where('id', $tempIds[0])
-                ->first();
+            $filename = UploadService::persistTemporaryUpload(
+                $tempIds[0],
+                'images',
+                $user->profile_image
+            );
 
-            if ($file) {
-                try {
-                    // Eliminar imagen anterior si existe
-                    if ($user->profile_image && Storage::disk('uploads')->exists("uploads/images/{$user->profile_image}")) {
-                        Storage::disk('uploads')->delete("uploads/images/{$user->profile_image}");
-                    }
+            if ($filename) {
+                $user->profile_image = $filename;
 
-                    // Mover de temporal a definitivo (carpeta por tipo)
-                    $finalPath = "uploads/images/{$file->stored_filename}";
-
-                    // Obtener contenido del archivo temporal
-                    $content = Storage::disk('local')->get($file->path);
-
-                    // Guardar en ubicación final
-                    Storage::disk('uploads')->put($finalPath, $content);
-
-                    // Eliminar temporal
-                    Storage::disk('local')->delete($file->path);
-
-                    // Actualizar usuario
-                    $user->profile_image = $file->stored_filename;
-
-                    // Limpiar temporal
-                    DB::table('temporary_uploads')->where('id', $file->id)->delete();
-
-                    $imageUrl = UploadService::fileUrl("uploads/images/{$user->profile_image}") . '?t=' . time();
-
-                    $this->uploader_profile->existingFile($imageUrl);
-
-                } catch (\Exception $e) {
-                    \Log::error('ProfileService: Error moviendo archivo', [
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString(),
-                    ]);
-                    $this->toast('Error al guardar la imagen: ' . $e->getMessage(), 'error');
-                    return;
-                }
+                // Actualizar uploader con nueva URL
+                $imageUrl = UploadService::fileUrl("uploads/images/{$filename}") . '?t=' . time();
+                $this->uploader_profile->existingFile($imageUrl);
+            } else {
+                $this->toast('Error al guardar la imagen', 'error');
+                return;
             }
         }
 
