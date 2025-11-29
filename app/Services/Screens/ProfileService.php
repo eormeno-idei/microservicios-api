@@ -135,10 +135,8 @@ class ProfileService extends AbstractUIService
         // Obtener datos del formulario
         $name = trim($params['input_name'] ?? '');
 
-        // Validar nombre
         if (empty($name)) {
             $this->input_name->error('El nombre es requerido');
-            $this->toast('Por favor completa el nombre', 'error');
             return;
         }
 
@@ -146,26 +144,8 @@ class ProfileService extends AbstractUIService
         $user->name = $name;
 
         // Procesar imagen de perfil si fue subida
-        $tempIdsJson = $params['uploader_profile_temp_ids'] ?? '[]';
-        $tempIds = json_decode($tempIdsJson, true) ?: [];
-
-        if (!empty($tempIds)) {
-            $filename = UploadService::persistTemporaryUpload(
-                $tempIds[0],
-                'images',
-                $user->profile_image
-            );
-
-            if ($filename) {
-                $user->profile_image = $filename;
-
-                // Actualizar uploader con nueva URL
-                $imageUrl = UploadService::fileUrl("uploads/images/{$filename}") . '?t=' . time();
-                $this->uploader_profile->existingFile($imageUrl);
-            } else {
-                $this->toast('Error al guardar la imagen', 'error');
-                return;
-            }
+        if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
+            $user->profile_image = $filename;
         }
 
         // Guardar cambios
@@ -177,7 +157,7 @@ class ProfileService extends AbstractUIService
         ]));
 
         // Mostrar éxito
-        $this->toast('Perfil actualizado exitosamente', 'success');
+        $this->toast('Perfil actualizado', 'success');
     }
 
     /**

@@ -194,25 +194,98 @@ class UploaderBuilder extends UIComponent
     }
 
     /**
-     * Obtener los IDs temporales de archivos subidos
+     * Extraer temp_id único de los parámetros (para uploaders con max_files = 1)
      *
-     * @return array
+     * @param array $params Parámetros del request
+     * @return string|null UUID del archivo temporal o null si no hay
      */
-    public function getTempIds(): array
+    public function getTempId(array $params): ?string
     {
-        // El input hidden tiene el formato: uploader_{id}_temp_ids
-        $inputName = "{$this->name}_temp_ids";
+        $ids = $this->getTempIds($params);
+        return $ids[0] ?? null;
+    }
 
-        // Buscar en los datos del request
-        $tempIdsJson = request()->input($inputName);
+    /**
+     * Extraer todos los temp_ids de los parámetros
+     *
+     * @param array $params Parámetros del request
+     * @return array Array de UUIDs de archivos temporales
+     */
+    public function getTempIds(array $params): array
+    {
+        $inputName = "{$this->name}_temp_ids";
+        $tempIdsJson = $params[$inputName] ?? '[]';
 
         if (empty($tempIdsJson)) {
             return [];
         }
 
-        // Decodificar JSON
         $tempIds = json_decode($tempIdsJson, true);
-
         return is_array($tempIds) ? $tempIds : [];
+    }
+
+    /**
+     * Confirmar y persistir archivos temporales subidos
+     *
+     * Este método:
+     * 1. Extrae los temp_ids de los parámetros
+     * 2. Persiste los archivos de temporal a ubicación final
+     * 3. Elimina archivos anteriores si existen
+     * 4. Actualiza la vista del uploader con los nuevos archivos
+     * 5. Retorna el/los filename(s) guardados
+     *
+     * @param array $params Parámetros del request
+     * @param string $category Categoría de archivos (ej: 'images', 'documents', 'videos')
+     * @param string|array|null $oldFiles Archivo(s) anterior(es) a eliminar (solo nombre, sin ruta)
+     * @return string|array|null String si max_files=1, array si max_files>1, null si no hay archivos
+     *
+     * @example
+     * // Uploader de imagen única
+     * if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
+     *     $user->profile_image = $filename;
+     *     $user->save();
+     * }
+     *
+     * @example
+     * // Uploader de múltiples documentos
+     * $filenames = $this->uploader_docs->confirm($params, 'documents', $oldDocuments);
+     * foreach ($filenames as $filename) {
+     *     Document::create(['filename' => $filename]);
+     * }
+     */
+    public function confirm(array $params, string $category, string|array|null $oldFiles = null): string|array|null
+    {
+        $tempIds = $this->getTempIds($params);
+
+        if (empty($tempIds)) {
+            return null;
+        }
+
+        $isSingle = $this->config['max_files'] === 1;
+
+        if ($isSingle) {
+            // Archivo único
+            $filename = \App\Services\Upload\UploadService::persistTemporaryUpload(
+                $tempIds[0],
+                $category,
+                $oldFiles
+            );
+
+            if ($filename) {
+                // Auto-actualizar vista del uploader
+                $url = \App\Services\Upload\UploadService::fileUrl("uploads/{$category}/{$filename}") . '?t=' . time();
+                $this->existingFile($url);
+            }
+
+            return $filename;
+        } else {
+            // Múltiples archivos
+            $filenames = \App\Services\Upload\UploadService::persistMultipleTemporaryUploads($tempIds, $category);
+
+            // TODO: implementar auto-actualización de vista para múltiples archivos
+            // Requeriría un método existingFiles(array $urls) en lugar de existingFile($url)
+
+            return $filenames;
+        }
     }
 }
