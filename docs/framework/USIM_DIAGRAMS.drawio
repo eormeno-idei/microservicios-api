@@ -1,481 +1,358 @@
-<mxfile host="app.diagrams.net" modified="2025-11-30T00:00:00.000Z" agent="drawio" version="22.1.0">
-  <diagram name="1. Ciclo de Vida USIM" id="cycle">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-        <!-- Título -->
-        <mxCell id="title1" value="CICLO DE VIDA USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="400" y="40" width="300" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- 1. INICIALIZACIÓN -->
-        <mxCell id="init_title" value="1. INICIALIZACIÓN" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="80" y="100" width="200" height="30" as="geometry" />
-        </mxCell>
-
-        <mxCell id="client1" value="Cliente" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="80" y="150" width="120" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow1" value="GET /screen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="client1" target="service1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="service1" value="AbstractUIService&#xa;buildBaseUI()&#xa;↓&#xa;UIStateManager&#xa;(cache session)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;" vertex="1" parent="1">
-          <mxGeometry x="280" y="140" width="160" height="80" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow2" value="JSON UI" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="service1" target="client1">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="json1" value="{&#xa;  components: {...},&#xa;  storage: {...},&#xa;  modals: []&#xa;}" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Courier New;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="480" y="150" width="150" height="60" as="geometry" />
-        </mxCell>
-
-        <!-- 2. EVENTO DE USUARIO -->
-        <mxCell id="event_title" value="2. EVENTO DE USUARIO" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="80" y="270" width="250" height="30" as="geometry" />
-        </mxCell>
-
-        <mxCell id="client2" value="Cliente&#xa;(botón click)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="80" y="320" width="120" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow3" value="POST /event&#xa;{storage, params}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="client2" target="service2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="service2" value="initializeEventContext()&#xa;↓&#xa;onEvent($params)&#xa;↓&#xa;UIDiffer.diff()&#xa;(oldUI → newUI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=center;" vertex="1" parent="1">
-          <mxGeometry x="280" y="310" width="160" height="80" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow4" value="DIFF" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;dashed=1;" edge="1" parent="1" source="service2" target="client2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="json2" value="{&#xa;  components: {&#xa;    btn_1: {text: &quot;Guardado&quot;}&#xa;  }&#xa;}" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Courier New;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="480" y="320" width="200" height="60" as="geometry" />
-        </mxCell>
-
-        <!-- 3. APLICACIÓN DE CAMBIOS -->
-        <mxCell id="apply_title" value="3. APLICACIÓN DE CAMBIOS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="80" y="440" width="280" height="30" as="geometry" />
-        </mxCell>
-
-        <mxCell id="renderer" value="ui-renderer&#xa;diff.each()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="80" y="490" width="120" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow5" value="updateComponent()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="renderer" target="dom">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow6" value="applyChanges()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="renderer" target="dom">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <mxCell id="dom" value="DOM Element&#xa;(actualizado)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
-          <mxGeometry x="280" y="490" width="120" height="60" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-
-  <diagram name="2. Arquitectura General" id="architecture">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-        <!-- Título -->
-        <mxCell id="title2" value="ARQUITECTURA GENERAL USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="40" width="400" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- FRONTEND -->
-        <mxCell id="frontend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
-          <mxGeometry x="80" y="100" width="980" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="frontend_label" value="FRONTEND" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="90" y="105" width="100" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="blade" value="demo.blade.php&#xa;&#xa;Contenedores&#xa;HTML base" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="120" y="140" width="140" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="ui_renderer" value="ui-renderer.js&#xa;&#xa;Motor de&#xa;renderizado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="300" y="140" width="140" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="ui_components" value="ui-components.css&#xa;&#xa;Estilos de&#xa;componentes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="480" y="140" width="140" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="uploader" value="uploader-&#xa;component.js&#xa;&#xa;Upload avanzado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="660" y="140" width="140" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="crop" value="image-crop-&#xa;editor.js&#xa;&#xa;Crop imágenes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="840" y="140" width="140" height="60" as="geometry" />
-        </mxCell>
-
-        <!-- Flecha HTTP -->
-        <mxCell id="http_arrow" value="JSON/HTTP" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;fontSize=14;fontStyle=1" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="220" as="sourcePoint" />
-            <mxPoint x="540" y="260" as="targetPoint" />
-            <Array as="points">
-              <mxPoint x="540" y="240" />
-              <mxPoint x="540" y="240" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- CONTROLADORES -->
-        <mxCell id="controllers_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
-          <mxGeometry x="80" y="260" width="980" height="100" as="geometry" />
-        </mxCell>
-        <mxCell id="controllers_label" value="CONTROLADORES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="90" y="265" width="150" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="uidemo" value="UIDemoController&#xa;&#xa;Ruta → Servicio&#xa;Servicio → JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="200" y="295" width="180" height="55" as="geometry" />
-        </mxCell>
-
-        <mxCell id="uievent" value="UIEventController&#xa;&#xa;Evento → Handler&#xa;Diff → Respuesta" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="660" y="295" width="180" height="55" as="geometry" />
-        </mxCell>
-
-        <!-- Flecha a Servicios -->
-        <mxCell id="services_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="360" as="sourcePoint" />
-            <mxPoint x="540" y="390" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- SERVICIOS Y BUILDERS -->
-        <mxCell id="services_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
-          <mxGeometry x="80" y="390" width="980" height="280" as="geometry" />
-        </mxCell>
-        <mxCell id="services_label" value="SERVICIOS Y BUILDERS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="90" y="395" width="220" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="abstract" value="AbstractUIService&#xa;• Gestión de estado (cache)&#xa;• Lifecycle de eventos&#xa;• Diff automático&#xa;• Inyección de componentes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="120" y="430" width="900" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="builder_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="490" as="sourcePoint" />
-            <mxPoint x="540" y="510" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="uibuilder" value="UIBuilder (Factory)&#xa;button() • label() • input() • select()&#xa;checkbox() • table() • uploader() • modal()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="120" y="510" width="900" height="50" as="geometry" />
-        </mxCell>
-
-        <mxCell id="components_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="540" y="560" as="sourcePoint" />
-            <mxPoint x="540" y="580" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
-
-        <mxCell id="component_builders" value="Componentes (ButtonBuilder, InputBuilder, TableBuilder...)&#xa;• Configuración fluida&#xa;• Serialización a JSON&#xa;• IDs determinísticos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="120" y="580" width="900" height="60" as="geometry" />
-        </mxCell>
-
-        <!-- SOPORTE Y UTILIDADES -->
-        <mxCell id="support_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;" vertex="1" parent="1">
-          <mxGeometry x="80" y="700" width="980" height="80" as="geometry" />
-        </mxCell>
-        <mxCell id="support_label" value="SOPORTE Y UTILIDADES" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="90" y="705" width="220" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="idgen" value="UIIdGenerator&#xa;&#xa;IDs únicos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="150" y="735" width="120" height="35" as="geometry" />
-        </mxCell>
-
-        <mxCell id="differ" value="UIDiffer&#xa;&#xa;Detección" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="320" y="735" width="120" height="35" as="geometry" />
-        </mxCell>
-
-        <mxCell id="statemanager" value="UIStateManager&#xa;&#xa;Cache de estado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="490" y="735" width="140" height="35" as="geometry" />
-        </mxCell>
-
-        <mxCell id="changescollector" value="UIChangesCollector&#xa;&#xa;Recolección cambios" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="680" y="735" width="160" height="35" as="geometry" />
-        </mxCell>
-
-        <mxCell id="eventdispatcher" value="UsimEventDispatcher&#xa;&#xa;Eventos cross-service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;" vertex="1" parent="1">
-          <mxGeometry x="890" y="735" width="150" height="35" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-
-  <diagram name="3. Clases de Componentes" id="components">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-        <!-- Título -->
-        <mxCell id="title3" value="JERARQUÍA DE COMPONENTES USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="350" y="40" width="450" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- AbstractComponent -->
-        <mxCell id="abstract_comp" value="&lt;&lt;abstract&gt;&gt;&#xa;AbstractComponent&#xa;&#xa;+ id: string&#xa;+ _id: string&#xa;+ type: ComponentType&#xa;+ visible: bool&#xa;+ enabled: bool&#xa;&#xa;+ toArray(): array&#xa;+ applyChanges(): void" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="440" y="100" width="250" height="140" as="geometry" />
-        </mxCell>
-
-        <!-- UIContainer -->
-        <mxCell id="container" value="UIContainer&#xa;&#xa;+ title: string&#xa;+ layout: LayoutType&#xa;+ padding: string&#xa;+ children: array&#xa;&#xa;+ add(component)&#xa;+ remove(id)&#xa;+ centerHorizontal()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="80" y="300" width="200" height="150" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_container" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="container" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- ButtonBuilder -->
-        <mxCell id="button" value="ButtonBuilder&#xa;&#xa;+ label: string&#xa;+ action: string&#xa;+ style: ButtonStyle&#xa;+ icon: string&#xa;+ tooltip: string&#xa;&#xa;+ onClick(action)&#xa;+ disabled(bool)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="320" y="300" width="180" height="150" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_button" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="button" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- InputBuilder -->
-        <mxCell id="input" value="InputBuilder&#xa;&#xa;+ label: string&#xa;+ value: string&#xa;+ type: InputType&#xa;+ placeholder: string&#xa;+ required: bool&#xa;+ error: string&#xa;&#xa;+ validate()&#xa;+ mask(pattern)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="540" y="300" width="180" height="160" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_input" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="input" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- TableBuilder -->
-        <mxCell id="table" value="TableBuilder&#xa;&#xa;+ headers: array&#xa;+ data: array&#xa;+ pagination: bool&#xa;+ sortable: bool&#xa;&#xa;+ addHeader()&#xa;+ rows(data)&#xa;+ removeRow(id)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="760" y="300" width="180" height="150" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_table" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="table" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- UploaderBuilder -->
-        <mxCell id="uploader_comp" value="UploaderBuilder&#xa;&#xa;+ allowedTypes: array&#xa;+ maxFiles: int&#xa;+ maxSize: int&#xa;+ aspect: string&#xa;+ existingFile: string&#xa;&#xa;+ getTempId()&#xa;+ getTempIds()&#xa;+ confirm()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="80" y="500" width="200" height="160" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_uploader" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="uploader_comp" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="180" y="280" />
-              <mxPoint x="440" y="280" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- LabelBuilder -->
-        <mxCell id="label" value="LabelBuilder&#xa;&#xa;+ text: string&#xa;+ style: LabelStyle&#xa;+ fontSize: int&#xa;+ fontWeight: string&#xa;&#xa;+ color(hex)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="320" y="500" width="180" height="130" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_label" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.25;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="label" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="410" y="280" />
-              <mxPoint x="503" y="280" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- SelectBuilder -->
-        <mxCell id="select" value="SelectBuilder&#xa;&#xa;+ options: array&#xa;+ selected: string&#xa;+ multiple: bool&#xa;+ searchable: bool&#xa;&#xa;+ addOption()&#xa;+ clearSelection()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="540" y="500" width="180" height="140" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_select" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="select" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="630" y="280" />
-              <mxPoint x="628" y="280" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- ModalBuilder -->
-        <mxCell id="modal" value="ModalBuilder&#xa;&#xa;+ title: string&#xa;+ type: DialogType&#xa;+ message: string&#xa;+ confirmAction: string&#xa;+ cancelAction: string&#xa;&#xa;+ open()&#xa;+ close()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="760" y="500" width="180" height="150" as="geometry" />
-        </mxCell>
-
-        <mxCell id="arrow_modal" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=1;entryDx=0;entryDy=0;endArrow=block;endFill=0;" edge="1" parent="1" source="modal" target="abstract_comp">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="850" y="280" />
-              <mxPoint x="690" y="280" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Leyenda -->
-        <mxCell id="legend" value="16+ componentes implementados:&#xa;Button, Input, Label, Select, Checkbox, Table,&#xa;Uploader, Modal, Card, Form, MenuDropdown, etc." style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontColor=#333333;" vertex="1" parent="1">
-          <mxGeometry x="320" y="700" width="500" height="50" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-
-  <diagram name="4. Flujo de Eventos" id="events">
-    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0" />
-
-        <!-- Título -->
-        <mxCell id="title4" value="FLUJO DE EVENTOS Y COMUNICACIÓN" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="300" y="40" width="550" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- Usuario -->
-        <mxCell id="user" value="👤&#xa;Usuario" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
-          <mxGeometry x="100" y="120" width="40" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Frontend -->
-        <mxCell id="frontend" value="Frontend&#xa;(ui-renderer.js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;align=center;" vertex="1" parent="1">
-          <mxGeometry x="220" y="120" width="140" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Backend Service -->
-        <mxCell id="backend" value="ProfileService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;align=center;" vertex="1" parent="1">
-          <mxGeometry x="440" y="120" width="140" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Base de Datos -->
-        <mxCell id="database" value="📊&#xa;Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
-          <mxGeometry x="660" y="120" width="100" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Otros Servicios -->
-        <mxCell id="other_services" value="DashboardService&#xa;NotificationsService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=middle;align=center;" vertex="1" parent="1">
-          <mxGeometry x="840" y="120" width="160" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- 1. Click en botón -->
-        <mxCell id="step1_label" value="1. Click botón" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="40" y="240" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step1" value="onClick()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="user" target="frontend">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="140" y="140" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- 2. POST /event -->
-        <mxCell id="step2_label" value="2. POST /event" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="240" y="240" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step2" value="{action, params, storage}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=10;" edge="1" parent="1" source="frontend" target="backend">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- 3. onSaveProfile() -->
-        <mxCell id="step3_label" value="3. Ejecutar handler" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="440" y="240" width="140" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step3" value="onSaveProfile($params)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="450" y="145" width="120" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- 4. Guardar en BD -->
-        <mxCell id="step4_label" value="4. Persistir datos" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="600" y="240" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step4" value="$user-&gt;save()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=10;" edge="1" parent="1" source="backend" target="database">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- 5. Emitir evento -->
-        <mxCell id="step5_label" value="5. Emitir evento" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="600" y="300" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step5" value="UsimEvent&#xa;'updated_profile'" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;dashed=1;dashPattern=8 8;" edge="1" parent="1" source="backend" target="other_services">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="620" y="180" />
-              <mxPoint x="620" y="160" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- 6. Actualizar otros servicios -->
-        <mxCell id="step6_label" value="6. onUpdatedProfile()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="840" y="240" width="160" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step6" value="$this-&gt;label_welcome&#xa;  -&gt;text('Hola, ' . $user-&gt;name)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
-          <mxGeometry x="850" y="145" width="140" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- 7. Calcular diff -->
-        <mxCell id="step7_label" value="7. Calcular diff" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="440" y="340" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step7" value="UIDiffer::diff()&#xa;oldUI → newUI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="450" y="370" width="120" height="40" as="geometry" />
-        </mxCell>
-
-        <!-- 8. Respuesta con diff -->
-        <mxCell id="step8_label" value="8. Respuesta" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="240" y="340" width="100" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step8" value="{components: {changes}}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;dashed=1;" edge="1" parent="1" source="backend" target="frontend">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- 9. Actualizar DOM -->
-        <mxCell id="step9_label" value="9. Actualizar UI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="40" y="340" width="120" height="20" as="geometry" />
-        </mxCell>
-
-        <mxCell id="step9" value="applyChanges()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;dashed=1;" edge="1" parent="1" source="frontend" target="user">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="220" y="180" as="sourcePoint" />
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Timeline -->
-        <mxCell id="timeline" value="⏱️ Latencia típica: 80-200ms" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1" vertex="1" parent="1">
-          <mxGeometry x="380" y="450" width="250" height="30" as="geometry" />
-        </mxCell>
-
-        <!-- Leyenda -->
-        <mxCell id="legend_event" value="Líneas sólidas: Request/Response&#xa;Líneas punteadas: Eventos asíncronos" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;spacingLeft=10;" vertex="1" parent="1">
-          <mxGeometry x="380" y="500" width="280" height="40" as="geometry" />
-        </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
+<mxfile host="65bd71144e">
+    <diagram name="1. Ciclo de Vida USIM" id="cycle">
+        <mxGraphModel dx="1625" dy="696" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title1" value="CICLO DE VIDA USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="400" y="40" width="300" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="init_title" value="1. INICIALIZACIÓN" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="80" y="100" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="client1" value="Cliente" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="140" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow1" value="GET /screen" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="client1" target="service1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="270" y="170"/>
+                            <mxPoint x="270" y="170"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="service1" value="AbstractUIService.buildBaseUI()&lt;br&gt;↓&lt;br&gt;UIStateManager (cache session)" style="rounded=1;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontFamily=Courier New;spacingLeft=10;fontSize=10;fontColor=default;whiteSpace=wrap;" parent="1" vertex="1">
+                    <mxGeometry x="340" y="140" width="230" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow2" value="JSON UI" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" parent="1" source="service1" target="client1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="270" y="200"/>
+                            <mxPoint x="270" y="200"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="json1" value="{&lt;br&gt;&amp;nbsp; &amp;nbsp;components: {...},&lt;br&gt;&amp;nbsp; &amp;nbsp;storage: {...},&lt;br&gt;&amp;nbsp; &amp;nbsp;modals: []&lt;br&gt;}" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Courier New;fontSize=10;spacingLeft=10;" parent="1" vertex="1">
+                    <mxGeometry x="584" y="150" width="180" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="event_title" value="2. EVENTO DE USUARIO" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="80" y="270" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="client2" value="Cliente&#xa;(botón click)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="310" width="120" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow3" value="POST /event&#xa;{storage, params}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="200" y="340" as="sourcePoint"/>
+                        <mxPoint x="340" y="340" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="service2" value="initializeEventContext()&lt;br&gt;↓&lt;br&gt;onEvent($params)&lt;br&gt;↓&lt;br&gt;UIDiffer.diff()(oldUI → newUI)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;fontFamily=Courier New;fontSize=10;spacingLeft=10;" parent="1" vertex="1">
+                    <mxGeometry x="340" y="310" width="230" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow4" value="DIFF" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;dashed=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="340" y="370" as="sourcePoint"/>
+                        <mxPoint x="200" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="json2" value="{&lt;br&gt;&amp;nbsp; &amp;nbsp; components: {&lt;br&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;btn_1: {text: &quot;Guardado&quot;}&lt;br&gt;&amp;nbsp; &amp;nbsp; }&lt;br&gt;}" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontFamily=Courier New;fontSize=10;spacingLeft=10;" parent="1" vertex="1">
+                    <mxGeometry x="584" y="320" width="230" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="apply_title" value="3. APLICACIÓN DE CAMBIOS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="80" y="440" width="280" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="renderer" value="ui-renderer&#xa;diff.each()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontFamily=Courier New;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="490" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow5" value="updateComponent()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="200" y="510" as="sourcePoint"/>
+                        <mxPoint x="340" y="510" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="arrow6" value="applyChanges()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="200" y="540" as="sourcePoint"/>
+                        <mxPoint x="340" y="540" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="dom" value="DOM Element&#xa;(actualizado)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="340" y="490" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="2. Arquitectura General" id="architecture">
+        <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title2" value="ARQUITECTURA GENERAL USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="370" y="20" width="400" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="http_arrow" value="&lt;font style=&quot;font-size: 12px;&quot;&gt;JSON/HTTP&lt;/font&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3;fontSize=14;fontStyle=1" parent="1" edge="1" target="controllers_box" source="frontend_box">
+                    <mxGeometry x="0.0958" relative="1" as="geometry">
+                        <mxPoint x="570" y="219" as="sourcePoint"/>
+                        <mxPoint x="570" y="259" as="targetPoint"/>
+                        <Array as="points"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="services_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=3" parent="1" edge="1" target="services_box" source="controllers_box">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="540" y="360" as="sourcePoint"/>
+                        <mxPoint x="540" y="390" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="BIjn1Z4AEju04GT3t9Pa-3" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="390" y="250" width="360" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="controllers_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;" parent="BIjn1Z4AEju04GT3t9Pa-3" vertex="1">
+                    <mxGeometry width="360" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="controllers_label" value="CONTROLADORES" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="BIjn1Z4AEju04GT3t9Pa-3" vertex="1">
+                    <mxGeometry x="100" width="150" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="uidemo" value="UIController&lt;br&gt;&lt;br&gt;Ruta → Servicio&lt;br&gt;Servicio → JSON" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=10;spacingBottom=10;" parent="BIjn1Z4AEju04GT3t9Pa-3" vertex="1">
+                    <mxGeometry x="20" y="30" width="150" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="uievent" value="UIEventController&#xa;&#xa;Evento → Handler&#xa;Diff → Respuesta" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=10;spacingBottom=10;" parent="BIjn1Z4AEju04GT3t9Pa-3" vertex="1">
+                    <mxGeometry x="194" y="30" width="150" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="BIjn1Z4AEju04GT3t9Pa-4" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="390" y="80" width="360" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="frontend_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;arcSize=9;" parent="BIjn1Z4AEju04GT3t9Pa-4" vertex="1">
+                    <mxGeometry width="360" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="frontend_label" value="FRONTEND" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="BIjn1Z4AEju04GT3t9Pa-4" vertex="1">
+                    <mxGeometry x="130" y="2" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="blade" value="app.blade.php&lt;br&gt;&lt;br&gt;Contenedores&lt;br&gt;HTML base" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-4" vertex="1">
+                    <mxGeometry x="20" y="40" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ui_renderer" value="ui-renderer.js&#xa;&#xa;Motor de&#xa;renderizado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-4" vertex="1">
+                    <mxGeometry x="130" y="40" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="ui_components" value="ui-components.css&#xa;&#xa;Estilos de&#xa;componentes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-4" vertex="1">
+                    <mxGeometry x="244" y="40" width="100" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="BIjn1Z4AEju04GT3t9Pa-5" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="390" y="380" width="360" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="services_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;arcSize=4;" parent="BIjn1Z4AEju04GT3t9Pa-5" vertex="1">
+                    <mxGeometry width="360" height="310" as="geometry"/>
+                </mxCell>
+                <mxCell id="services_label" value="SERVICIOS Y BUILDERS" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="BIjn1Z4AEju04GT3t9Pa-5" vertex="1">
+                    <mxGeometry x="70" y="4" width="220" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="abstract" value="AbstractUIService&#xa;• Gestión de estado (cache)&#xa;• Lifecycle de eventos&#xa;• Diff automático&#xa;• Inyección de componentes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=left;spacingLeft=30;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-5" vertex="1">
+                    <mxGeometry x="55" y="40" width="250" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="uibuilder" value="UIBuilder (Factory)&#xa;button() • label() • input() • select()&#xa;checkbox() • table() • uploader() • modal()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-5" vertex="1">
+                    <mxGeometry x="55" y="140" width="250" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="component_builders" value="Componentes (ButtonBuilder, InputBuilder, TableBuilder...)&#xa;• Configuración fluida&#xa;• Serialización a JSON&#xa;• IDs determinísticos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;fontSize=10;spacingTop=0;spacingBottom=10;verticalAlign=top;" parent="BIjn1Z4AEju04GT3t9Pa-5" vertex="1">
+                    <mxGeometry x="55" y="230" width="250" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="builder_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2" parent="BIjn1Z4AEju04GT3t9Pa-5" edge="1" target="uibuilder" source="abstract">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="150" y="100" as="sourcePoint"/>
+                        <mxPoint x="150" y="120" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="components_arrow" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=2" parent="BIjn1Z4AEju04GT3t9Pa-5" edge="1" target="component_builders" source="uibuilder">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="150" y="170" as="sourcePoint"/>
+                        <mxPoint x="150" y="190" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="BIjn1Z4AEju04GT3t9Pa-6" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="270" y="710" width="610" height="87.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="support_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;align=left;spacingLeft=10;spacingTop=5;arcSize=8;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry width="610" height="87.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="support_label" value="SOPORTE Y UTILIDADES" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=14;fontStyle=1" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="210" y="7.5" width="220" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="idgen" value="UIIdGenerator&lt;br&gt;IDs únicos" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;verticalAlign=top;fontSize=10;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="10" y="37.5" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="differ" value="UIDiffer&lt;br&gt;Detección deltas" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;verticalAlign=top;fontSize=10;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="130" y="37.5" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="statemanager" value="UIStateManager&lt;br&gt;Cache de estado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;verticalAlign=top;fontSize=10;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="250" y="37.5" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="changescollector" value="UIChangesCollector&lt;br&gt;Recolección cambios" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;verticalAlign=top;fontSize=10;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="369" y="37.5" width="110" height="35" as="geometry"/>
+                </mxCell>
+                <mxCell id="eventdispatcher" value="UsimEventDispatcher&lt;br&gt;Eventos cross-service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;align=center;verticalAlign=top;fontSize=10;" parent="BIjn1Z4AEju04GT3t9Pa-6" vertex="1">
+                    <mxGeometry x="490" y="37.5" width="110" height="35" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="3. Clases de Componentes" id="components">
+        <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="arrow_select" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="select" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_modal" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="modal" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="title3" value="JERARQUÍA DE COMPONENTES USIM" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="320" y="70" width="450" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="abstract_comp" value="AbstractComponent&lt;br&gt;&lt;br&gt;+ id: string&lt;br&gt;+ name: string&lt;br&gt;+ type: ComponentType&lt;br&gt;+ visible: bool&lt;br&gt;+ enabled: bool&lt;br&gt;+ toJson(): array" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;" parent="1" vertex="1">
+                    <mxGeometry x="445" y="120" width="200" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="container" value="UIContainer&#xa;&#xa;+ title: string&#xa;+ layout: LayoutType&#xa;+ padding: string&#xa;+ children: array&#xa;&#xa;+ add(component)&#xa;+ remove(id)&#xa;+ centerHorizontal()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="520" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_container" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="container" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="button" value="ButtonBuilder&#xa;&#xa;+ label: string&#xa;+ action: string&#xa;+ style: ButtonStyle&#xa;+ icon: string&#xa;+ tooltip: string&#xa;&#xa;+ onClick(action)&#xa;+ disabled(bool)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="520" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_button" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="button" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="input" value="InputBuilder&#xa;&#xa;+ label: string&#xa;+ value: string&#xa;+ type: InputType&#xa;+ placeholder: string&#xa;+ required: bool&#xa;+ error: string&#xa;&#xa;+ validate()&#xa;+ mask(pattern)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="340" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_input" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="input" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="table" value="TableBuilder&#xa;&#xa;+ headers: array&#xa;+ data: array&#xa;+ pagination: bool&#xa;+ sortable: bool&#xa;&#xa;+ addHeader()&#xa;+ rows(data)&#xa;+ removeRow(id)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="340" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_table" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="table" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="uploader_comp" value="UploaderBuilder&#xa;&#xa;+ allowedTypes: array&#xa;+ maxFiles: int&#xa;+ maxSize: int&#xa;+ aspect: string&#xa;+ existingFile: string&#xa;&#xa;+ getTempId()&#xa;+ getTempIds()&#xa;+ confirm()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="340" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_uploader" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="uploader_comp" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="label" value="LabelBuilder&#xa;&#xa;+ text: string&#xa;+ style: LabelStyle&#xa;+ fontSize: int&#xa;+ fontWeight: string&#xa;&#xa;+ color(hex)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="330" y="340" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="arrow_label" value="" style="edgeStyle=elbowEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=0;elbow=vertical;" parent="1" source="label" target="abstract_comp" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="select" value="SelectBuilder&#xa;&#xa;+ options: array&#xa;+ selected: string&#xa;+ multiple: bool&#xa;+ searchable: bool&#xa;&#xa;+ addOption()&#xa;+ clearSelection()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="330" y="520" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="modal" value="ModalBuilder&#xa;&#xa;+ title: string&#xa;+ type: DialogType&#xa;+ message: string&#xa;+ confirmAction: string&#xa;+ cancelAction: string&#xa;&#xa;+ open()&#xa;+ close()" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;align=left;verticalAlign=top;spacingLeft=10;fontFamily=Courier New;fontSize=11;opacity=80;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="520" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend" value="16+ componentes implementados:&#xa;Button, Input, Label, Select, Checkbox, Table,&#xa;Uploader, Modal, Card, Form, MenuDropdown, etc." style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=center;verticalAlign=top;whiteSpace=wrap;rounded=1;fontSize=10;fontColor=#333333;spacingTop=10;arcSize=5;spacingLeft=10;spacingRight=10;" parent="1" vertex="1">
+                    <mxGeometry x="799" y="120" width="191" height="130" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram name="4. Flujo de Eventos" id="events">
+        <mxGraphModel dx="1204" dy="516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title4" value="FLUJO DE EVENTOS Y COMUNICACIÓN" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="380" y="30" width="410" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="user" value="👤&#xa;Usuario" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="120" width="40" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="frontend" value="Frontend&#xa;(ui-renderer.js)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="220" y="120" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="backend" value="ProfileService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="120" width="140" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="database" value="📊&#xa;Database" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="120" width="100" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="other_services" value="DashboardService&#xa;NotificationsService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=middle;align=center;" parent="1" vertex="1">
+                    <mxGeometry x="840" y="120" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="step1_label" value="1. Click botón" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="40" y="240" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step1" value="onClick()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="user" target="frontend" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="140" y="140" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="step2_label" value="2. POST /event" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="240" y="240" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step2" value="{action, params, storage}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontSize=10;" parent="1" source="frontend" target="backend" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="step3_label" value="3. Ejecutar handler" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="440" y="240" width="140" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step3" value="onSaveProfile($params)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="145" width="120" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="step4_label" value="4. Persistir datos" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="600" y="240" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step4" value="$user-&gt;save()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;fontSize=10;" parent="1" source="backend" target="database" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="step5_label" value="5. Emitir evento" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="600" y="300" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step5" value="UsimEvent&#xa;&#39;updated_profile&#39;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=10;dashed=1;dashPattern=8 8;" parent="1" source="backend" target="other_services" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="620" y="180"/>
+                            <mxPoint x="620" y="160"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="step6_label" value="6. onUpdatedProfile()" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="840" y="240" width="160" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step6" value="$this-&gt;label_welcome&#xa;  -&gt;text(&#39;Hola, &#39; . $user-&gt;name)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;align=left;spacingLeft=5;" parent="1" vertex="1">
+                    <mxGeometry x="850" y="145" width="140" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="step7_label" value="7. Calcular diff" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="440" y="340" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step7" value="UIDiffer::diff()&#xa;oldUI → newUI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="370" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="step8_label" value="8. Respuesta" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="240" y="340" width="100" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step8" value="{components: {changes}}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;dashed=1;" parent="1" source="backend" target="frontend" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="step9_label" value="9. Actualizar UI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="40" y="340" width="120" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="step9" value="applyChanges()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.75;entryDx=0;entryDy=0;fontSize=10;dashed=1;" parent="1" source="frontend" target="user" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="220" y="180" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="timeline" value="⏱️ Latencia típica: 80-200ms" style="text;html=1;strokeColor=#b85450;fillColor=#f8cecc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=12;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="380" y="450" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="legend_event" value="Líneas sólidas: Request/Response&#xa;Líneas punteadas: Eventos asíncronos" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;spacingLeft=10;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="500" width="280" height="40" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
 </mxfile>
