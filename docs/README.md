@@ -2,108 +2,102 @@
 
 > **Última actualización:** 30 de noviembre de 2025
 
-## 🎯 Índice General
+## 📂 Estructura de Documentación
+
+```
+docs/
+├── README.md                          # Este archivo - Índice principal
+│
+├── framework/                         # Framework USIM
+│   ├── USIM_ACADEMIC_REPORT.md       # ⭐ Documentación principal
+│   ├── UI_BUILDER_REFERENCE.md       # Referencia de UIBuilder API
+│   ├── CONTAINER_ALIGNMENT_GUIDE.md  # Guía de alineación de contenedores
+│   └── TECHNICAL_COMPONENTS_README.md# Sistema CSS y componentes técnicos
+│
+├── api/                               # API REST y Comunicación
+│   ├── API_COMPLETE_DOCUMENTATION.md # Endpoints REST completos
+│   └── EMAIL_CUSTOMIZATION_GUIDE.md  # Sistema de emails
+│
+├── deployment/                        # Producción y Deployment
+│   └── PRODUCTION_UPLOAD_FIX.md      # Configuración de uploads en producción
+│
+└── tooling/                           # Herramientas de Desarrollo
+    ├── LOG_VIEWER.md                  # Sistema de logs
+    ├── LOG_VIEWER_DEMO.md             # Demo de logs
+    └── COLORS_GUIDE.md                # Guía de colores en tests
+```
+
+---
+
+## 🎯 Acceso Rápido por Categoría
 
 ### 🚀 Framework USIM (UI Services Implementation Model)
 
-- **[USIM_ACADEMIC_REPORT.md](USIM_ACADEMIC_REPORT.md)** ⭐ **[PRINCIPAL]**
-  - Documentación académica completa del framework USIM
-  - Arquitectura, características distintivas y ventajas competitivas
-  - Ejemplos completos de servicios reales
-  - Comparativas con stack tradicional (Laravel + React)
-  - Roadmap con Pest testing y Laravel Reverb
-  - **Líneas:** 1,379 | **Tamaño:** 41K
+| Documento | Descripción | Tamaño |
+|-----------|-------------|--------|
+| **[USIM_ACADEMIC_REPORT.md](framework/USIM_ACADEMIC_REPORT.md)** ⭐ | Documentación académica completa del framework. Arquitectura, características, ejemplos de servicios reales y comparativas con stack tradicional | 41K |
+| **[UI_BUILDER_REFERENCE.md](framework/UI_BUILDER_REFERENCE.md)** | Referencia técnica de UIBuilder. Patrón Composite, manipulación de árbol, todos los componentes disponibles | 13K |
+| **[CONTAINER_ALIGNMENT_GUIDE.md](framework/CONTAINER_ALIGNMENT_GUIDE.md)** | Guía específica de alineación de contenedores horizontales con ejemplos | 5.2K |
+| **[TECHNICAL_COMPONENTS_README.md](framework/TECHNICAL_COMPONENTS_README.md)** | Sistema CSS modular, variables, temas y personalización | 13K |
 
-- **[CONTAINER_ALIGNMENT_GUIDE.md](CONTAINER_ALIGNMENT_GUIDE.md)**
-  - Guía específica de alineación de contenedores horizontales
-  - Configuración de `alignContent` y `alignItems`
-  - Ejemplos prácticos con diferentes layouts
-  - **Líneas:** 193 | **Tamaño:** 5.2K
+**Total Framework:** 4 documentos, ~72K
 
 ---
 
-### 🌐 API REST
+### 🌐 API REST y Comunicación
 
-- **[API_COMPLETE_DOCUMENTATION.md](API_COMPLETE_DOCUMENTATION.md)**
-  - Documentación completa de endpoints REST
-  - Estructura de respuestas estandarizadas
-  - Autenticación con Sanctum
-  - Manejo de archivos y attachments
-  - Ejemplos de uso con cliente JavaScript
-  - **Líneas:** 1,083 | **Tamaño:** 30K
+| Documento | Descripción | Tamaño |
+|-----------|-------------|--------|
+| **[API_COMPLETE_DOCUMENTATION.md](api/API_COMPLETE_DOCUMENTATION.md)** | Documentación completa de endpoints REST. Autenticación Sanctum, estructura de respuestas, manejo de archivos | 30K |
+| **[EMAIL_CUSTOMIZATION_GUIDE.md](api/EMAIL_CUSTOMIZATION_GUIDE.md)** | Personalización de emails: CSS inline, vistas Blade, notificaciones Mailable | 7.6K |
 
----
-
-### 📧 Sistema de Emails
-
-- **[EMAIL_CUSTOMIZATION_GUIDE.md](EMAIL_CUSTOMIZATION_GUIDE.md)**
-  - Tres métodos de personalización de emails
-  - Personalización básica con CSS inline
-  - Vistas Blade personalizadas
-  - Notificaciones Mailable completas
-  - Ejemplos de reset de contraseña y verificación
-  - **Líneas:** 271 | **Tamaño:** 7.6K
+**Total API:** 2 documentos, ~38K
 
 ---
 
-### 📋 Sistema de Logs
+### 🚀 Deployment y Producción
 
-- **[LOG_VIEWER.md](LOG_VIEWER.md)**
-  - Sistema completo de visualización de logs
-  - Interfaz web para consultar logs
-  - Filtros por nivel, fecha y contenido
-  - Configuración de canales de logging
-  - **Líneas:** 278 | **Tamaño:** 6.6K
+| Documento | Descripción | Tamaño |
+|-----------|-------------|--------|
+| **[PRODUCTION_UPLOAD_FIX.md](deployment/PRODUCTION_UPLOAD_FIX.md)** | Solución error 413 en uploads. Configuración PHP-FPM y Nginx para producción | 6.2K |
 
-- **[LOG_VIEWER_DEMO.md](LOG_VIEWER_DEMO.md)**
-  - Ejemplos prácticos para generar logs de prueba
-  - Testing del sistema de logs
-  - Casos de uso comunes
-  - **Líneas:** 288 | **Tamaño:** 6.4K
+**Total Deployment:** 1 documento, ~6K
 
 ---
 
-### 🚀 Producción y Deployment
+### 🛠️ Herramientas de Desarrollo
 
-- **[PRODUCTION_UPLOAD_FIX.md](PRODUCTION_UPLOAD_FIX.md)**
-  - Solución al error 413 en uploads de producción
-  - Configuración de PHP-FPM (`upload_max_filesize`, `post_max_size`)
-  - Configuración de Nginx (`client_max_body_size`)
-  - Comandos de verificación y troubleshooting
-  - **Líneas:** 283 | **Tamaño:** 6.2K
+| Documento | Descripción | Tamaño |
+|-----------|-------------|--------|
+| **[LOG_VIEWER.md](tooling/LOG_VIEWER.md)** | Sistema de visualización de logs. Interfaz web, filtros, configuración | 6.6K |
+| **[LOG_VIEWER_DEMO.md](tooling/LOG_VIEWER_DEMO.md)** | Ejemplos prácticos para generar logs de prueba | 6.4K |
+| **[COLORS_GUIDE.md](tooling/COLORS_GUIDE.md)** | Guía visual del esquema de colores en tests con Pest | 3K |
 
----
-
-### 🎨 Componentes Técnicos
-
-- **[TECHNICAL_COMPONENTS_README.md](TECHNICAL_COMPONENTS_README.md)**
-  - Sistema de CSS modular
-  - Configuración de temas (variables CSS)
-  - Renderizador de Markdown
-  - Personalización de estilos
-  - Arquitectura de archivos CSS
-  - **Líneas:** 479 | **Tamaño:** 13K
+**Total Tooling:** 3 documentos, ~16K
 
 ---
 
 ## 📖 Guía de Lectura Recomendada
 
-### Para Nuevos Desarrolladores:
-1. **Inicio:** [USIM_ACADEMIC_REPORT.md](USIM_ACADEMIC_REPORT.md) - Entender el framework
-2. **Ejemplos:** Revisar ejemplos de ButtonDemoService, ProfileService y ModalDemoService en el report
-3. **API REST:** [API_COMPLETE_DOCUMENTATION.md](API_COMPLETE_DOCUMENTATION.md) - Endpoints disponibles
+### 👨‍💻 Para Nuevos Desarrolladores:
+1. **Inicio:** [framework/USIM_ACADEMIC_REPORT.md](framework/USIM_ACADEMIC_REPORT.md) - Comprender el framework
+2. **API Técnica:** [framework/UI_BUILDER_REFERENCE.md](framework/UI_BUILDER_REFERENCE.md) - Referencia de componentes
+3. **Ejemplos:** Revisar ButtonDemoService, ProfileService y ModalDemoService en USIM_ACADEMIC_REPORT
+4. **REST API:** [api/API_COMPLETE_DOCUMENTATION.md](api/API_COMPLETE_DOCUMENTATION.md) - Endpoints disponibles
 
-### Para Desarrollo de UI:
-1. [USIM_ACADEMIC_REPORT.md](USIM_ACADEMIC_REPORT.md) - Framework completo
-2. [CONTAINER_ALIGNMENT_GUIDE.md](CONTAINER_ALIGNMENT_GUIDE.md) - Layouts específicos
-3. [TECHNICAL_COMPONENTS_README.md](TECHNICAL_COMPONENTS_README.md) - CSS y estilos
+### 🎨 Para Desarrollo de UI:
+1. [framework/USIM_ACADEMIC_REPORT.md](framework/USIM_ACADEMIC_REPORT.md) - Framework completo
+2. [framework/UI_BUILDER_REFERENCE.md](framework/UI_BUILDER_REFERENCE.md) - API de UIBuilder
+3. [framework/CONTAINER_ALIGNMENT_GUIDE.md](framework/CONTAINER_ALIGNMENT_GUIDE.md) - Layouts específicos
+4. [framework/TECHNICAL_COMPONENTS_README.md](framework/TECHNICAL_COMPONENTS_README.md) - CSS y estilos
 
-### Para DevOps/Deployment:
-1. [PRODUCTION_UPLOAD_FIX.md](PRODUCTION_UPLOAD_FIX.md) - Configuración de uploads
-2. [LOG_VIEWER.md](LOG_VIEWER.md) - Monitoreo y debugging
+### 🚀 Para DevOps/Deployment:
+1. [deployment/PRODUCTION_UPLOAD_FIX.md](deployment/PRODUCTION_UPLOAD_FIX.md) - Configuración de uploads
+2. [tooling/LOG_VIEWER.md](tooling/LOG_VIEWER.md) - Monitoreo y debugging
 
-### Para Testing:
-1. [LOG_VIEWER_DEMO.md](LOG_VIEWER_DEMO.md) - Generar logs de prueba
+### 🧪 Para Testing y Debugging:
+1. [tooling/COLORS_GUIDE.md](tooling/COLORS_GUIDE.md) - Interpretar output de tests
+2. [tooling/LOG_VIEWER_DEMO.md](tooling/LOG_VIEWER_DEMO.md) - Generar logs de prueba
 
 ---
 
@@ -111,13 +105,11 @@
 
 | Categoría | Documentos | Tamaño Total |
 |-----------|------------|--------------|
-| **Framework USIM** | 2 | 46K |
-| **API REST** | 1 | 30K |
-| **Emails** | 1 | 7.6K |
-| **Logs** | 2 | 13K |
-| **Producción** | 1 | 6.2K |
-| **Componentes** | 1 | 13K |
-| **TOTAL** | **8** | **~116K** |
+| **Framework USIM** | 4 | ~72K |
+| **API REST** | 2 | ~38K |
+| **Deployment** | 1 | ~6K |
+| **Tooling** | 3 | ~16K |
+| **TOTAL** | **10** | **~132K** |
 
 ---
 
@@ -145,6 +137,7 @@ Los siguientes documentos fueron removidos por estar desactualizados, duplicados
 ## 🤝 Contribución
 
 Al crear nueva documentación:
+- Ubicar en la carpeta apropiada (`framework/`, `api/`, `deployment/`, `tooling/`)
 - Usar Markdown con sintaxis clara
 - Incluir ejemplos de código completos
 - Mantener estructura consistente (título, introducción, ejemplos, resumen)

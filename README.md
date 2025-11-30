@@ -1,12 +1,44 @@
-# Microservicios API - Base para Proyectos Backend
+# Microservicios API - Framework USIM
 
 ## Descripción
 
-Este proyecto tiene como objetivo ser la **base fundamental para múltiples proyectos de backend de microservicios**. Ha sido diseñado específicamente como una plataforma **didáctica y profesional** para que estudiantes puedan utilizarla como punto de partida para sus proyectos personales y académicos.
+Este proyecto implementa **USIM (UI Services Implementation Model)**, un innovador framework backend-driven que permite construir interfaces de usuario dinámicas donde el backend controla completamente la estructura y lógica de la UI.
 
-La API está construida con **Laravel 12** y PHP 8.2+, siguiendo las mejores prácticas de desarrollo backend moderno. Incluye todas las funcionalidades esenciales que necesita un proyecto profesional, desde autenticación hasta manejo de archivos y notificaciones por email.
+La plataforma está construida con **Laravel 11** y PHP 8.3+, siguiendo las mejores prácticas de desarrollo backend moderno. USIM elimina la necesidad de escribir código frontend, permitiendo que los desarrolladores backend construyan aplicaciones completas usando únicamente PHP.
+
+## 🚀 Framework USIM
+
+### ¿Qué es USIM?
+
+USIM es un framework de UI reactivo donde:
+
+- ✅ **El backend (PHP/Laravel) controla completamente la estructura y lógica de la UI**
+- ✅ **El frontend (JavaScript) es un renderizador agnóstico que interpreta instrucciones**
+- ✅ **Las actualizaciones son automáticas y optimizadas** (solo se envían cambios, no toda la UI)
+- ✅ **Los componentes son reutilizables y type-safe** (con inyección automática)
+- ✅ **El estado persiste entre requests** (cacheo inteligente en sesión)
+- ✅ **Reducción del 40-60% del código** comparado con stack tradicional (Laravel + React)
+
+### Ventajas Competitivas
+
+| Aspecto | Stack Tradicional | USIM |
+|---------|-------------------|------|
+| **Archivos necesarios** | Controller + API Resource + React Component + Redux | 1 archivo PHP (Service) |
+| **Líneas de código** | ~1050 (450 backend + 600 frontend) | ~140 total |
+| **Validación** | Frontend + Backend duplicada | Solo Backend |
+| **Estado** | Redux + localStorage manual | Propiedades del servicio (automático) |
+| **Testing** | Unit tests backend + E2E frontend | Unit tests PHP únicos |
 
 ## Características y Funcionalidades
+
+### Framework USIM
+- **16+ Componentes UI** (Button, Input, Table, Uploader, Modal, etc.)
+- **Event-Driven Architecture** con `UsimEvent` para comunicación entre servicios
+- **Diffing Algorithm optimizado** (solo transmite cambios)
+- **Sistema de IDs determinísticos** para componentes estables
+- **Inyección automática de componentes** como propiedades
+- **Sistema de modales** con `ConfirmDialogService` y múltiples tipos
+- **Uploader avanzado** con crop, preview, validación y persistencia automática
 
 ### Sistema de Autenticación Completo
 - **Registro de usuarios** con validación de datos
@@ -15,30 +47,27 @@ La API está construida con **Laravel 12** y PHP 8.2+, siguiendo las mejores pr�
 - **Reset de contraseñas** con tokens seguros
 - **Logout seguro** con revocación de tokens
 
-### Sistema de Notificaciones
-- **Emails personalizados** con tema corporativo
-- **Verificación de cuenta** por email
-- **Recuperación de contraseña** por email
-- **Configuración para Mailtrap** (ideal para desarrollo)
-
 ### Sistema de Archivos
 - **Upload de archivos** con validación de tipos y tamaños
-- **Descarga de archivos** con control de acceso
+- **Almacenamiento temporal** con limpieza automática (cronjob)
+- **Persistencia optimizada** con método `confirm()` de UploaderBuilder
 - **Gestión de archivos** (listado, eliminación)
-- **Almacenamiento local** configurado
+- **Sistema de attachments polimórficos**
 
 ### Herramientas de Desarrollo
-- **Pruebas automatizadas** con PestPHP
-- **Cliente API genérico** para probar endpoints
-- **Documentación interactiva** incluida
-- **Logs detallados** para debugging
+- **Pruebas automatizadas** con PestPHP (configurado, en roadmap)
+- **Sistema de logs** con visualizador web integrado
+- **Tests con colores** para mejor debugging
+- **Queue Workers** para procesamiento en background
+- **Scheduler** para tareas programadas
 
 ### Características Técnicas
 - **API RESTful** con respuestas JSON consistentes
-- **Validación robusta** en todas las entradas
-- **Manejo de errores** centralizado
+- **Backend-driven UI** con renderizador JavaScript agnóstico
+- **Validación robusta** centralizada en backend
+- **Manejo de errores** consistente
 - **Middleware de autenticación** configurado
-- **Base de datos SQLite** (fácil setup)
+- **Base de datos** con migraciones y factories
 
 ## Requisitos del Sistema
 
@@ -221,22 +250,134 @@ MAIL_FROM_NAME="Tu Proyecto"
 
 ## Probando la API
 
+### Servicios de Demostración Incluidos
+
+El proyecto incluye 15+ servicios de ejemplo en USIM:
+
+- **ButtonDemoService** - Botones con estados
+- **ProfileService** - Perfil con upload de avatar
+- **ModalDemoService** - Sistema de modales
+- **FormDemoService** - Formularios complejos
+- **TableDemoService** - Tablas con paginación
+- **InputDemoService** - Inputs con validación
+- Y más...
+
 ### Cliente Web Incluido
-El proyecto incluye un cliente web para probar todos los endpoints:
-
 1. Ve a: http://127.0.0.1:8000
-2. Usa el cliente interactivo para probar las funcionalidades
+2. Usa el cliente interactivo para explorar servicios USIM
 
-### Endpoints Principales
+### Endpoints Principales API REST
 - **POST** `/api/register` - Registrar usuario
 - **POST** `/api/login` - Iniciar sesión
 - **POST** `/api/logout` - Cerrar sesión
 - **GET** `/api/user` - Obtener usuario autenticado
 - **POST** `/api/password/forgot` - Solicitar reset de contraseña
 - **POST** `/api/password/reset` - Resetear contraseña
-- **GET** `/api/email/verify/{id}/{hash}` - Verificar email
-- **POST** `/api/files/upload` - Subir archivo
-- **GET** `/api/files` - Listar archivos
+
+Ver [docs/api/API_COMPLETE_DOCUMENTATION.md](docs/api/API_COMPLETE_DOCUMENTATION.md) para la lista completa.
+
+## 🚀 Quick Start USIM
+
+### Ejemplo Básico - Service Interactivo
+
+```php
+<?php
+namespace App\Services\Screens;
+
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\ButtonBuilder;
+use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\UIBuilder;
+
+class HelloWorldService extends AbstractUIService
+{
+    protected LabelBuilder $lbl_message;
+    protected ButtonBuilder $btn_click;
+    
+    protected function buildBaseUI(UIContainer $container, ...$params): void
+    {
+        $container
+            ->title('Hello USIM')
+            ->maxWidth('400px')
+            ->centerHorizontal();
+        
+        $container->add(
+            UIBuilder::label('lbl_message')
+                ->text('Hello, World!')
+                ->style('info')
+        );
+        
+        $container->add(
+            UIBuilder::button('btn_click')
+                ->label('Click Me')
+                ->action('handle_click')
+                ->style('primary')
+        );
+    }
+    
+    public function onHandleClick(array $params): void
+    {
+        $this->lbl_message
+            ->text('Button clicked! 🎉')
+            ->style('success');
+    }
+}
+```
+
+**Resultado:** Una pantalla completa con lógica interactiva en ~30 líneas de PHP, sin JavaScript.
+
+## 📚 Documentación
+
+El proyecto incluye documentación completa organizada por categorías:
+
+### 🚀 Framework USIM
+- **[docs/framework/USIM_ACADEMIC_REPORT.md](docs/framework/USIM_ACADEMIC_REPORT.md)** ⭐ - Documentación principal
+- **[docs/framework/UI_BUILDER_REFERENCE.md](docs/framework/UI_BUILDER_REFERENCE.md)** - Referencia UIBuilder API
+- **[docs/framework/CONTAINER_ALIGNMENT_GUIDE.md](docs/framework/CONTAINER_ALIGNMENT_GUIDE.md)** - Guía de layouts
+- **[docs/framework/TECHNICAL_COMPONENTS_README.md](docs/framework/TECHNICAL_COMPONENTS_README.md)** - Sistema CSS
+
+### 🌐 API REST y Comunicación
+- **[docs/api/API_COMPLETE_DOCUMENTATION.md](docs/api/API_COMPLETE_DOCUMENTATION.md)** - Endpoints REST
+- **[docs/api/EMAIL_CUSTOMIZATION_GUIDE.md](docs/api/EMAIL_CUSTOMIZATION_GUIDE.md)** - Sistema de emails
+
+### 🚀 Deployment y Producción
+- **[docs/deployment/PRODUCTION_UPLOAD_FIX.md](docs/deployment/PRODUCTION_UPLOAD_FIX.md)** - Configuración uploads
+
+### 🛠️ Herramientas de Desarrollo
+- **[docs/tooling/LOG_VIEWER.md](docs/tooling/LOG_VIEWER.md)** - Sistema de logs
+- **[docs/tooling/COLORS_GUIDE.md](docs/tooling/COLORS_GUIDE.md)** - Colores en tests
+
+**Ver [docs/README.md](docs/README.md) para el índice completo.**
+
+## 🎓 Tutoriales
+
+Tutoriales paso a paso disponibles en `/tutoriales`:
+
+- Migraciones y modelos Eloquent
+- Seeders con archivos JSON
+- Frontend con autenticación Sanctum
+- Enums en Laravel
+- Storage y archivos
+- Controladores y rutas
+
+## 🎯 Para Estudiantes y Desarrolladores
+
+Este proyecto es ideal para:
+
+- **Aprender USIM** - Framework backend-driven innovador
+- **Desarrollo Full-Stack** sin necesidad de frameworks frontend
+- **APIs RESTful** con Laravel Sanctum
+- **Arquitecturas modernas** con event-driven design
+- **Testing automatizado** con Pest
+- **Deployment profesional** con mejores prácticas
+
+### Sugerencias para Proyectos
+1. **Crea nuevos servicios USIM** para tu dominio de negocio
+2. **Extiende componentes** con nuevas funcionalidades
+3. **Personaliza el sistema** de emails y notificaciones
+4. **Implementa features** usando el patrón USIM
+5. **Contribuye** con nuevos componentes al framework
 
 ### Ejecutar Pruebas
 ```powershell
@@ -344,10 +485,21 @@ php artisan migrate:fresh --seed
 
 Si tienes preguntas o encuentras problemas:
 
-1. Revisa la documentación en el repositorio
-2. Consulta los logs en `storage/logs/`
-3. Verifica tu configuración en `.env`
-4. Ejecuta las pruebas para verificar el funcionamiento
+1. Revisa la **[documentación completa](docs/README.md)**
+2. Consulta los **[tutoriales](tutoriales/)** paso a paso
+3. Revisa los logs en `storage/logs/` o usa el **[Log Viewer](docs/tooling/LOG_VIEWER.md)**
+4. Verifica tu configuración en `.env`
+5. Ejecuta las pruebas: `php artisan test`
+
+## 🗺️ Roadmap
+
+- ✅ Framework USIM base completado
+- ✅ 16+ componentes UI implementados
+- ✅ Sistema de eventos y diffing
+- ✅ Upload con crop y preview
+- ⏳ Testing completo con Pest
+- ⏳ Laravel Reverb (WebSockets push)
+- ⏳ Android Native Renderer
 
 ## Licencia
 
@@ -355,6 +507,9 @@ Este proyecto está bajo la licencia MIT. Puedes usarlo libremente para tus proy
 
 ---
 
-**¡Feliz codificación!**
+**Proyecto USIM - Backend-Driven UI Framework**
 
-> Proyecto diseñado para estudiantes por estudiantes. Úsalo como base para crear proyectos increíbles.
+> Construye aplicaciones completas usando solo PHP. Sin React, sin Vue, sin complejidad frontend.
+
+**Preparado por:** Equipo de Desarrollo IDEI  
+**Versión:** USIM 1.0
