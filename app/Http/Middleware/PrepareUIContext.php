@@ -39,24 +39,44 @@ class PrepareUIContext
 
         if ($request->hasHeader('X-USIM-Storage')) {
             $encrypted = $request->header('X-USIM-Storage');
+            
+            \Log::info('🔐 [PrepareUIContext] Desencriptando USIM Storage', [
+                'encrypted_length' => strlen($encrypted),
+            ]);
 
             try {
                 // Desencripta el contenido utilizando la APP_KEY del proyecto
                 $decrypted = decrypt($encrypted);
                 $storage = json_decode($decrypted, true);
+                
+                \Log::info('✅ [PrepareUIContext] Storage desencriptado exitosamente', [
+                    'storage_keys' => array_keys($storage ?? []),
+                    'storage' => $storage,
+                ]);
             } catch (DecryptException $e) {
+                \Log::warning('⚠️ [PrepareUIContext] Error desencriptando storage', [
+                    'error' => $e->getMessage(),
+                ]);
                 // Silently fail - storage will be empty
             }
+        } else {
+            \Log::info('ℹ️ [PrepareUIContext] No hay header X-USIM-Storage');
         }
 
         // Si el contenido es válido, exponerlo y setear token Bearer
         if (is_array($storage)) {
             $request->merge(['storage' => $storage]);
+            
+            \Log::info('💾 [PrepareUIContext] Storage inyectado en request', [
+                'storage' => $storage,
+            ]);
 
             if (!empty($storage['store_token'])) {
                 $store_token = $storage['store_token'];
                 $request->headers->set('Authorization', 'Bearer ' . $store_token);
                 UIStateManager::setAuthToken($store_token);
+                
+                \Log::info('🔑 [PrepareUIContext] Token Bearer configurado');
             }
         }
     }

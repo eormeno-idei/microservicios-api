@@ -39,15 +39,7 @@ USIM propone un cambio de paradigma: **la UI como un servicio del backend**. El 
 
 #### 2.1.1 Backend (PHP/Laravel)
 
-> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "2. Arquitectura General" desde `USIM_DIAGRAMS.drawio`.
-> 
-> El diagrama completo muestra 4 capas:
-> - **FRONTEND**: blade.php, ui-renderer.js, ui-components.css, uploader-component.js, image-crop-editor.js
-> - **CONTROLADORES**: UIDemoController, UIEventController
-> - **SERVICIOS Y BUILDERS**: AbstractUIService, UIBuilder (factory), 16+ Component Builders
-> - **SOPORTE Y UTILIDADES**: UIIdGenerator, UIDiffer, UIStateManager, UIChangesCollector, UsimEventDispatcher
-
-<!-- TODO: Agregar imagen: ![Arquitectura General USIM](./images/usim-architecture-diagram.png) -->
+![Arquitectura General USIM](./images/arquitectura.png)
 
 **Estructura de directorios:**
 
@@ -85,21 +77,7 @@ app/Services/UI/
 
 #### 2.1.2 Frontend (JavaScript)
 
-> **📊 NOTA PARA AUTOR:** El diagrama "3. Clases de Componentes" en `USIM_DIAGRAMS.drawio` muestra la jerarquía completa de componentes UI.
-> 
-> **Jerarquía de clases:**
-> - **AbstractComponent** (clase base con id, _id, type, visible, enabled)
->   - UIContainer
->   - ButtonBuilder
->   - InputBuilder
->   - TableBuilder
->   - UploaderBuilder
->   - LabelBuilder
->   - SelectBuilder
->   - ModalBuilder
->   - Y 8+ componentes más
-
-<!-- TODO: Agregar imagen: ![Jerarquía de Componentes](./images/usim-components-hierarchy.png) -->
+![Jerarquía de Componentes](./images/clases.png)
 
 **Estructura de archivos frontend:**
 
@@ -119,14 +97,7 @@ public/js/
 
 ### 2.2 Flujo de Datos
 
-> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "1. Ciclo de Vida USIM" desde `USIM_DIAGRAMS.drawio`.
-> 
-> El diagrama muestra:
-> - **Inicialización**: Cliente → GET /screen → AbstractUIService → buildBaseUI() → JSON UI
-> - **Evento de Usuario**: Cliente → POST /event → onEvent() → UIDiffer.diff() → DIFF
-> - **Aplicación de Cambios**: ui-renderer → updateComponent() → applyChanges() → DOM actualizado
-
-<!-- TODO: Agregar imagen: ![Ciclo de Vida USIM](./images/usim-lifecycle-diagram.png) -->
+![Ciclo de Vida USIM](./images/ciclo.png)
 
 ### 2.3 Sistema de Identificación
 
@@ -290,7 +261,7 @@ class UIDiffer
 > 8. Backend → Respuesta {components}
 > 9. Frontend → Actualizar DOM
 
-<!-- TODO: Agregar imagen: ![Flujo de Eventos USIM](./images/usim-events-flow.png) -->
+![Flujo de Eventos USIM](./images/flujo.png)
 
 ```php
 // Servicio emite evento genérico

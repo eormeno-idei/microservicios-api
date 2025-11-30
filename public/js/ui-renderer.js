@@ -112,6 +112,13 @@ class UIComponent {
      */
     async sendEventToBackend(event, action, parameters = {}) {
         try {
+            console.log('🚀 [UIComponent] sendEventToBackend() - Enviando evento', {
+                component_id: this.config._id || parseInt(this.id),
+                event,
+                action,
+                parameters
+            });
+            
             // Get CSRF token from meta tag
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -120,6 +127,11 @@ class UIComponent {
 
             // Get USIM storage from localStorage
             const usimStorage = localStorage.getItem('usim') || '';
+            
+            console.log('📦 [UIComponent] USIM Storage from localStorage', {
+                storage_length: usimStorage.length,
+                storage_preview: usimStorage.substring(0, 50) + '...'
+            });
 
             // console.log('Sending event:', { component_id: componentId, action, csrfToken });
 
@@ -142,10 +154,16 @@ class UIComponent {
             });
 
             const result = await response.json();
+            
+            console.log('📥 [UIComponent] Respuesta recibida', {
+                ok: response.ok,
+                status: response.status,
+                result
+            });
 
             // ÉXITO: response.ok = true (status 200-299)
             if (response.ok) {
-                // console.log('✅ Action executed:', action, result);
+                console.log('✅ [UIComponent] Evento ejecutado exitosamente', { action, result });
 
                 // Handle UI updates using global renderer
                 if (result && Object.keys(result).length > 0) {
@@ -1808,6 +1826,9 @@ class UIRenderer {
      * @param {object} storageData - Storage variables object
      */
     handleStorageUpdate(storageData) {
+        console.log('💾 [UIRenderer] handleStorageUpdate() - Guardando en localStorage', {
+            storageData
+        });
 
         Object.keys(storageData).forEach(key => {
             const value = storageData[key];
@@ -1816,8 +1837,10 @@ class UIRenderer {
             // If it's an object/array, stringify it
             if (typeof value === 'object' && value !== null) {
                 localStorage.setItem(key, JSON.stringify(value));
+                console.log(`  ✅ localStorage['${key}'] = ${JSON.stringify(value)}`);
             } else {
                 localStorage.setItem(key, String(value));
+                console.log(`  ✅ localStorage['${key}'] = ${value}`);
             }
         });
     }
@@ -1904,9 +1927,16 @@ class UIRenderer {
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
+        console.log('🔄 [UIRenderer] handleUIUpdate() - Procesando actualización de UI', {
+            uiUpdate_keys: Object.keys(uiUpdate),
+            uiUpdate
+        });
 
         // Handle storage updates if present
         if (uiUpdate.storage) {
+            console.log('💾 [UIRenderer] Actualizando storage en localStorage', {
+                storage: uiUpdate.storage
+            });
             this.handleStorageUpdate(uiUpdate.storage);
         }
 
@@ -2021,6 +2051,12 @@ class UIRenderer {
      * @param {object} changes - Properties to update
      */
     updateComponent(element, changes) {
+        console.log('🔧 [UIRenderer] updateComponent() - Actualizando componente', {
+            element_id: element.getAttribute('data-component-id'),
+            element_tag: element.tagName,
+            changes
+        });
+        
         try {
             // Button in table cell - needs special handling to update the button inside the cell
             if (changes.button !== undefined && element.tagName === 'TD') {
