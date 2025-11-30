@@ -34,34 +34,6 @@
 
 ---
 
-### 🗄️ Base de Datos
-
-- **[DATABASE_SEEDERS_GUIDE.md](DATABASE_SEEDERS_GUIDE.md)**
-  - Arquitectura del sistema de seeders
-  - Uso de archivos JSON para datos de prueba
-  - Relaciones 1:N y N:M
-  - Sistema de gestión de contenidos (CMS)
-  - **Líneas:** 473 | **Tamaño:** 11K
-
-- **[DATABASE_QUERY_EXAMPLES.md](DATABASE_QUERY_EXAMPLES.md)**
-  - Ejemplos prácticos de consultas Eloquent
-  - Queries con relaciones (posts, channels, medias)
-  - Consultas avanzadas con eager loading
-  - **Líneas:** 553 | **Tamaño:** 13K
-
-- **[SEEDERS_IMPLEMENTATION_SUMMARY.md](SEEDERS_IMPLEMENTATION_SUMMARY.md)**
-  - Resumen de implementación de seeders
-  - Estado y validación de datos
-  - Comandos útiles
-  - **Líneas:** 430 | **Tamaño:** 11K
-
-- **[SEEDERS_FILES_INVENTORY.md](SEEDERS_FILES_INVENTORY.md)**
-  - Inventario completo de archivos creados/modificados
-  - Listado de modelos, migrations, seeders y factories
-  - **Líneas:** 365 | **Tamaño:** 11K
-
----
-
 ### 📧 Sistema de Emails
 
 - **[EMAIL_CUSTOMIZATION_GUIDE.md](EMAIL_CUSTOMIZATION_GUIDE.md)**
@@ -120,7 +92,6 @@
 1. **Inicio:** [USIM_ACADEMIC_REPORT.md](USIM_ACADEMIC_REPORT.md) - Entender el framework
 2. **Ejemplos:** Revisar ejemplos de ButtonDemoService, ProfileService y ModalDemoService en el report
 3. **API REST:** [API_COMPLETE_DOCUMENTATION.md](API_COMPLETE_DOCUMENTATION.md) - Endpoints disponibles
-4. **Base de Datos:** [DATABASE_SEEDERS_GUIDE.md](DATABASE_SEEDERS_GUIDE.md) - Estructura de datos
 
 ### Para Desarrollo de UI:
 1. [USIM_ACADEMIC_REPORT.md](USIM_ACADEMIC_REPORT.md) - Framework completo
@@ -132,8 +103,7 @@
 2. [LOG_VIEWER.md](LOG_VIEWER.md) - Monitoreo y debugging
 
 ### Para Testing:
-1. [DATABASE_QUERY_EXAMPLES.md](DATABASE_QUERY_EXAMPLES.md) - Consultas de ejemplo
-2. [LOG_VIEWER_DEMO.md](LOG_VIEWER_DEMO.md) - Generar logs de prueba
+1. [LOG_VIEWER_DEMO.md](LOG_VIEWER_DEMO.md) - Generar logs de prueba
 
 ---
 
@@ -143,24 +113,32 @@
 |-----------|------------|--------------|
 | **Framework USIM** | 2 | 46K |
 | **API REST** | 1 | 30K |
-| **Base de Datos** | 4 | 46K |
 | **Emails** | 1 | 7.6K |
 | **Logs** | 2 | 13K |
 | **Producción** | 1 | 6.2K |
 | **Componentes** | 1 | 13K |
-| **TOTAL** | **12** | **~162K** |
+| **TOTAL** | **8** | **~116K** |
 
 ---
 
 ## 🗑️ Documentos Eliminados (Obsoletos)
 
-Los siguientes documentos fueron removidos por estar desactualizados o duplicados:
+Los siguientes documentos fueron removidos por estar desactualizados, duplicados o pertenecer a otro proyecto:
 
-- ❌ `UI_FRAMEWORK_GUIDE.md` - API antigua (reemplazado por USIM_ACADEMIC_REPORT.md)
-- ❌ `UPLOADER_COMPONENT_PLAN.md` - Plan ya implementado
-- ❌ `pasos.md` - Notas temporales
-- ❌ `IMPLEMENTATION_COMPLETE_SUMMARY.md` - Información dispersa y redundante
-- ❌ `FILE_UPLOAD_EXAMPLES.md` - Ejemplos de API legacy sin USIM
+### Obsoletos - Framework USIM:
+- ❌ `UI_FRAMEWORK_GUIDE.md` (52K) - API antigua (reemplazado por USIM_ACADEMIC_REPORT.md)
+- ❌ `UPLOADER_COMPONENT_PLAN.md` (17K) - Plan ya implementado
+- ❌ `pasos.md` (228 bytes) - Notas temporales
+- ❌ `IMPLEMENTATION_COMPLETE_SUMMARY.md` (14K) - Información dispersa y redundante
+- ❌ `FILE_UPLOAD_EXAMPLES.md` (5K) - Ejemplos de API legacy sin USIM
+
+### De otro proyecto (CMS):
+- ❌ `DATABASE_SEEDERS_GUIDE.md` (11K) - Sistema de seeders de CMS
+- ❌ `DATABASE_QUERY_EXAMPLES.md` (13K) - Queries de CMS (posts, channels, medias)
+- ❌ `SEEDERS_IMPLEMENTATION_SUMMARY.md` (11K) - Resumen de seeders de CMS
+- ❌ `SEEDERS_FILES_INVENTORY.md` (11K) - Inventario de seeders de CMS
+
+**Total eliminado:** ~134K en 9 documentos
 
 ---
 
