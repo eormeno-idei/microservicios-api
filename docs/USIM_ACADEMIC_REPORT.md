@@ -147,10 +147,11 @@ USIM implementa un sistema de IDs dual:
 
 ```php
 // Backend
-$this->input_email = $container->input()
-    ->id('input_email')
-    ->label('Email')
-    ->value($user->email);
+$container->add(
+    UIBuilder::input('input_email')
+        ->label('Email')
+        ->value($user->email)
+);
 
 // JSON transmitido
 {
@@ -201,37 +202,64 @@ fetch('/event', {
 Los servicios de UI utilizan una API fluida para construir interfaces:
 
 ```php
-protected function buildBaseUI(UIContainer $container): void
+protected function buildBaseUI(UIContainer $container, ...$params): void
 {
-    // Tarjeta de perfil con formulario
-    $this->card_profile = $container->card()
+    $user = Auth::user();
+    
+    // Container principal
+    $container
         ->title('Mi Perfil')
-        ->padding('20px');
+        ->maxWidth('600px')
+        ->centerHorizontal()
+        ->shadow(2)
+        ->padding('30px');
 
-    $this->form_profile = $this->card_profile->form()
-        ->id('form_profile')
-        ->onSubmit('onSaveProfile');
+    // Componentes se agregan al container con UIBuilder
+    $container->add(
+        UIBuilder::label('lbl_title')
+            ->text('👤 Configuración de Perfil')
+            ->style('primary')
+            ->fontSize(20)
+    );
 
-    // Uploader con confirmación automática
-    $this->uploader_profile = $this->form_profile->uploader()
-        ->id('uploader_profile')
-        ->label('Foto de Perfil')
-        ->maxFiles(1)
-        ->acceptImages();
+    // Input de email (deshabilitado)
+    $container->add(
+        UIBuilder::input('input_email')
+            ->label('Email')
+            ->type('email')
+            ->value($user->email)
+            ->disabled(true)
+            ->width('100%')
+    );
 
-    // Input con validación
-    $this->input_name = $this->form_profile->input()
-        ->id('input_name')
-        ->label('Nombre Completo')
-        ->value($user->name)
-        ->required();
+    // Input de nombre
+    $container->add(
+        UIBuilder::input('input_name')
+            ->label('Nombre Completo')
+            ->placeholder('Tu nombre completo')
+            ->value($user->name ?? '')
+            ->required(true)
+            ->width('100%')
+    );
 
-    // Botón con evento
-    $this->btn_save = $this->form_profile->button()
-        ->id('btn_save')
-        ->text('Guardar Cambios')
-        ->style(ButtonStyle::PRIMARY)
-        ->onClick('onSaveProfile');
+    // Uploader de foto de perfil
+    $container->add(
+        UIBuilder::uploader('uploader_profile')
+            ->allowedTypes(['image/*'])
+            ->label('Foto de Perfil')
+            ->maxFiles(1)
+            ->maxSize(2)
+            ->aspect('1:1')
+    );
+
+    // Botón guardar con action
+    $container->add(
+        UIBuilder::button('btn_save_profile')
+            ->label('💾 Guardar Cambios')
+            ->action('save_profile')
+            ->style('primary')
+            ->width('100%')
+    );
 }
 ```
 
@@ -301,39 +329,96 @@ if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profi
 
 **Ventaja:** API de alto nivel que encapsula operaciones complejas (persistir, borrar, actualizar UI automáticamente).
 
-### 3.5 Storage Automático
+### 3.5 Modals con ConfirmDialogService
 
 ```php
-// Guardar datos en storage (disponible en todos los eventos)
-$this->container->storage()->set('filters', [
-    'status' => 'active',
-    'role' => 'admin'
-]);
-
-// Recuperar en cualquier evento posterior
-public function onApplyFilters($params)
+// Abrir modal de confirmación desde cualquier servicio
+public function onOpenConfirmation(array $params): void
 {
-    $filters = $this->container->storage()->get('filters');
-    // Aplicar filtros...
+    // Obtener ID del servicio para recibir callbacks
+    $serviceId = $this->getServiceComponentId();
+
+    ConfirmDialogService::open(
+        type: DialogType::CONFIRM,
+        title: "¿Eliminar usuario?",
+        message: "Esta acción no se puede deshacer",
+        confirmAction: 'handle_delete',
+        confirmParams: ['user_id' => $userId],
+        confirmLabel: 'Sí, Eliminar',
+        cancelAction: 'handle_cancel',
+        cancelLabel: 'Cancelar',
+        callerServiceId: $serviceId
+    );
+}
+
+// Manejar confirmación del usuario
+public function onHandleDelete(array $params): void
+{
+    $userId = $params['user_id'];
+    User::find($userId)->delete();
+    
+    $this->toast('Usuario eliminado', 'success');
+    $this->closeModal();
+}
+
+// Manejar cancelación
+public function onHandleCancel(array $params): void
+{
+    $this->closeModal();
 }
 ```
 
-**Ventaja:** Persistencia de estado entre requests sin gestión manual de session/localStorage.
+**Tipos de diálogos soportados:**
+- `DialogType::CONFIRM` - Confirmación con botones Sí/No
+- `DialogType::ERROR` - Error con botón OK
+- `DialogType::WARNING` - Advertencia
+- `DialogType::SUCCESS` - Éxito
+- `DialogType::INFO` - Información
+- `DialogType::TIMEOUT` - Auto-cierre con countdown
+- `DialogType::CHOICE` - Opciones personalizadas
 
-### 3.6 Modals Integrados
+**Ventaja:** Sistema modal consistente sin gestión manual de overlays, z-index, estados. El modal se renderiza automáticamente y los callbacks se enrutan al servicio caller.
+
+### 3.6 Storage con Propiedades de Servicio
 
 ```php
-// Mostrar modal de confirmación
-$this->container->modal()->confirmation(
-    title: '¿Eliminar usuario?',
-    message: 'Esta acción no se puede deshacer',
-    confirmText: 'Eliminar',
-    onConfirm: 'onDeleteUser',
-    params: ['user_id' => $userId]
-);
+// Usar propiedades protegidas para mantener estado entre eventos
+class UsersService extends AbstractUIService
+{
+    protected int|null $editingUserId = null;
+    protected array $filters = [];
+    
+    public function onShowUserForm($params)
+    {
+        // Guardar ID del usuario en edición
+        $this->editingUserId = null; // nuevo usuario
+        
+        $this->form_user->visible(true);
+    }
+    
+    public function onEditUser($params)
+    {
+        $this->editingUserId = $params['user_id'];
+        
+        $user = User::find($this->editingUserId);
+        $this->input_name->value($user->name);
+        $this->form_user->visible(true);
+    }
+    
+    public function onSaveUser($params)
+    {
+        if ($this->editingUserId) {
+            // Actualizar usuario existente
+            User::find($this->editingUserId)->update([...]);
+        } else {
+            // Crear nuevo usuario
+            User::create([...]);
+        }
+    }
+}
 ```
 
-**Ventaja:** Sistema modal consistente sin gestión manual de overlays, z-index, estados.
+**Ventaja:** El estado del servicio persiste entre eventos durante la sesión. No se requiere gestión manual de session/localStorage.
 
 ---
 
@@ -359,7 +444,7 @@ public function onDeleteUser($params)
 {
     // Autorización centralizada
     if (!auth()->user()->can('delete-users')) {
-        $this->container->toast()->error('Sin permisos');
+        $this->toast('Sin permisos', 'error');
         return;
     }
     
@@ -368,12 +453,13 @@ public function onDeleteUser($params)
     
     // Lógica de negocio protegida
     if ($user->posts()->exists()) {
-        $this->container->toast()->error('Usuario tiene posts asociados');
+        $this->toast('Usuario tiene posts asociados', 'error');
         return;
     }
     
     $user->delete();
     $this->table_users->removeRow($params['user_id']);
+    $this->toast('Usuario eliminado', 'success');
 }
 ```
 
@@ -406,12 +492,16 @@ protected function createUserForm(FormBuilder $form, ?User $user = null)
 // Desarrollo lineal sin context switching
 class UsersService extends AbstractUIService
 {
+    protected TableBuilder $table_users;
+
     // 1. Definir UI
     protected function buildBaseUI(UIContainer $container): void
     {
-        $this->table_users = $container->table()
-            ->headers(['Nombre', 'Email', 'Rol', 'Acciones'])
-            ->data(User::with('roles')->get());
+        $container->add(
+            UIBuilder::table('table_users')
+                ->headers(['Nombre', 'Email', 'Rol', 'Acciones'])
+                ->data(User::with('roles')->get())
+        );
     }
     
     // 2. Manejar evento
@@ -946,223 +1036,339 @@ class UsimDevTools {
 
 ## Anexo A: Ejemplo Completo de Servicio
 
+### Ejemplo 1: ButtonDemoService (Simple)
+
 ```php
 <?php
 namespace App\Services\Screens;
 
-use App\Models\User;
 use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\ButtonBuilder;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Enums\ButtonStyle;
-use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\UIBuilder;
 
-class UsersService extends AbstractUIService
+class ButtonDemoService extends AbstractUIService
 {
-    // Componentes como propiedades (autocompletado IDE)
-    protected $card_users;
-    protected $table_users;
-    protected $btn_add_user;
-    protected $form_user;
-    protected $input_name;
-    protected $input_email;
-    protected $select_role;
-    protected $btn_save;
+    protected ButtonBuilder $btn_toggle;
+    protected bool $store_state = false;
 
-    /**
-     * Construir UI base (ejecutado una vez, cacheado en session)
-     */
-    protected function buildBaseUI(UIContainer $container): void
+    protected function buildBaseUI(UIContainer $container, ...$params): void
     {
-        // Layout principal
-        $container->layout(LayoutType::VERTICAL);
-
-        // Tarjeta de usuarios
-        $this->card_users = $container->card()
-            ->title('Gestión de Usuarios')
-            ->padding('20px');
-
-        // Botón añadir
-        $this->btn_add_user = $this->card_users->button()
-            ->id('btn_add_user')
-            ->text('+ Nuevo Usuario')
-            ->style(ButtonStyle::PRIMARY)
-            ->onClick('onShowUserForm');
-
-        // Tabla de usuarios
-        $this->table_users = $this->card_users->table()
-            ->id('table_users')
-            ->headers(['ID', 'Nombre', 'Email', 'Rol', 'Acciones'])
-            ->data($this->getUsersData())
-            ->onRowClick('onEditUser');
-
-        // Formulario de usuario (inicialmente oculto)
-        $this->form_user = $container->form()
-            ->id('form_user')
-            ->title('Datos del Usuario')
-            ->visible(false)
-            ->onSubmit('onSaveUser');
-
-        $this->input_name = $this->form_user->input()
-            ->id('input_name')
-            ->label('Nombre Completo')
-            ->required();
-
-        $this->input_email = $this->form_user->input()
-            ->id('input_email')
-            ->label('Email')
-            ->type('email')
-            ->required();
-
-        $this->select_role = $this->form_user->select()
-            ->id('select_role')
-            ->label('Rol')
-            ->options([
-                'admin' => 'Administrador',
-                'editor' => 'Editor',
-                'viewer' => 'Visualizador'
-            ]);
-
-        $this->btn_save = $this->form_user->button()
-            ->id('btn_save')
-            ->text('Guardar Usuario')
-            ->style(ButtonStyle::SUCCESS)
-            ->onClick('onSaveUser');
+        $container
+            ->alignContent('center')->alignItems('center')
+            ->title('Button Demo - Click Me!')
+            ->padding('30px')->maxWidth('400px')
+            ->centerHorizontal()->shadow(2)
+            ->add(
+                UIBuilder::button('btn_toggle')
+                    ->label('Click Me!')
+                    ->action('toggle_label')
+                    ->style('primary')
+            );
     }
 
-    /**
-     * Mostrar formulario de nuevo usuario
-     */
-    public function onShowUserForm($params)
+    protected function postLoadUI(): void
     {
-        // Limpiar formulario
-        $this->input_name->value('');
-        $this->input_email->value('');
-        $this->select_role->value('viewer');
-
-        // Mostrar formulario
-        $this->form_user->visible(true);
-        $this->btn_save->text('Crear Usuario');
-
-        // Guardar contexto en storage
-        $this->container->storage()->set('editing_user_id', null);
+        $this->updateButtonState();
     }
 
-    /**
-     * Editar usuario existente
-     */
-    public function onEditUser($params)
+    public function onToggleLabel(array $params): void
     {
-        $user = User::findOrFail($params['row_id']);
-
-        // Poblar formulario
-        $this->input_name->value($user->name);
-        $this->input_email->value($user->email);
-        $this->select_role->value($user->roles->first()?->name ?? 'viewer');
-
-        // Mostrar formulario
-        $this->form_user->visible(true);
-        $this->btn_save->text('Actualizar Usuario');
-
-        // Guardar contexto
-        $this->container->storage()->set('editing_user_id', $user->id);
+        $this->store_state = ! $this->store_state;
+        $this->updateButtonState();
     }
 
-    /**
-     * Guardar usuario (crear o actualizar)
-     */
-    public function onSaveUser($params)
+    private function updateButtonState(): void
     {
-        // Validación
-        $validated = validator($params, [
-            'input_name' => 'required|string|max:255',
-            'input_email' => 'required|email|unique:users,email',
-            'select_role' => 'required|in:admin,editor,viewer'
-        ])->validate();
-
-        // Recuperar contexto
-        $userId = $this->container->storage()->get('editing_user_id');
-
-        if ($userId) {
-            // Actualizar
-            $user = User::findOrFail($userId);
-            $user->update([
-                'name' => $validated['input_name'],
-                'email' => $validated['input_email']
-            ]);
-            $user->syncRoles([$validated['select_role']]);
-
-            $this->container->toast()->success('Usuario actualizado');
+        if ($this->store_state) {
+            $this->btn_toggle->label('Clicked! 🎉')->style('success');
         } else {
-            // Crear
-            $user = User::create([
-                'name' => $validated['input_name'],
-                'email' => $validated['input_email'],
-                'password' => bcrypt('password123')
-            ]);
-            $user->assignRole($validated['select_role']);
-
-            $this->container->toast()->success('Usuario creado');
+            $this->btn_toggle->label('Click Me!')->style('primary');
         }
-
-        // Actualizar tabla
-        $this->table_users->data($this->getUsersData());
-
-        // Ocultar formulario
-        $this->form_user->visible(false);
-    }
-
-    /**
-     * Eliminar usuario
-     */
-    public function onDeleteUser($params)
-    {
-        $user = User::findOrFail($params['user_id']);
-
-        // Validación de negocio
-        if ($user->id === auth()->id()) {
-            $this->container->toast()->error('No puedes eliminarte a ti mismo');
-            return;
-        }
-
-        $user->delete();
-
-        // Remover fila de tabla (diff optimizado)
-        $this->table_users->removeRow($params['user_id']);
-
-        $this->container->toast()->success('Usuario eliminado');
-    }
-
-    /**
-     * Obtener datos formateados para tabla
-     */
-    private function getUsersData(): array
-    {
-        return User::with('roles')->get()->map(function ($user) {
-            return [
-                'id' => $user->id,
-                'cells' => [
-                    $user->id,
-                    $user->name,
-                    $user->email,
-                    $user->roles->pluck('name')->join(', '),
-                    [
-                        'type' => 'button',
-                        'text' => 'Eliminar',
-                        'onClick' => 'onDeleteUser',
-                        'params' => ['user_id' => $user->id],
-                        'style' => 'danger'
-                    ]
-                ]
-            ];
-        })->toArray();
     }
 }
 ```
 
-**Líneas de código:** ~180  
-**Funcionalidad:** CRUD completo + validación + autorización + UI reactiva  
-**Equivalente en React + Laravel API:** ~450 líneas (backend) + ~600 líneas (frontend) = **1050 líneas**  
-**Reducción:** 82.9%
+**Líneas de código:** ~45  
+**Funcionalidad:** Botón interactivo con estado persistente  
+**Características:**
+- Uso de `$store_state` para persistencia automática
+- `postLoadUI()` para actualizar componentes en cada request
+- Métodos de evento simples (`on{Action}`)
+- API fluida para modificar componentes
+
+---
+
+### Ejemplo 2: ProfileService (Completo)
+
+```php
+<?php
+namespace App\Services\Screens;
+
+use App\Events\UsimEvent;
+use App\Services\UI\UIBuilder;
+use Illuminate\Support\Facades\Auth;
+use App\Services\UI\AbstractUIService;
+use App\Services\Upload\UploadService;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Components\InputBuilder;
+use App\Services\UI\Components\UploaderBuilder;
+
+class ProfileService extends AbstractUIService
+{
+    protected InputBuilder $input_email;
+    protected InputBuilder $input_name;
+    protected UploaderBuilder $uploader_profile;
+
+    protected function buildBaseUI(UIContainer $container, ...$params): void
+    {
+        $user = Auth::user();
+
+        $container
+            ->title('Mi Perfil')
+            ->maxWidth('600px')
+            ->centerHorizontal()
+            ->shadow(2)
+            ->padding('30px');
+
+        // Título
+        $container->add(
+            UIBuilder::label('lbl_title')
+                ->text("👤 Configuración de Perfil")
+                ->style('primary')
+                ->fontSize(20)
+                ->fontWeight('bold')
+        );
+
+        // Email (readonly)
+        $container->add(
+            UIBuilder::input('input_email')
+                ->label('Email')
+                ->type('email')
+                ->value($user->email)
+                ->disabled(true)
+                ->width('100%')
+        );
+
+        // Nombre
+        $container->add(
+            UIBuilder::input('input_name')
+                ->label('Nombre Completo')
+                ->type('text')
+                ->placeholder('Tu nombre completo')
+                ->value($user->name ?? '')
+                ->required(true)
+                ->width('100%')
+        );
+
+        // Uploader de foto de perfil
+        $container->add(
+            UIBuilder::uploader('uploader_profile')
+                ->allowedTypes(['image/*'])
+                ->label('Foto de Perfil')
+                ->maxFiles(1)
+                ->maxSize(2)
+                ->aspect('1:1')
+                ->size(1)
+        );
+
+        // Botones
+        $container->add(
+            UIBuilder::button('btn_save_profile')
+                ->label('💾 Guardar Cambios')
+                ->action('save_profile')
+                ->style('primary')
+                ->width('100%')
+        );
+
+        $container->add(
+            UIBuilder::button('btn_change_password')
+                ->label('🔒 Cambiar Contraseña')
+                ->action('change_password')
+                ->style('secondary')
+                ->width('100%')
+        );
+    }
+
+    protected function postLoadUI(): void
+    {
+        $user = Auth::user();
+
+        // Actualizar componentes con datos actuales
+        $this->input_email->value($user->email ?? '');
+        $this->input_name->value($user->name ?? '');
+
+        // Mostrar error si email no verificado
+        if (!$user->email_verified_at) {
+            $this->input_email->error('Email no verificado');
+        } else {
+            $this->input_email->error(null);
+        }
+
+        // Actualizar uploader con imagen existente
+        if ($user->profile_image) {
+            $imageUrl = UploadService::fileUrl("uploads/images/{$user->profile_image}") . '?t=' . time();
+            $this->uploader_profile->existingFile($imageUrl);
+        }
+    }
+
+    /**
+     * Guardar cambios del perfil
+     */
+    public function onSaveProfile(array $params): void
+    {
+        $user = Auth::user();
+        $name = trim($params['input_name'] ?? '');
+
+        if (empty($name)) {
+            $this->input_name->error('El nombre es requerido');
+            return;
+        }
+
+        // Actualizar nombre
+        $user->name = $name;
+
+        // Procesar imagen de perfil usando confirm()
+        if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
+            $user->profile_image = $filename;
+        }
+
+        // Guardar y emitir evento
+        $user->save();
+        $this->input_name->error(null);
+
+        event(new UsimEvent('updated_profile', ['user' => $user]));
+
+        $this->toast('Perfil actualizado', 'success');
+    }
+
+    /**
+     * Cambiar contraseña
+     */
+    public function onChangePassword(array $params): void
+    {
+        $user = Auth::user();
+
+        // Enviar email de reset
+        $status = Password::sendResetLink(['email' => $user->email]);
+
+        if ($status === Password::RESET_LINK_SENT) {
+            $this->toast('Enlace enviado a tu email', 'success');
+        } else {
+            $this->toast('Error al enviar el enlace', 'error');
+        }
+    }
+}
+```
+
+**Líneas de código:** ~140  
+**Funcionalidad:** Perfil completo con upload de avatar, validación, eventos  
+**Características:**
+- Inyección automática de componentes (`protected InputBuilder $input_name`)
+- `confirm()` encapsula todo el flujo de upload (3 líneas vs 18)
+- `postLoadUI()` para datos dinámicos (ejecutado en cada request)
+- Eventos USIM para comunicación entre servicios
+- Toast notifications integrados
+
+---
+
+### Ejemplo 3: ModalDemoService (Modales)
+
+```php
+<?php
+namespace App\Services\Screens;
+
+use App\Services\UI\AbstractUIService;
+use App\Services\UI\Components\LabelBuilder;
+use App\Services\UI\Components\UIContainer;
+use App\Services\UI\Enums\DialogType;
+use App\Services\UI\Modals\ConfirmDialogService;
+use App\Services\UI\UIBuilder;
+
+class ModalDemoService extends AbstractUIService
+{
+    protected LabelBuilder $lbl_result;
+
+    protected function buildBaseUI(UIContainer $container, ...$params): void
+    {
+        $container
+            ->title('Modal Demo')
+            ->maxWidth('600px')
+            ->centerHorizontal();
+
+        $container->add(
+            UIBuilder::label('lbl_result')
+                ->text('Presiona un botón para abrir un modal')
+                ->style('info')
+        );
+
+        $container->add(
+            UIBuilder::button('btn_confirm')
+                ->label('Abrir Confirmación')
+                ->action('open_confirmation')
+                ->style('primary')
+        );
+    }
+
+    public function onOpenConfirmation(array $params): void
+    {
+        $serviceId = $this->getServiceComponentId();
+
+        ConfirmDialogService::open(
+            type: DialogType::CONFIRM,
+            title: "¿Confirmar acción?",
+            message: "¿Estás seguro de continuar?",
+            confirmAction: 'handle_confirm',
+            confirmParams: ['action_type' => 'demo'],
+            confirmLabel: 'Sí, Continuar',
+            cancelAction: 'handle_cancel',
+            cancelLabel: 'Cancelar',
+            callerServiceId: $serviceId
+        );
+    }
+
+    public function onHandleConfirm(array $params): void
+    {
+        $this->lbl_result
+            ->text("✅ Acción confirmada!")
+            ->style('success');
+
+        $this->closeModal();
+    }
+
+    public function onHandleCancel(array $params): void
+    {
+        $this->lbl_result
+            ->text("❌ Acción cancelada")
+            ->style('warning');
+
+        $this->closeModal();
+    }
+}
+```
+
+**Líneas de código:** ~65  
+**Funcionalidad:** Sistema de modales con callbacks  
+**Características:**
+- `ConfirmDialogService::open()` para modales
+- `DialogType` enum (CONFIRM, ERROR, WARNING, SUCCESS, TIMEOUT)
+- Callbacks con `callerServiceId` para routing correcto
+- `closeModal()` para cerrar desde event handlers
+
+---
+
+**Comparación con Stack Tradicional (Laravel + React):**
+
+| Aspecto | Tradicional | USIM ProfileService |
+|---------|-------------|---------------------|
+| **Archivos necesarios** | Controller + API Resource + React Component + Redux actions/reducers | 1 archivo PHP (ProfileService) |
+| **Líneas de código** | ~450 backend + ~600 frontend = 1050 | ~140 total |
+| **Testing** | Unit tests backend + E2E tests frontend | Unit tests PHP únicos |
+| **Validación** | Frontend + Backend duplicada | Solo backend |
+| **Estado** | Redux + localStorage manual | Propiedades del servicio (automático) |
+| **Upload** | Controlador + Store + Progress tracking manual | `confirm()` una línea |
+
+**Reducción estimada:** ~86.7% menos código
 
 ---
 
