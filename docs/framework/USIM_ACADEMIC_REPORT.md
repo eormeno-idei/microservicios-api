@@ -6,15 +6,11 @@
 **Framework:** Laravel 11 + JavaScript ES6  
 **Autor:** Equipo de Desarrollo IDEI
 
----
-
 ## Resumen Ejecutivo
 
 USIM (UI Services Implementation Model) es un framework arquitectónico innovador que implementa un patrón de desarrollo backend-driven para la construcción de interfaces de usuario. A diferencia de los frameworks tradicionales basados en componentes del lado del cliente (React, Vue, Angular), USIM centraliza la lógica de UI en el backend, transmitiendo únicamente diferencias de estado al frontend mediante un algoritmo de diffing optimizado.
 
 Este informe presenta las características técnicas del framework, analiza sus ventajas competitivas y plantea la hipótesis de que su adopción puede reducir drásticamente el esfuerzo de desarrollo en equipos de desarrollo de software.
-
----
 
 ## 1. Introducción
 
@@ -30,8 +26,6 @@ El desarrollo de aplicaciones web modernas tradicionalmente requiere la duplicac
 ### 1.2 Propuesta de USIM
 
 USIM propone un cambio de paradigma: **la UI como un servicio del backend**. El servidor se convierte en la única fuente de verdad para la estructura, estado y comportamiento de la interfaz de usuario, mientras que el cliente actúa como un renderizador genérico que interpreta instrucciones JSON.
-
----
 
 ## 2. Arquitectura del Framework
 
@@ -153,8 +147,6 @@ fetch('/event', {
     body: JSON.stringify({storage: encrypted, params: {...}})
 });
 ```
-
----
 
 ## 3. Características Distintivas
 
@@ -396,8 +388,6 @@ class UsersService extends AbstractUIService
 
 **Ventaja:** El estado del servicio persiste entre eventos durante la sesión. No se requiere gestión manual de session/localStorage.
 
----
-
 ## 4. Ventajas Competitivas
 
 ### 4.1 Reducción de Duplicación de Código
@@ -525,8 +515,6 @@ test('profile update changes avatar URL', function () {
 
 **Ventaja:** Testing de UI como testing de servicios PHP estándar, sin navegador headless.
 
----
-
 ## 5. Hipótesis: Reducción del Esfuerzo de Desarrollo
 
 ### 5.1 Métricas de Comparación
@@ -600,8 +588,6 @@ class UIConfig
 
 **Estimación:** Reducción del **50%** en tiempo de refactorización de UI.
 
----
-
 ## 6. Infraestructura de Soporte
 
 ### 6.1 Sistema de Colas
@@ -666,8 +652,6 @@ public function handle()
 ```
 
 **Ventaja:** Limpieza automática de recursos temporales sin intervención manual.
-
----
 
 ## 7. Testing con Pest (Roadmap)
 
@@ -765,8 +749,6 @@ test('upload avatar updates existing_file property', function () {
 | Tiempo de escritura | ~30 min/test | ~5 min/test |
 | Mantenimiento | Alto (selectores frágiles) | Bajo (API estable) |
 
----
-
 ## 8. Roadmap Futuro
 
 ### 8.1 Notificaciones PUSH con Reverb
@@ -843,8 +825,6 @@ class UsimDevTools {
 }
 ```
 
----
-
 ## 9. Comparación con Frameworks Existentes
 
 ### 9.1 USIM vs LiveWire (Laravel)
@@ -880,8 +860,6 @@ class UsimDevTools {
 | **Ecosistema** | Nicho (Elixir) | Mainstream (PHP/Laravel) |
 
 **Conclusión:** USIM ofrece concepto similar con stack más accesible.
-
----
 
 ## 10. Análisis de Riesgos
 
@@ -928,8 +906,6 @@ class UsimDevTools {
 - TTL de session (auto-limpieza)
 - Compresión de UI state (gzip)
 - Lazy loading de componentes grandes (tablas con paginación)
-
----
 
 ## 11. Conclusiones
 
@@ -980,8 +956,6 @@ class UsimDevTools {
 4. **Documentar casos de estudio** (proyectos reales con métricas)
 5. **Crear DevTools para debugging** (Q4 2026)
 
----
-
 ## 12. Referencias
 
 ### 12.1 Código Fuente
@@ -1007,8 +981,6 @@ class UsimDevTools {
 - **Storage:** Local + S3-compatible
 - **Testing:** Pest (en desarrollo)
 - **Futuro:** Laravel Reverb (WebSockets), Android Native
-
----
 
 ## Anexo A: Ejemplo Completo de Servicio
 
@@ -1072,8 +1044,6 @@ class ButtonDemoService extends AbstractUIService
 - `postLoadUI()` para actualizar componentes en cada request
 - Métodos de evento simples (`on{Action}`)
 - API fluida para modificar componentes
-
----
 
 ### Ejemplo 2: ProfileService (Completo)
 
@@ -1246,8 +1216,6 @@ class ProfileService extends AbstractUIService
 - Eventos USIM para comunicación entre servicios
 - Toast notifications integrados
 
----
-
 ### Ejemplo 3: ModalDemoService (Modales)
 
 ```php
@@ -1331,8 +1299,6 @@ class ModalDemoService extends AbstractUIService
 - Callbacks con `callerServiceId` para routing correcto
 - `closeModal()` para cerrar desde event handlers
 
----
-
 **Comparación con Stack Tradicional (Laravel + React):**
 
 | Aspecto | Tradicional | USIM ProfileService |
@@ -1345,8 +1311,6 @@ class ModalDemoService extends AbstractUIService
 | **Upload** | Controlador + Store + Progress tracking manual | `confirm()` una línea |
 
 **Reducción estimada:** ~86.7% menos código
-
----
 
 **Documento preparado por:** Equipo de Desarrollo IDEI  
 **Fecha de publicación:** 29 de noviembre de 2025  
