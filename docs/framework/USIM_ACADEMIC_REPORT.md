@@ -39,6 +39,18 @@ USIM propone un cambio de paradigma: **la UI como un servicio del backend**. El 
 
 #### 2.1.1 Backend (PHP/Laravel)
 
+> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "2. Arquitectura General" desde `USIM_DIAGRAMS.drawio`.
+> 
+> El diagrama completo muestra 4 capas:
+> - **FRONTEND**: blade.php, ui-renderer.js, ui-components.css, uploader-component.js, image-crop-editor.js
+> - **CONTROLADORES**: UIDemoController, UIEventController
+> - **SERVICIOS Y BUILDERS**: AbstractUIService, UIBuilder (factory), 16+ Component Builders
+> - **SOPORTE Y UTILIDADES**: UIIdGenerator, UIDiffer, UIStateManager, UIChangesCollector, UsimEventDispatcher
+
+<!-- TODO: Agregar imagen: ![Arquitectura General USIM](./images/usim-architecture-diagram.png) -->
+
+**Estructura de directorios:**
+
 ```
 app/Services/UI/
 ├── AbstractUIService.php          # Clase base para servicios de UI
@@ -73,6 +85,24 @@ app/Services/UI/
 
 #### 2.1.2 Frontend (JavaScript)
 
+> **📊 NOTA PARA AUTOR:** El diagrama "3. Clases de Componentes" en `USIM_DIAGRAMS.drawio` muestra la jerarquía completa de componentes UI.
+> 
+> **Jerarquía de clases:**
+> - **AbstractComponent** (clase base con id, _id, type, visible, enabled)
+>   - UIContainer
+>   - ButtonBuilder
+>   - InputBuilder
+>   - TableBuilder
+>   - UploaderBuilder
+>   - LabelBuilder
+>   - SelectBuilder
+>   - ModalBuilder
+>   - Y 8+ componentes más
+
+<!-- TODO: Agregar imagen: ![Jerarquía de Componentes](./images/usim-components-hierarchy.png) -->
+
+**Estructura de archivos frontend:**
+
 ```
 public/js/
 ├── ui-renderer.js                  # Renderizador principal (3373 líneas)
@@ -89,54 +119,14 @@ public/js/
 
 ### 2.2 Flujo de Datos
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    CICLO DE VIDA USIM                         │
-└──────────────────────────────────────────────────────────────┘
+> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "1. Ciclo de Vida USIM" desde `USIM_DIAGRAMS.drawio`.
+> 
+> El diagrama muestra:
+> - **Inicialización**: Cliente → GET /screen → AbstractUIService → buildBaseUI() → JSON UI
+> - **Evento de Usuario**: Cliente → POST /event → onEvent() → UIDiffer.diff() → DIFF
+> - **Aplicación de Cambios**: ui-renderer → updateComponent() → applyChanges() → DOM actualizado
 
-1. INICIALIZACIÓN
-   ┌─────────────┐
-   │  Cliente    │ ──GET /screen──> ┌──────────────────┐
-   │             │                   │ AbstractUIService│
-   └─────────────┘                   │ buildBaseUI()    │
-                                     │ ↓                │
-                                     │ UIStateManager   │
-                                     │ (cache session)  │
-                                     └──────────────────┘
-                                            │
-                    ←──────JSON UI──────────┘
-                    {
-                      components: {...},
-                      storage: {...},
-                      modals: []
-                    }
-
-2. EVENTO DE USUARIO
-   ┌─────────────┐
-   │  Cliente    │ ──POST /event──> ┌──────────────────┐
-   │ (botón)     │                   │ initializeEvent  │
-   │             │ {storage,params}  │ Context()        │
-   └─────────────┘                   │ ↓                │
-                                     │ onEvent($params) │
-                                     │ ↓                │
-                                     │ UIDiffer.diff()  │
-                                     │ (oldUI → newUI)  │
-                                     └──────────────────┘
-                                            │
-                    ←──────DIFF──────────────┘
-                    {
-                      components: {
-                        btn_1: {text: "Guardado"}
-                      }
-                    }
-
-3. APLICACIÓN DE CAMBIOS
-   ┌─────────────┐
-   │ ui-renderer │ ──updateComponent()──> ┌──────────────┐
-   │             │                         │ DOM Element  │
-   │ diff.each() │ ──applyChanges()───>   │ (actualizado)│
-   └─────────────┘                         └──────────────┘
-```
+<!-- TODO: Agregar imagen: ![Ciclo de Vida USIM](./images/usim-lifecycle-diagram.png) -->
 
 ### 2.3 Sistema de Identificación
 
@@ -286,6 +276,21 @@ class UIDiffer
 **Ventaja:** Tráfico de red mínimo (solo cambios), actualizaciones quirúrgicas del DOM.
 
 ### 3.3 Event-Driven Architecture
+
+> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "4. Flujo de Eventos" desde `USIM_DIAGRAMS.drawio`.
+> 
+> El diagrama completo muestra el flujo completo desde click de usuario hasta actualización de múltiples servicios:
+> 1. Usuario → Click botón
+> 2. Frontend → POST /event
+> 3. ProfileService → onSaveProfile()
+> 4. Database → $user->save()
+> 5. Backend → UsimEvent 'updated_profile'
+> 6. DashboardService/NotificationsService → onUpdatedProfile()
+> 7. UIDiffer → Calcular diff
+> 8. Backend → Respuesta {components}
+> 9. Frontend → Actualizar DOM
+
+<!-- TODO: Agregar imagen: ![Flujo de Eventos USIM](./images/usim-events-flow.png) -->
 
 ```php
 // Servicio emite evento genérico
