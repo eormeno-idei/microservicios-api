@@ -193,6 +193,7 @@ class DemoMenuService extends AbstractUIService
     {
         RegisterDialogService::open(
             submitAction: 'submit_register',
+            fakeData: true,
             callerServiceId: $this->getServiceComponentId()
         );
     }
@@ -204,7 +205,7 @@ class DemoMenuService extends AbstractUIService
     {
         $params['roles'] = ['user'];
         $params['send_verification_email'] = true;
-        $response = HttpClient::post('users.store', $params);
+        $response = HttpClient::post('api.register', $params);
         $status = $response['status'];
         $message = $response['message'];
 

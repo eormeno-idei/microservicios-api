@@ -33,10 +33,8 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $fullName = trim($request->first_name . ' ' . $request->last_name);
-
         $user = User::create([
-            'name' => $fullName,
+            'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
