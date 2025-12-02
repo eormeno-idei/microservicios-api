@@ -66,12 +66,6 @@ class UIEventController extends Controller
 
 
             if (!$serviceClass) {
-                Log::warning('UI Event: Service not found for component', [
-                    'component_id' => $componentId,
-                    'caller_service_id' => $callerServiceId,
-                    'action' => $action,
-                ]);
-
                 return response()->json([
                     'error' => 'Service not found for this component',
                 ], 404);
@@ -85,12 +79,6 @@ class UIEventController extends Controller
 
             // Verify method exists
             if (!method_exists($service, $method)) {
-                Log::warning('UI Event: Action method not found', [
-                    'service' => $serviceClass,
-                    'action' => $action,
-                    'method' => $method,
-                ]);
-
                 return response()->json([
                     'error' => "Action '{$action}' not implemented",
                 ], 404);
@@ -104,13 +92,6 @@ class UIEventController extends Controller
 
             return response()->json($result);
         } catch (\Exception $e) {
-            Log::error('UI Event: Exception during action execution', [
-                'component_id' => $componentId,
-                'action' => $action,
-                'exception' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
             return response()->json([
                 'error' => 'Internal server error',
                 'message' => config('app.debug') ? $e->getMessage() : null,
