@@ -124,30 +124,6 @@ $container->add(
 const element = document.querySelector('[data-component-id="_1a2b3c4d"]');
 ```
 
-### 2.4 Gestión de Estado
-
-**Session Storage Backend:**
-```php
-// UIStateManager almacena en session PHP
-session()->put('ui_state_' . $screenId, [
-    'components' => $componentArray,
-    'storage' => ['user_id' => 1, 'filters' => [...]]
-]);
-```
-
-**Encriptación Frontend:**
-```javascript
-// Storage encriptado transmitido en cada request
-const encrypted = CryptoJS.AES.encrypt(
-    JSON.stringify(storage),
-    encryptionKey
-).toString();
-
-fetch('/event', {
-    body: JSON.stringify({storage: encrypted, params: {...}})
-});
-```
-
 ## 3. Características Distintivas
 
 ### 3.1 Declarative UI Building
@@ -216,6 +192,11 @@ protected function buildBaseUI(UIContainer $container, ...$params): void
 }
 ```
 
+La configuración anterior será renderizada automáticamente en el frontend sin código adicional. La siguiente captura muestra el resultado:
+
+![Ejemplo de UI Generada](./images/profile_ui.png)
+
+
 ### 3.2 Diffing Algorithm Optimizado
 
 El algoritmo de diffing compara estados recursivamente:
@@ -239,19 +220,6 @@ class UIDiffer
 **Ventaja:** Tráfico de red mínimo (solo cambios), actualizaciones quirúrgicas del DOM.
 
 ### 3.3 Event-Driven Architecture
-
-> **📊 NOTA PARA AUTOR:** Insertar aquí captura de pantalla del diagrama "4. Flujo de Eventos" desde `USIM_DIAGRAMS.drawio`.
-> 
-> El diagrama completo muestra el flujo completo desde click de usuario hasta actualización de múltiples servicios:
-> 1. Usuario → Click botón
-> 2. Frontend → POST /event
-> 3. ProfileService → onSaveProfile()
-> 4. Database → $user->save()
-> 5. Backend → UsimEvent 'updated_profile'
-> 6. DashboardService/NotificationsService → onUpdatedProfile()
-> 7. UIDiffer → Calcular diff
-> 8. Backend → Respuesta {components}
-> 9. Frontend → Actualizar DOM
 
 ![Flujo de Eventos USIM](./images/flujo.png)
 
@@ -280,16 +248,7 @@ class UsimEventDispatcher
 ### 3.4 Component Builders con Encapsulación
 
 ```php
-// Antes: 18 líneas de código repetitivo
-$tempId = $params['uploader_profile']['temp_id'] ?? null;
-if ($tempId) {
-    $filename = UploadService::persistTemporaryUpload(...);
-    UploadService::deleteFile($category, $user->profile_image);
-    $url = UploadService::fileUrl(...) . '?t=' . time();
-    $this->uploader_profile->existingFile($url);
-}
-
-// Después: 1 línea con confirm()
+// 1 línea con confirm()
 if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
     $user->profile_image = $filename;
 }
@@ -328,12 +287,6 @@ public function onHandleDelete(array $params): void
     $this->toast('Usuario eliminado', 'success');
     $this->closeModal();
 }
-
-// Manejar cancelación
-public function onHandleCancel(array $params): void
-{
-    $this->closeModal();
-}
 ```
 
 **Tipos de diálogos soportados:**
@@ -349,35 +302,37 @@ public function onHandleCancel(array $params): void
 
 ### 3.6 Storage con Propiedades de Servicio
 
+Para definir que la variable tendrá persistencia en el localStorage del navegador, simplemente se debe incluir el prefijo `'store_'` en el nombre de la propiedad.
+
 ```php
 // Usar propiedades protegidas para mantener estado entre eventos
 class UsersService extends AbstractUIService
 {
-    protected int|null $editingUserId = null;
+    protected int|null $store_UserId = null;
     protected array $filters = [];
     
     public function onShowUserForm($params)
     {
         // Guardar ID del usuario en edición
-        $this->editingUserId = null; // nuevo usuario
+        $this->store_UserId = null; // nuevo usuario
         
         $this->form_user->visible(true);
     }
     
     public function onEditUser($params)
     {
-        $this->editingUserId = $params['user_id'];
+        $this->store_UserId = $params['user_id'];
         
-        $user = User::find($this->editingUserId);
+        $user = User::find($this->store_UserId);
         $this->input_name->value($user->name);
         $this->form_user->visible(true);
     }
     
     public function onSaveUser($params)
     {
-        if ($this->editingUserId) {
+        if ($this->store_UserId) {
             // Actualizar usuario existente
-            User::find($this->editingUserId)->update([...]);
+            User::find($this->store_UserId)->update([...]);
         } else {
             // Crear nuevo usuario
             User::create([...]);
