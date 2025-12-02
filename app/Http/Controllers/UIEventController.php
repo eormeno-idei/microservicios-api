@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Log;
-use App\Services\UI\Support\UIDebug;
 use App\Services\UI\UIChangesCollector;
 use App\Services\UI\Support\UIIdGenerator;
 
@@ -26,7 +24,9 @@ use App\Services\UI\Support\UIIdGenerator;
 class UIEventController extends Controller
 {
 
-    public function __construct(protected UIChangesCollector $uiChanges) {}
+    public function __construct(protected UIChangesCollector $uiChanges)
+    {
+    }
 
     /**
      * Handle UI component event
@@ -37,11 +37,6 @@ class UIEventController extends Controller
     public function handleEvent(Request $request): JsonResponse
     {
         $incomingStorage = $request->storage;
-        
-        Log::info('🎬 [UIEventController] handleEvent() - Evento recibido', [
-            'url' => $request->fullUrl(),
-            'storage_keys' => array_keys($incomingStorage ?? []),
-        ]);
 
         // Validate request
         $validated = $request->validate([
@@ -54,12 +49,6 @@ class UIEventController extends Controller
         $componentId = $validated['component_id'];
         $action = $validated['action'];
         $parameters = $validated['parameters'] ?? [];
-        
-        Log::info('📝 [UIEventController] Request validado', [
-            'component_id' => $componentId,
-            'action' => $action,
-            'parameters' => $parameters,
-        ]);
 
         try {
             // Check if there's a caller service ID (for modal callbacks)
@@ -70,20 +59,11 @@ class UIEventController extends Controller
             if ($callerServiceId) {
                 // Use the caller service (the one that opened the modal)
                 $serviceClass = UIIdGenerator::getContextFromId($callerServiceId);
-                Log::info('🔀 [UIEventController] Usando caller service (modal callback)', [
-                    'caller_service_id' => $callerServiceId,
-                ]);
             } else {
                 // Use the component's service (normal flow)
                 $serviceClass = UIIdGenerator::getContextFromId($componentId);
-                Log::info('📍 [UIEventController] Resolviendo servicio desde component_id', [
-                    'component_id' => $componentId,
-                ]);
             }
-            
-            Log::info('🏗️ [UIEventController] Servicio resuelto', [
-                'service_class' => $serviceClass,
-            ]);
+
 
             if (!$serviceClass) {
                 Log::warning('UI Event: Service not found for component', [
@@ -99,18 +79,9 @@ class UIEventController extends Controller
 
             // Instantiate service
             $service = app($serviceClass);
-            
-            Log::info('🆕 [UIEventController] Servicio instanciado', [
-                'service_class' => get_class($service),
-            ]);
 
             // Convert action to method name: test_action → onTestAction
             $method = $this->actionToMethodName($action);
-            
-            Log::info('🔧 [UIEventController] Método convertido', [
-                'action' => $action,
-                'method' => $method,
-            ]);
 
             // Verify method exists
             if (!method_exists($service, $method)) {
@@ -125,21 +96,10 @@ class UIEventController extends Controller
                 ], 404);
             }
 
-            Log::info('🔄 [UIEventController] Inicializando contexto de evento');
-            
             $this->uiChanges->setStorage($incomingStorage);
             $service->initializeEventContext($incomingStorage);
-            
-            Log::info('🚀 [UIEventController] Ejecutando método del evento', [
-                'method' => $method,
-                'parameters' => $parameters,
-            ]);
-            
             $service->$method($parameters);
-            
-            Log::info('✅ [UIEventController] Método ejecutado exitosamente');
             $service->finalizeEventContext();
-
             $result = $this->uiChanges->all();
 
             return response()->json($result);

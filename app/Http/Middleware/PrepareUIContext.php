@@ -22,7 +22,7 @@ class PrepareUIContext
     {
         // 1. Desencriptar USIM Storage
         $this->decryptUsimStorage($request);
-        
+
         // 2. Inyectar route params desde query
         $this->injectRouteParamsFromQuery($request);
 
@@ -39,76 +39,56 @@ class PrepareUIContext
 
         if ($request->hasHeader('X-USIM-Storage')) {
             $encrypted = $request->header('X-USIM-Storage');
-            
-            \Log::info('🔐 [PrepareUIContext] Desencriptando USIM Storage', [
-                'encrypted_length' => strlen($encrypted),
-            ]);
-
             try {
                 // Desencripta el contenido utilizando la APP_KEY del proyecto
                 $decrypted = decrypt($encrypted);
                 $storage = json_decode($decrypted, true);
-                
-                \Log::info('✅ [PrepareUIContext] Storage desencriptado exitosamente', [
-                    'storage_keys' => array_keys($storage ?? []),
-                    'storage' => $storage,
-                ]);
+
             } catch (DecryptException $e) {
-                \Log::warning('⚠️ [PrepareUIContext] Error desencriptando storage', [
-                    'error' => $e->getMessage(),
-                ]);
                 // Silently fail - storage will be empty
             }
-        } else {
-            \Log::info('ℹ️ [PrepareUIContext] No hay header X-USIM-Storage');
         }
 
         // Si el contenido es válido, exponerlo y setear token Bearer
         if (is_array($storage)) {
             $request->merge(['storage' => $storage]);
-            
-            \Log::info('💾 [PrepareUIContext] Storage inyectado en request', [
-                'storage' => $storage,
-            ]);
 
             if (!empty($storage['store_token'])) {
                 $store_token = $storage['store_token'];
                 $request->headers->set('Authorization', 'Bearer ' . $store_token);
                 UIStateManager::setAuthToken($store_token);
-                
-                \Log::info('🔑 [PrepareUIContext] Token Bearer configurado');
             }
         }
     }
 
     /**
      * Inyecta query params con prefijo "route_" como route parameters
-     * 
+     *
      * Ejemplo: ?route_id=123&route_hash=abc
      * Resultado: request()->route('id') = "123", request()->route('hash') = "abc"
      */
     private function injectRouteParamsFromQuery(Request $request): void
     {
         $route = $request->route();
-        
+
         if (!$route) {
             return; // No hay ruta, salir
         }
 
         $queryParams = $request->query();
-        
+
         foreach ($queryParams as $key => $value) {
             // Solo procesar params que empiecen con "route_"
             if (strpos($key, 'route_') === 0) {
                 // Extraer el nombre real del parámetro (sin el prefijo)
                 $paramName = substr($key, 6); // Quitar "route_"
-                
+
                 // Solo inyectar si NO existe ya un route param real con ese nombre
                 // (los route params reales tienen precedencia)
                 if (!$route->hasParameter($paramName)) {
                     $route->setParameter($paramName, $value);
                 }
-                
+
                 // Opcional: Remover del query string para limpiar
                 $request->query->remove($key);
             }
