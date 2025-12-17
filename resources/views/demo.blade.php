@@ -44,5 +44,6 @@
     <script src="{{ asset('js/ui-renderer.js') }}"></script>
     <script src="{{ asset('js/image-crop-editor.js') }}"></script>
     <script src="{{ asset('js/uploader-component.js') }}"></script>
+    <script src="{{ asset('js/calendar-component.js') }}"></script>
 </body>
 </html>

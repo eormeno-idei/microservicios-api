@@ -1507,6 +1507,8 @@ class ComponentFactory {
                 return new CardComponent(id, config);
             case 'uploader':
                 return window.UploaderComponent ? new window.UploaderComponent(id, config) : null;
+            case 'calendar':
+                return window.CalendarComponent ? new window.CalendarComponent(id, config) : null;
             case 'storage':
                 return new StorageComponent(id, config);
             default:

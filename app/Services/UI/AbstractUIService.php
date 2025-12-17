@@ -407,6 +407,7 @@ abstract class AbstractUIService
             'tableheaderrow' => TableHeaderRowBuilder::class,
             'menudropdown' => MenuDropdownBuilder::class,
             'uploader' => UploaderBuilder::class,
+            'calendar' => \App\Services\UI\Components\CalendarBuilder::class,
             'default' => null,
         };
     }
