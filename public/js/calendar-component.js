@@ -70,7 +70,8 @@ class CalendarComponent extends UIComponent {
             .current-month { font-size: 1.3rem; font-weight: bold; text-transform: capitalize; }
 
             .weekdays, .days-grid {
-                display: grid; grid-template-columns: 0.6fr repeat(5, 1fr) 0.6fr;
+                display: grid; grid-template-columns: var(--grid-columns, repeat(7, 1fr));
+                justify-content: center; /* Center the grid if it's smaller than container */
             }
             .weekdays {
                 background: #f8f9fa; padding: 8px 0; text-align: center;
@@ -83,7 +84,10 @@ class CalendarComponent extends UIComponent {
 
             .day {
                 aspect-ratio: 1 / 1;
-                min-height: 30px;
+                min-height: var(--day-min-height, 30px);
+                max-height: var(--day-max-height, none);
+                width: var(--day-size, auto);
+                height: var(--day-size, auto);
                 border: 1px solid #f0f0f0; border-radius: 4px;
                 position: relative; background: white;
                 display: flex; justify-content: center; align-items: center; padding: 1px;
@@ -104,10 +108,12 @@ class CalendarComponent extends UIComponent {
 
             .num-circle-web {
                 width: 28px; height: 28px;
+                min-width: 28px; min-height: 28px; /* Prevent shrinking */
                 background: white; color: black; border-radius: 50%;
                 display: flex; align-items: center; justify-content: center;
                 font-size: 1.1rem; font-weight: 800;
                 box-shadow: 0 1px 2px rgba(0,0,0,0.3); z-index: 2;
+                flex-shrink: 0; /* Prevent flexbox shrinking */
             }
 
             /* Bordes de Eventos */
@@ -148,6 +154,29 @@ class CalendarComponent extends UIComponent {
     render() {
         const container = document.createElement('div');
         container.className = 'calendar-wrapper';
+
+        // Apply min-height config
+        if (this.config.min_height) {
+            container.style.setProperty('--day-min-height', this.config.min_height);
+        }
+        // Apply max-height config
+        if (this.config.max_height) {
+            container.style.setProperty('--day-max-height', this.config.max_height);
+        }
+        // Apply cell-size config
+        if (this.config.cell_size) {
+            container.style.setProperty('--day-size', this.config.cell_size);
+            // If cell size is fixed, we might want to adjust grid columns to fit content or be fixed
+            // But repeat(7, 1fr) with fixed width items might behave oddly if container is small.
+            // If cell size is set, we force the grid columns to be that size?
+            // Let's try to set grid-template-columns via variable if needed, but for now let's rely on width/height on .day
+            // Actually, if .day has fixed width, and grid is 1fr, the grid cell might be larger than the .day.
+            // To force the grid to match the cell size, we should update the grid definition.
+            container.style.setProperty('--grid-columns', `repeat(7, ${this.config.cell_size})`);
+        } else {
+            container.style.setProperty('--grid-columns', 'repeat(7, 1fr)');
+        }
+
         this.applyCommonAttributes(container);
 
         // Header

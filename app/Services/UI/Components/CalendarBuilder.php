@@ -16,6 +16,9 @@ class CalendarBuilder extends UIComponent
             'show_saturday_info' => true,
             'show_sunday_info' => true,
             'references_columns' => 2,
+            'min_height' => '30px',
+            'max_height' => null,
+            'cell_size' => null,
         ];
     }
 
@@ -32,6 +35,21 @@ class CalendarBuilder extends UIComponent
     public function events(array $events): static
     {
         return $this->setConfig('events', $events);
+    }
+
+    public function cellSize(string $size): static
+    {
+        return $this->setConfig('cell_size', $size);
+    }
+
+    public function minHeight(string $height): static
+    {
+        return $this->setConfig('min_height', $height);
+    }
+
+    public function maxHeight(string $height): static
+    {
+        return $this->setConfig('max_height', $height);
     }
 
     public function showSaturdayInfo(bool $show = true): static

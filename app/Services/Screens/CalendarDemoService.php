@@ -2,10 +2,9 @@
 
 namespace App\Services\Screens;
 
+use App\Services\UI\UIBuilder;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\CalendarBuilder;
-use App\Services\UI\UIBuilder;
 
 class CalendarDemoService extends AbstractUIService
 {
@@ -15,14 +14,8 @@ class CalendarDemoService extends AbstractUIService
             ->title('Calendar Component Demo')
             ->maxWidth('800px')
             ->centerHorizontal()
-            ->shadow(2)
+            ->shadow(0)
             ->padding('30px');
-
-        $container->add(
-            UIBuilder::label('lbl_instructions')
-                ->text('📅 Calendario Académico 2026-2027')
-                ->style('info')
-        );
 
         // Datos del calendario académico
         $events = [
@@ -69,12 +62,13 @@ class CalendarDemoService extends AbstractUIService
         ];
 
         $container->add(
-            (new CalendarBuilder('academic_calendar'))
+            UIBuilder::calendar('academic_calendar')
                 ->year(2026)
-                ->month(4) // Abril 2026 como en el ejemplo
+                ->month(4)
                 ->events($events)
                 ->showSaturdayInfo(false)
                 ->showSundayInfo(false)
+                ->cellSize('60px')
         );
     }
 

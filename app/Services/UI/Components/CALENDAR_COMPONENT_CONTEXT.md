@@ -3,6 +3,7 @@
 ## Identity
 - **Component Type**: `calendar`
 - **Backend Builder**: `App\Services\UI\Components\CalendarBuilder`
+- **Factory Method**: `UIBuilder::calendar(?string $name)`
 - **Frontend Class**: `CalendarComponent` (`public/js/calendar-component.js`)
 
 ## Backend Configuration (`CalendarBuilder`)
@@ -13,6 +14,9 @@ The builder provides a fluent interface to configure the component state.
 - `showSaturdayInfo(bool $show)`: Toggles visibility of event details on Saturdays.
 - `showSundayInfo(bool $show)`: Toggles visibility of event details on Sundays.
 - `referencesColumns(int $columns)`: Sets the number of columns for the references grid (1-3).
+- `minHeight(string $height)`: Sets the minimum height of the day cells (e.g., '40px').
+- `maxHeight(string $height)`: Sets the maximum height of the day cells.
+- `cellSize(string $size)`: Sets a fixed width and height for the day cells (e.g., '40px'). Overrides min/max height logic and forces grid columns to match this size.
 
 ## Data Structures
 
@@ -41,7 +45,9 @@ Events can be single-day or multi-day ranges.
 ### Rendering Logic (Concentric Squares Design)
 The component uses a specific rendering strategy to visualize multiple events per day as concentric squares (nested frames).
 
-1.  **Grid Generation**: Standard month grid with padding for previous/next month days.
+1.  **Grid Generation**: 
+    - Standard month grid with padding for previous/next month days.
+    - If `cellSize` is set, grid columns are fixed (`repeat(7, size)`). Otherwise, they are fluid (`repeat(7, 1fr)`).
 2.  **Weekend Visibility**:
     - Checks `this.config.show_saturday_info` and `this.config.show_sunday_info`.
     - If `false`, events are NOT rendered for that day, only the day number.
@@ -63,9 +69,9 @@ The component uses a specific rendering strategy to visualize multiple events pe
         </div>
         ```
     - **Styling**:
-        - `.day`: Compact square (min-height: 30px).
+        - `.day`: Compact square.
         - `.concentric-layer`: `border-width: 7px`, `border-style: solid`.
-        - `.num-circle-web`: White circle (28px) containing the day number.
+        - `.num-circle-web`: White circle (28px) containing the day number. **Crucial**: Has `flex-shrink: 0` and `min-width/height` to prevent deformation in small cells.
 
 ### Key Methods
 - `updateCalendar()`: Main render loop. Handles grid generation and calls `buildConcentricLayers`.
@@ -79,7 +85,7 @@ The component uses a specific rendering strategy to visualize multiple events pe
 - **Badge Visibility**: The date badge is hidden if the text string exceeds 15 characters (to handle long periods cleanly).
 
 ## Current Status & Known Constraints
-- **Design**: Concentric squares with thick borders (7px) and compact days (30px).
+- **Design**: Concentric squares with thick borders (7px).
 - **Interaction**: Hover effects on `.day`.
 - **Weekend Logic**: Hardcoded to check `getDay() === 0` (Sun) or `6` (Sat).
 - **Dependencies**: Relies on `UIComponent` base class.

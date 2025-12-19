@@ -265,20 +265,20 @@ abstract class AbstractUIService
         return $result;
     }
 
-    /**
-     * Get the UI structure
-     *
-     * Returns the UI from cache or regenerates if not exists.
-     * This is the standard public method to retrieve UI for all services.
-     *
-     * @param mixed ...$params Optional parameters that can be used by child classes
-     * @return array UI structure in JSON format
-     */
-    public function getUI(string $parent = 'main', ...$params): array
-    {
-        $ui = $this->getStoredUI($parent, ...$params);
-        return $ui;
-    }
+    // /**
+    //  * Get the UI structure
+    //  *
+    //  * Returns the UI from cache or regenerates if not exists.
+    //  * This is the standard public method to retrieve UI for all services.
+    //  *
+    //  * @param mixed ...$params Optional parameters that can be used by child classes
+    //  * @return array UI structure in JSON format
+    //  */
+    // public function getUI(string $parent = 'main', ...$params): array
+    // {
+    //     $ui = $this->getStoredUI($parent, ...$params);
+    //     return $ui;
+    // }
 
     /**
      * Get stored UI state, regenerate if missing

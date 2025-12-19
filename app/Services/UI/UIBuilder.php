@@ -14,6 +14,7 @@ use App\Services\UI\Components\FormBuilder;
 use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\CardBuilder;
 use App\Services\UI\Components\UploaderBuilder;
+use App\Services\UI\Components\CalendarBuilder;
 
 /**
  * Factory class for creating UI components
@@ -156,5 +157,16 @@ class UIBuilder
     public static function uploader(?string $name = null): UploaderBuilder
     {
         return new UploaderBuilder($name);
+    }
+
+    /**
+     * Create a new calendar component
+     *
+     * @param string|null $name The optional semantic name for the calendar
+     * @return CalendarBuilder
+     */
+    public static function calendar(?string $name = null): CalendarBuilder
+    {
+        return new CalendarBuilder($name);
     }
 }
