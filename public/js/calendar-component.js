@@ -29,11 +29,11 @@ class CalendarComponent extends UIComponent {
         style.id = 'calendar-component-styles';
         style.textContent = `
             :root {
-                --calendar-primary-color: #e67e22;
-                --calendar-primary-gradient: linear-gradient(90deg, #e67e22 0%, #f39c12 100%);
-                --calendar-weekend-bg: #f8f9fa;
-                --calendar-weekend-text: #ccc;
-                --calendar-other-month-text: #e0e0e0;
+                --calendar-primary-color: #3b5585;
+                --calendar-primary-gradient: linear-gradient(90deg, #3b5585 0%, #566f9e 100%);
+                --calendar-secondary-color: #707070;
+                --calendar-bg-color: #f4f7f6;
+                --calendar-text-color: #333;
 
                 /* Colores Eventos */
                 --color-feriado: #e74c3c;
@@ -41,11 +41,19 @@ class CalendarComponent extends UIComponent {
                 --color-clases: #27ae60;
                 --color-receso: #9b59b6;
                 --color-admin: #f1c40f;
-                --color-mensual: #2980b9;
+                --color-mensual: #1abc9c;
+
+                /* Estilos */
+                --calendar-weekend-bg: #f8f9fa;
+                --calendar-weekend-text: #ccc;
+                --calendar-other-month-text: #e0e0e0;
             }
 
             .calendar-wrapper {
-                background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                background: white;
+                border-radius: 12px;
+                box-shadow: none;
+                border: 1px solid #e0e0e0;
                 overflow: hidden; width: 100%; max-width: 700px;
                 display: flex; flex-direction: column; margin-bottom: 20px;
                 font-family: 'Roboto', sans-serif;
@@ -67,40 +75,72 @@ class CalendarComponent extends UIComponent {
             .weekdays {
                 background: #f8f9fa; padding: 8px 0; text-align: center;
                 font-size: 0.9rem; font-weight: bold; color: #7f8c8d; border-bottom: 1px solid #eee;
+                align-items: center;
             }
+            .weekdays div { display: flex; justify-content: center; align-items: center; width: 100%; }
+
             .days-grid { padding: 10px; gap: 4px; background: #fff; }
 
             .day {
-                height: 50px; border: 1px solid #f0f0f0; border-radius: 4px;
-                padding: 0; position: relative; background: white;
-                display: flex; flex-direction: column;
+                aspect-ratio: 1 / 1;
+                min-height: 30px;
+                border: 1px solid #f0f0f0; border-radius: 4px;
+                position: relative; background: white;
+                display: flex; justify-content: center; align-items: center; padding: 1px;
             }
             .day:not(.weekend):not(.other-month):hover {
-                border-color: var(--calendar-primary-color); cursor: pointer;
-                /* Remove background hover effect as it interferes with event layers */
+                background-color: #ebf5fb; border-color: var(--calendar-primary-color); cursor: pointer; z-index: 10;
             }
             .day.other-month { color: var(--calendar-other-month-text); pointer-events: none; }
             .day.weekend { background-color: var(--calendar-weekend-bg); color: var(--calendar-weekend-text); pointer-events: none; }
 
-            .day-number { font-weight: bold; font-size: 0.9rem; display: block; margin-left: 2px; }
+            /* Capas Concéntricas */
+            .concentric-layer {
+                width: 100%; height: 100%; box-sizing: border-box;
+                display: flex; justify-content: center; align-items: center;
+                border-style: solid; background-color: white;
+                border-width: 7px;
+            }
 
-            /* Event Dots / Bars */
-            .event-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; margin: 1px; }
+            .num-circle-web {
+                width: 28px; height: 28px;
+                background: white; color: black; border-radius: 50%;
+                display: flex; align-items: center; justify-content: center;
+                font-size: 1.1rem; font-weight: 800;
+                box-shadow: 0 1px 2px rgba(0,0,0,0.3); z-index: 2;
+            }
 
-            /* Colores */
-            .bg-feriado { background-color: var(--color-feriado); }
-            .bg-examen { background-color: var(--color-examen); }
-            .bg-clases { background-color: var(--color-clases); }
-            .bg-receso { background-color: var(--color-receso); }
-            .bg-admin { background-color: var(--color-admin); }
-            .bg-mensual { background-color: var(--color-mensual); }
+            /* Bordes de Eventos */
+            .border-feriado { border-color: var(--color-feriado); }
+            .border-examen { border-color: var(--color-examen); }
+            .border-clases { border-color: var(--color-clases); }
+            .border-receso { border-color: var(--color-receso); }
+            .border-admin { border-color: var(--color-admin); }
+            .border-mensual { border-color: var(--color-mensual); }
 
+            /* Lista de Eventos */
             .month-events-list {
                 padding: 12px 15px; border-top: 1px solid #eee; background: #fff;
                 font-size: 0.85rem; color: #444; min-height: 40px;
             }
-            .event-item { display: flex; align-items: center; margin-bottom: 4px; }
-            .event-title { margin-left: 8px; }
+            .references-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px 20px; }
+            .event-item { display: flex; align-items: center; line-height: 1.3; }
+            .event-date-badge {
+                background-color: #eff6ff; color: var(--calendar-primary-color);
+                padding: 1px 6px; border-radius: 4px; font-weight: 700; margin-right: 8px;
+                white-space: nowrap; font-size: 0.8rem; border: 1px solid #dbeafe;
+            }
+            .event-box-icon { width: 10px; height: 10px; display: inline-block; margin-right: 8px; flex-shrink: 0; border: 3px solid; background: white; }
+            .event-title { font-weight: 500; }
+
+            /* Clases de fondo para badges/iconos */
+            .bg-feriado { border-color: var(--color-feriado); background: var(--color-feriado) !important; }
+            .box-feriado { border-color: var(--color-feriado); }
+            .box-examen { border-color: var(--color-examen); }
+            .box-clases { border-color: var(--color-clases); }
+            .box-receso { border-color: var(--color-receso); }
+            .box-admin { border-color: var(--color-admin); }
+            .box-mensual { border-color: var(--color-mensual); }
         `;
         document.head.appendChild(style);
     }
@@ -190,12 +230,7 @@ class CalendarComponent extends UIComponent {
                 dayEl.classList.add('other-month');
             }
 
-            // Calcular si es fin de semana
-            // Necesitamos saber el día de la semana.
-            // cell.num es el día del mes.
-            // Si es 'prev', corresponde al mes anterior.
-            // Si es 'next', al siguiente.
-            // Simplificación: Usamos Date para saber el día de la semana
+            // Calcular fecha
             let dateToCheck;
             if (cell.type === 'prev') {
                 dateToCheck = new Date(year, month - 1, cell.num);
@@ -218,83 +253,65 @@ class CalendarComponent extends UIComponent {
             // Renderizar eventos (concentric squares)
             const eventsForDay = showInfo ? this.getEventsForDate(dateToCheck) : [];
 
-            // Limpiar contenido previo (número) para reconstruir estructura
+            // Limpiar contenido previo
             dayEl.innerHTML = '';
 
-            // Contenedor base
-            let currentContainer = dayEl;
-
-            // Si hay eventos, crear capas
-            if (eventsForDay.length > 0) {
-                // Ordenar eventos si es necesario (por ahora orden de llegada)
-                // Crear capas concéntricas
-                eventsForDay.forEach((ev, index) => {
-                    const layer = document.createElement('div');
-                    layer.className = `event-layer bg-${ev.type}`;
-                    layer.title = ev.title;
-
-                    // Estilo para que ocupe todo el padre
-                    layer.style.width = '100%';
-                    layer.style.height = '100%';
-                    layer.style.display = 'flex';
-                    layer.style.alignItems = 'center';
-                    layer.style.justifyContent = 'center';
-
-                    // Padding para el efecto concéntrico (el siguiente hijo será más pequeño visualmente debido al padding del padre)
-                    // Pero si usamos padding en el padre, el hijo se reduce.
-                    // Vamos a aplicar padding al contenedor actual antes de añadir el hijo.
-                    // O mejor: el layer es el hijo, y le damos padding.
-                    // No, el layer debe ser el fondo.
-
-                    // Estrategia:
-                    // dayEl (bg-event1) -> div (padding, bg-event2) -> div (padding, bg-white) -> number
-
-                    // Pero dayEl ya tiene estilos. Mejor añadir un div hijo que ocupe 100% y tenga el color.
-                    // Y dentro de ese, otro div con padding.
-
-                    // Simplificación:
-                    // El 'currentContainer' recibe el color de fondo del evento.
-                    // Luego creamos un hijo con padding que será el nuevo 'currentContainer'.
-
-                    currentContainer.classList.add(`bg-${ev.type}`);
-                    currentContainer.title = (currentContainer.title ? currentContainer.title + ', ' : '') + ev.title;
-
-                    const inner = document.createElement('div');
-                    inner.style.width = '100%';
-                    inner.style.height = '100%';
-                    inner.style.padding = '4px'; // Grosor del borde de color
-                    inner.style.boxSizing = 'border-box';
-
-                    currentContainer.appendChild(inner);
-                    currentContainer = inner;
-                });
-            }
-
-            // El último contenedor debe tener fondo blanco para el número (salvo que queramos que el último evento sea el fondo del número)
-            // La imagen muestra fondo blanco para el número.
-            const numberContainer = document.createElement('div');
-            numberContainer.style.width = '100%';
-            numberContainer.style.height = '100%';
-            numberContainer.style.backgroundColor = 'white';
-            numberContainer.style.display = 'flex';
-            numberContainer.style.alignItems = 'center';
-            numberContainer.style.justifyContent = 'center';
-            numberContainer.style.borderRadius = '2px'; // Opcional
-
-            // Si no hubo eventos, currentContainer es dayEl.
-            // Si hubo eventos, currentContainer es el inner del último evento.
-            currentContainer.appendChild(numberContainer);
-
-            const numSpan = document.createElement('span');
-            numSpan.className = 'day-number';
-            numSpan.textContent = cell.num;
-            numberContainer.appendChild(numSpan);
+            // Construir capas concéntricas
+            const content = this.buildConcentricLayers(eventsForDay, cell.num);
+            dayEl.appendChild(content);
 
             this.daysGrid.appendChild(dayEl);
         });
 
         // Actualizar lista de eventos del mes
         this.renderMonthList(year, month);
+    }
+
+    buildConcentricLayers(events, dayNum) {
+        const numEl = document.createElement('span');
+        numEl.className = 'num-circle-web';
+        numEl.textContent = dayNum;
+
+        if (events.length === 0) return numEl;
+
+        // Prioridad de eventos para el orden de capas (menor número = más externo)
+        const priority = {
+            'feriado': 1,
+            'examen': 2,
+            'mensual': 3,
+            'receso': 4,
+            'clases': 5,
+            'admin': 6
+        };
+
+        // Ordenar eventos por prioridad
+        events.sort((a, b) => {
+            const pA = priority[a.type] || 99;
+            const pB = priority[b.type] || 99;
+            return pA - pB;
+        });
+
+        let root = null;
+        let currentParent = null;
+
+        events.forEach(ev => {
+            const div = document.createElement('div');
+            div.className = `concentric-layer border-${ev.type}`;
+            div.title = ev.title;
+
+            if (!root) {
+                root = div;
+            } else {
+                currentParent.appendChild(div);
+            }
+            currentParent = div;
+        });
+
+        if (currentParent) {
+            currentParent.appendChild(numEl);
+        }
+
+        return root;
     }
 
     generateMonthData(year, month) {
@@ -344,7 +361,6 @@ class CalendarComponent extends UIComponent {
         this.eventsList.innerHTML = '';
 
         // Filtrar eventos que ocurren en este mes
-        // Simplificación: iterar todos los días del mes y recolectar eventos únicos
         const eventsInMonth = new Map(); // Key: title+type
 
         const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -359,8 +375,15 @@ class CalendarComponent extends UIComponent {
             const evs = this.getEventsForDate(date);
             evs.forEach(ev => {
                 const key = ev.title + '|' + ev.type;
+
                 if (!eventsInMonth.has(key)) {
-                    eventsInMonth.set(key, ev);
+                    eventsInMonth.set(key, {
+                        title: ev.title,
+                        type: ev.type,
+                        dates: [d]
+                    });
+                } else {
+                    eventsInMonth.get(key).dates.push(d);
                 }
             });
         }
@@ -370,23 +393,63 @@ class CalendarComponent extends UIComponent {
             return;
         }
 
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'references-grid';
+
+        // Configurar columnas desde backend (1-3)
+        const cols = this.config.references_columns || 2;
+        const safeCols = Math.max(1, Math.min(3, cols));
+        gridDiv.style.gridTemplateColumns = `repeat(${safeCols}, 1fr)`;
+
         eventsInMonth.forEach(ev => {
             const item = document.createElement('div');
             item.className = 'event-item';
 
-            const dot = document.createElement('div');
-            dot.className = `event-dot bg-${ev.type}`;
-            dot.style.width = '10px';
-            dot.style.height = '10px';
-            dot.style.marginRight = '8px';
+            // Formatear fechas (ej: "1-3, 6-10")
+            const dates = ev.dates.sort((a,b) => a-b);
+            let dateStr = '';
 
-            const title = document.createElement('div');
+            // Agrupar consecutivos
+            let ranges = [];
+            let start = dates[0];
+            let prev = dates[0];
+
+            for(let i=1; i<dates.length; i++) {
+                if (dates[i] === prev + 1) {
+                    prev = dates[i];
+                } else {
+                    ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+                    start = dates[i];
+                    prev = dates[i];
+                }
+            }
+            ranges.push(start === prev ? `${start}` : `${start}-${prev}`);
+            dateStr = ranges.join(', ');
+
+            // Icono de color
+            const icon = document.createElement('div');
+            icon.className = `event-box-icon box-${ev.type} bg-${ev.type}`;
+
+            item.appendChild(icon);
+
+            // Badge de fecha (Ocultar si es muy largo, ej: periodos extensos > 15 chars)
+            if (dateStr.length <= 15) {
+                const badge = document.createElement('span');
+                badge.className = 'event-date-badge';
+                badge.textContent = dateStr;
+                item.appendChild(badge);
+            }
+
+            // Título
+            const title = document.createElement('span');
+            title.className = 'event-title';
             title.textContent = ev.title;
 
-            item.appendChild(dot);
             item.appendChild(title);
-            this.eventsList.appendChild(item);
+            gridDiv.appendChild(item);
         });
+
+        this.eventsList.appendChild(gridDiv);
     }
 }
 

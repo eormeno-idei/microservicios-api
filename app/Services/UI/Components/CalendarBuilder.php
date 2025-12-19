@@ -15,6 +15,7 @@ class CalendarBuilder extends UIComponent
             'events' => [],
             'show_saturday_info' => true,
             'show_sunday_info' => true,
+            'references_columns' => 2,
         ];
     }
 
@@ -41,5 +42,12 @@ class CalendarBuilder extends UIComponent
     public function showSundayInfo(bool $show = true): static
     {
         return $this->setConfig('show_sunday_info', $show);
+    }
+
+    public function referencesColumns(int $columns): static
+    {
+        // Limitación entre 1 y 3
+        $columns = max(1, min(3, $columns));
+        return $this->setConfig('references_columns', $columns);
     }
 }

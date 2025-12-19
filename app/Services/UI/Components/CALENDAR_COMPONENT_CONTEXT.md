@@ -12,6 +12,7 @@ The builder provides a fluent interface to configure the component state.
 - `events(array $events)`: Sets the array of event objects.
 - `showSaturdayInfo(bool $show)`: Toggles visibility of event details on Saturdays.
 - `showSundayInfo(bool $show)`: Toggles visibility of event details on Sundays.
+- `referencesColumns(int $columns)`: Sets the number of columns for the references grid (1-3).
 
 ## Data Structures
 
@@ -20,7 +21,7 @@ Events can be single-day or multi-day ranges.
 ```json
 {
   "title": "Event Title",
-  "type": "event_type", // Maps to CSS class .bg-{type}
+  "type": "event_type", // Maps to CSS class .bg-{type} and .border-{type}
   "date": "YYYY-MM-DD", // For single day
   // OR
   "start": "YYYY-MM-DD",
@@ -30,7 +31,10 @@ Events can be single-day or multi-day ranges.
 
 ### CSS Classes & Variables
 - **Event Colors**: defined via CSS variables (e.g., `--color-feriado`, `--color-examen`).
-- **Classes**: `.bg-{type}` applies the background color.
+- **Classes**: 
+    - `.bg-{type}`: Applies background color.
+    - `.border-{type}`: Applies border color.
+    - `.box-{type}`: Used for legend icons.
 
 ## Frontend Implementation Details (`calendar-component.js`)
 
@@ -42,43 +46,44 @@ The component uses a specific rendering strategy to visualize multiple events pe
     - Checks `this.config.show_saturday_info` and `this.config.show_sunday_info`.
     - If `false`, events are NOT rendered for that day, only the day number.
 3.  **Event Layering (The "Concentric" Logic)**:
-    - Instead of sibling dots, events are rendered as **nested containers**.
+    - Events are rendered as **nested containers** with thick borders.
+    - **Priority Order**: Events are sorted by priority (Feriado > Examen > Mensual > Receso > Clases > Admin) to determine nesting order (outer to inner).
     - **Structure**:
         ```html
         <div class="day">
-            <!-- Layer 1 (Event A) -->
-            <div class="bg-event-a" style="width:100%; height:100%; ...">
-                <!-- Layer 2 (Event B) -->
-                <div class="bg-event-b" style="padding: 4px; ...">
+            <!-- Layer 1 (Outer Event) -->
+            <div class="concentric-layer border-event-a" title="Event A">
+                <!-- Layer 2 (Inner Event) -->
+                <div class="concentric-layer border-event-b" title="Event B">
                     <!-- ... more layers ... -->
                         <!-- Center (Number) -->
-                        <div style="background: white; ...">
-                            <span class="day-number">15</span>
-                        </div>
+                        <span class="num-circle-web">15</span>
                 </div>
             </div>
         </div>
         ```
-    - **Mechanism**:
-        - The loop iterates through events for the day.
-        - `currentContainer` starts as the `.day` element.
-        - For each event, it applies the background class to `currentContainer`.
-        - It creates a new `inner` div with `padding: 4px` (this padding creates the visual "thickness" of the frame).
-        - `currentContainer` updates to this new `inner` div.
-        - Finally, a white container is appended to the last `currentContainer` to hold the day number, ensuring legibility.
+    - **Styling**:
+        - `.day`: Compact square (min-height: 30px).
+        - `.concentric-layer`: `border-width: 7px`, `border-style: solid`.
+        - `.num-circle-web`: White circle (28px) containing the day number.
 
 ### Key Methods
-- `updateCalendar()`: Main render loop. Handles the concentric logic.
+- `updateCalendar()`: Main render loop. Handles grid generation and calls `buildConcentricLayers`.
+- `buildConcentricLayers(events, dayNum)`: Generates the nested DOM structure for events.
 - `getEventsForDate(date)`: Filters events for a specific `Date` object.
-- `renderMonthList()`: Renders the summary list below the calendar. Respects weekend visibility flags.
+- `renderMonthList(year, month)`: Renders the summary list below the calendar.
+
+### References List Logic
+- **Grid Layout**: Uses CSS Grid with configurable columns (`this.config.references_columns`, default 2, max 3).
+- **Date Grouping**: Consecutive dates are grouped (e.g., "1-3, 6-10").
+- **Badge Visibility**: The date badge is hidden if the text string exceeds 15 characters (to handle long periods cleanly).
 
 ## Current Status & Known Constraints
-- **Design**: Concentric squares implemented.
-- **Interaction**: Hover effects on `.day` modified to only change `border-color` to avoid conflict with event backgrounds.
+- **Design**: Concentric squares with thick borders (7px) and compact days (30px).
+- **Interaction**: Hover effects on `.day`.
 - **Weekend Logic**: Hardcoded to check `getDay() === 0` (Sun) or `6` (Sat).
 - **Dependencies**: Relies on `UIComponent` base class.
 
 ## Future Work Context
-- If modifying the render loop, preserve the nesting logic for the concentric effect.
-- Ensure `numSpan` is not redeclared if reverting to simpler logic.
-- The "white center" is crucial for readability; do not remove the final white container.
+- If modifying the render loop, preserve the nesting logic (`buildConcentricLayers`).
+- The "white center" (`.num-circle-web`) is crucial for readability.
