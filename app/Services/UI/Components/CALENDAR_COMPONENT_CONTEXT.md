@@ -17,6 +17,7 @@ The builder provides a fluent interface to configure the component state.
 - `minHeight(string $height)`: Sets the minimum height of the day cells (e.g., '40px').
 - `maxHeight(string $height)`: Sets the maximum height of the day cells.
 - `cellSize(string $size)`: Sets a fixed width and height for the day cells (e.g., '40px'). Overrides min/max height logic and forces grid columns to match this size.
+- `eventBorderRadius(string $radius)`: Sets the border radius for event layers (e.g., '50%' for circles, '8px' for rounded corners).
 
 ## Data Structures
 
@@ -58,9 +59,9 @@ The component uses a specific rendering strategy to visualize multiple events pe
         ```html
         <div class="day">
             <!-- Layer 1 (Outer Event) -->
-            <div class="concentric-layer border-event-a" title="Event A">
+            <div class="concentric-layer border-event-a" title="Event A" style="border-radius: 15px">
                 <!-- Layer 2 (Inner Event) -->
-                <div class="concentric-layer border-event-b" title="Event B">
+                <div class="concentric-layer border-event-b" title="Event B" style="border-radius: 8px">
                     <!-- ... more layers ... -->
                         <!-- Center (Number) -->
                         <span class="num-circle-web">15</span>
@@ -70,8 +71,11 @@ The component uses a specific rendering strategy to visualize multiple events pe
         ```
     - **Styling**:
         - `.day`: Compact square.
-        - `.concentric-layer`: `border-width: 7px`, `border-style: solid`.
+        - `.concentric-layer`: `border-width: 7px` (var `--event-border-width`), `border-style: solid`.
         - `.num-circle-web`: White circle (28px) containing the day number. **Crucial**: Has `flex-shrink: 0` and `min-width/height` to prevent deformation in small cells.
+    - **Border Radius Logic**:
+        - If `eventBorderRadius` is a percentage (e.g., '50%'), it applies to all layers (concentric circles).
+        - If it is a pixel value (e.g., '15px'), the radius **decreases** for inner layers to maintain parallelism (`radius - (index * borderWidth)`).
 
 ### Key Methods
 - `updateCalendar()`: Main render loop. Handles grid generation and calls `buildConcentricLayers`.
@@ -85,7 +89,7 @@ The component uses a specific rendering strategy to visualize multiple events pe
 - **Badge Visibility**: The date badge is hidden if the text string exceeds 15 characters (to handle long periods cleanly).
 
 ## Current Status & Known Constraints
-- **Design**: Concentric squares with thick borders (7px).
+- **Design**: Concentric squares with thick borders (7px) and configurable radius.
 - **Interaction**: Hover effects on `.day`.
 - **Weekend Logic**: Hardcoded to check `getDay() === 0` (Sun) or `6` (Sat).
 - **Dependencies**: Relies on `UIComponent` base class.

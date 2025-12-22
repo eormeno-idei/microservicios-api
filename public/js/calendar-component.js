@@ -88,7 +88,7 @@ class CalendarComponent extends UIComponent {
                 max-height: var(--day-max-height, none);
                 width: var(--day-size, auto);
                 height: var(--day-size, auto);
-                border: 1px solid #f0f0f0; border-radius: 4px;
+                border: 1px solid #f0f0f0; border-radius: var(--event-border-radius, 4px);
                 position: relative; background: white;
                 display: flex; justify-content: center; align-items: center; padding: 1px;
             }
@@ -103,7 +103,8 @@ class CalendarComponent extends UIComponent {
                 width: 100%; height: 100%; box-sizing: border-box;
                 display: flex; justify-content: center; align-items: center;
                 border-style: solid; background-color: white;
-                border-width: 7px;
+                border-width: var(--event-border-width, 7px);
+                /* border-radius se maneja inline en JS para la lógica decreciente */
             }
 
             .num-circle-web {
@@ -176,6 +177,15 @@ class CalendarComponent extends UIComponent {
         } else {
             container.style.setProperty('--grid-columns', 'repeat(7, 1fr)');
         }
+
+        // Apply event border radius config (base variable, though JS handles logic)
+        if (this.config.event_border_radius) {
+            container.style.setProperty('--event-border-radius', this.config.event_border_radius);
+        }
+
+        // Define border width constant
+        this.borderWidth = 7;
+        container.style.setProperty('--event-border-width', `${this.borderWidth}px`);
 
         this.applyCommonAttributes(container);
 
@@ -320,13 +330,36 @@ class CalendarComponent extends UIComponent {
             return pA - pB;
         });
 
+        // Lógica de radio decreciente
+        let baseRadius = 0;
+        let isPercentage = false;
+        const configRadius = this.config.event_border_radius || '0px';
+
+        if (configRadius.endsWith('%')) {
+            isPercentage = true;
+            baseRadius = parseFloat(configRadius);
+        } else {
+            baseRadius = parseFloat(configRadius) || 0;
+        }
+
         let root = null;
         let currentParent = null;
 
-        events.forEach(ev => {
+        events.forEach((ev, index) => {
             const div = document.createElement('div');
             div.className = `concentric-layer border-${ev.type}`;
             div.title = ev.title;
+
+            // Calcular radio para esta capa
+            if (isPercentage) {
+                div.style.borderRadius = configRadius;
+            } else {
+                // Restar el ancho del borde acumulado
+                // Capa 0 (externa): baseRadius
+                // Capa 1: baseRadius - borderWidth
+                const currentRadius = Math.max(0, baseRadius - (index * this.borderWidth));
+                div.style.borderRadius = `${currentRadius}px`;
+            }
 
             if (!root) {
                 root = div;

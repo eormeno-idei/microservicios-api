@@ -69,6 +69,7 @@ class CalendarDemoService extends AbstractUIService
                 ->showSaturdayInfo(false)
                 ->showSundayInfo(false)
                 ->cellSize('60px')
+                ->eventBorderRadius('50%')
         );
     }
 

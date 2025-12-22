@@ -19,6 +19,7 @@ class CalendarBuilder extends UIComponent
             'min_height' => '30px',
             'max_height' => null,
             'cell_size' => null,
+            'event_border_radius' => '0px',
         ];
     }
 
@@ -67,5 +68,10 @@ class CalendarBuilder extends UIComponent
         // Limitación entre 1 y 3
         $columns = max(1, min(3, $columns));
         return $this->setConfig('references_columns', $columns);
+    }
+
+    public function eventBorderRadius(string $radius): static
+    {
+        return $this->setConfig('event_border_radius', $radius);
     }
 }
