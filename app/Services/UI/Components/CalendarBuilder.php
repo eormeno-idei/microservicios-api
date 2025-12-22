@@ -20,6 +20,8 @@ class CalendarBuilder extends UIComponent
             'max_height' => null,
             'cell_size' => null,
             'event_border_radius' => '0px',
+            'number_style' => [],
+            'border_radius' => '12px',
         ];
     }
 
@@ -38,6 +40,11 @@ class CalendarBuilder extends UIComponent
         return $this->setConfig('events', $events);
     }
 
+    public function borderRadius(string $radius): static
+    {
+        return $this->setConfig('border_radius', $radius);
+    }
+
     public function cellSize(string $size): static
     {
         return $this->setConfig('cell_size', $size);
@@ -51,6 +58,11 @@ class CalendarBuilder extends UIComponent
     public function maxHeight(string $height): static
     {
         return $this->setConfig('max_height', $height);
+    }
+
+    public function numberStyle(array $style): static
+    {
+        return $this->setConfig('number_style', $style);
     }
 
     public function showSaturdayInfo(bool $show = true): static

@@ -51,7 +51,7 @@ class CalendarComponent extends UIComponent {
 
             .calendar-wrapper {
                 background: white;
-                border-radius: 12px;
+                border-radius: var(--calendar-border-radius, 12px);
                 box-shadow: none;
                 border: 1px solid #e0e0e0;
                 overflow: hidden; width: 100%; max-width: 700px;
@@ -110,10 +110,16 @@ class CalendarComponent extends UIComponent {
             .num-circle-web {
                 width: 28px; height: 28px;
                 min-width: 28px; min-height: 28px; /* Prevent shrinking */
-                background: white; color: black; border-radius: 50%;
+                background: var(--number-bg-color, white);
+                color: var(--number-color, black);
+                border-radius: 50%;
                 display: flex; align-items: center; justify-content: center;
-                font-size: 1.1rem; font-weight: 800;
-                box-shadow: 0 1px 2px rgba(0,0,0,0.3); z-index: 2;
+                font-family: var(--number-font-family, inherit);
+                font-size: var(--number-font-size, 1.1rem);
+                font-weight: var(--number-font-weight, 800);
+                font-style: var(--number-font-style, normal);
+                box-shadow: var(--number-shadow, 0 1px 2px rgba(0,0,0,0.3));
+                z-index: 2;
                 flex-shrink: 0; /* Prevent flexbox shrinking */
             }
 
@@ -183,9 +189,26 @@ class CalendarComponent extends UIComponent {
             container.style.setProperty('--event-border-radius', this.config.event_border_radius);
         }
 
+        // Apply calendar wrapper border radius
+        if (this.config.border_radius) {
+            container.style.setProperty('--calendar-border-radius', this.config.border_radius);
+        }
+
         // Define border width constant
         this.borderWidth = 7;
         container.style.setProperty('--event-border-width', `${this.borderWidth}px`);
+
+        // Apply number style config
+        if (this.config.number_style) {
+            const ns = this.config.number_style;
+            if (ns.color) container.style.setProperty('--number-color', ns.color);
+            if (ns.font_family) container.style.setProperty('--number-font-family', ns.font_family);
+            if (ns.font_size) container.style.setProperty('--number-font-size', ns.font_size);
+            if (ns.font_weight) container.style.setProperty('--number-font-weight', ns.font_weight);
+            if (ns.font_style) container.style.setProperty('--number-font-style', ns.font_style);
+            if (ns.background_color) container.style.setProperty('--number-bg-color', ns.background_color);
+            if (ns.box_shadow) container.style.setProperty('--number-shadow', ns.box_shadow);
+        }
 
         this.applyCommonAttributes(container);
 

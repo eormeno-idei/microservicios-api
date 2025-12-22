@@ -18,6 +18,8 @@ The builder provides a fluent interface to configure the component state.
 - `maxHeight(string $height)`: Sets the maximum height of the day cells.
 - `cellSize(string $size)`: Sets a fixed width and height for the day cells (e.g., '40px'). Overrides min/max height logic and forces grid columns to match this size.
 - `eventBorderRadius(string $radius)`: Sets the border radius for event layers (e.g., '50%' for circles, '8px' for rounded corners).
+- `numberStyle(array $style)`: Configures the visual style of the day number circle. Keys: `color`, `font_family`, `font_size`, `font_weight`, `font_style`, `background_color`, `box_shadow`.
+- `borderRadius(string $radius)`: Sets the border radius of the entire calendar container (e.g., '12px', '0').
 
 ## Data Structures
 

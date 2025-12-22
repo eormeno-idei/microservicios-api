@@ -11,8 +11,7 @@ class CalendarDemoService extends AbstractUIService
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
-            ->title('Calendar Component Demo')
-            ->maxWidth('800px')
+            ->maxWidth('600px')
             ->centerHorizontal()
             ->shadow(0)
             ->padding('30px');
@@ -70,6 +69,13 @@ class CalendarDemoService extends AbstractUIService
                 ->showSundayInfo(false)
                 ->cellSize('60px')
                 ->eventBorderRadius('50%')
+                ->numberStyle([
+                    'font_size' => '13px',
+                    'background_color' => '#ffffff',
+                    'color' => '#333333',
+                    'box_shadow' => 'none'
+                ])
+                ->borderRadius('2px')
         );
     }
 
