@@ -22,6 +22,60 @@ class CalendarComponent extends UIComponent {
         this.injectStyles();
     }
 
+    /**
+     * Update component with new config
+     * @param {object} newConfig
+     */
+    update(newConfig) {
+        // Merge config
+        this.config = { ...this.config, ...newConfig };
+
+        // Update events if provided
+        if (newConfig.events) {
+            this.events = newConfig.events;
+        }
+
+        // Update date if provided
+        if (newConfig.year && newConfig.month) {
+            this.currentDate = new Date(newConfig.year, newConfig.month - 1, 1);
+        }
+
+        // Update CSS variables on container
+        if (this.element) {
+             if (newConfig.cell_size) {
+                this.element.style.setProperty('--day-size', newConfig.cell_size);
+                this.element.style.setProperty('--grid-columns', `repeat(7, ${newConfig.cell_size})`);
+            }
+            if (newConfig.event_border_radius) {
+                this.element.style.setProperty('--event-border-radius', newConfig.event_border_radius);
+            }
+            if (newConfig.border_radius) {
+                this.element.style.setProperty('--calendar-border-radius', newConfig.border_radius);
+            }
+            if (newConfig.min_height) {
+                this.element.style.setProperty('--day-min-height', newConfig.min_height);
+            }
+            if (newConfig.max_height) {
+                this.element.style.setProperty('--day-max-height', newConfig.max_height);
+            }
+
+            // Update number style if changed
+            if (newConfig.number_style) {
+                const ns = newConfig.number_style;
+                if (ns.color) this.element.style.setProperty('--number-color', ns.color);
+                if (ns.font_family) this.element.style.setProperty('--number-font-family', ns.font_family);
+                if (ns.font_size) this.element.style.setProperty('--number-font-size', ns.font_size);
+                if (ns.font_weight) this.element.style.setProperty('--number-font-weight', ns.font_weight);
+                if (ns.font_style) this.element.style.setProperty('--number-font-style', ns.font_style);
+                if (ns.background_color) this.element.style.setProperty('--number-bg-color', ns.background_color);
+                if (ns.box_shadow) this.element.style.setProperty('--number-shadow', ns.box_shadow);
+            }
+        }
+
+        // Re-render grid
+        this.updateCalendar();
+    }
+
     injectStyles() {
         if (document.getElementById('calendar-component-styles')) return;
 

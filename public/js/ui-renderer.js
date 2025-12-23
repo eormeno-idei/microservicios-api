@@ -2021,6 +2021,15 @@ class UIRenderer {
      */
     updateComponent(element, changes) {
         try {
+            // Generic component update delegation
+            const componentId = element.getAttribute('data-component-id');
+            if (componentId && this.components) {
+                const component = this.components.get(String(componentId));
+                if (component && typeof component.update === 'function') {
+                    component.update(changes);
+                }
+            }
+
             // Button in table cell - needs special handling to update the button inside the cell
             if (changes.button !== undefined && element.tagName === 'TD') {
                 // Clear the cell and re-render with new button
