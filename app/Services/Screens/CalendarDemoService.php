@@ -47,16 +47,6 @@ class CalendarDemoService extends AbstractUIService
         $year = $params['year'];
         $month = $params['month'];
         $monthEvents = CalendarioAcadémico::getMonthEvents($year, $month);
-        // Only for demonstration, if month changed is 5/2026,
-        // set an event in the 5th
-        if ($year === 2026 && $month === 5) {
-            $monthEvents[] = [
-                'date' => '2026-05-05',
-                'type' => 'special',
-                'title' => 'Mi Cumpleaños!',
-            ];
-        }
         $this->academic_calendar->events($monthEvents);
-
     }
 }

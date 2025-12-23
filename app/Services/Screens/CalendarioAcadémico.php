@@ -68,6 +68,15 @@ class CalendarioAcadémico
                 }
             }
         }
+        // Si el mes y año coinciden con now, agregar evento "hoy" al día actual
+        $now = new DateTime();
+        if ((int)$now->format('Y') === $year && (int)$now->format('n') === $month) {
+            $monthEvents[] = [
+                'date' => $now->format('Y-m-d'),
+                'type' => 'today',
+                'title' => 'Hoy',
+            ];
+        }
         return $monthEvents;
     }
 }
