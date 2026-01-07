@@ -21,6 +21,24 @@ The builder provides a fluent interface to configure the component state.
 - `numberStyle(array $style)`: Configures the visual style of the day number circle. Keys: `color`, `font_family`, `font_size`, `font_weight`, `font_style`, `background_color`, `box_shadow`.
 - `borderRadius(string $radius)`: Sets the border radius of the entire calendar container (e.g., '12px', '0').
 
+## Example Usage
+```php
+UIBuilder::calendar('academic_calendar')
+    ->year(2026)
+    ->month(4)
+    ->showSaturdayInfo(false)
+    ->showSundayInfo(false)
+    ->cellSize('60px')
+    ->eventBorderRadius('50%')
+    ->numberStyle([
+        'font_size' => '13px',
+        'background_color' => '#ffffff',
+        'color' => '#333333'
+    ])
+    ->borderRadius('2px')
+    ->referencesColumns(2);
+```
+
 ## Data Structures
 
 ### Event Object
@@ -38,6 +56,13 @@ Events can be single-day or multi-day ranges.
 
 ### CSS Classes & Variables
 - **Event Colors**: defined via CSS variables (e.g., `--color-feriado`, `--color-examen`).
+- **Dynamic Config Variables**:
+    - `--calendar-border-radius`: Container radius.
+    - `--event-border-radius`: Event layer radius.
+    - `--day-min-height`: Minimum cell height.
+    - `--day-size`: Fixed cell size (if set).
+    - `--grid-columns`: Grid column definition.
+    - `--number-color`, `--number-bg-color`, `--number-font-size`, etc.: Day number style.
 - **Classes**: 
     - `.bg-{type}`: Applies background color.
     - `.border-{type}`: Applies border color.
