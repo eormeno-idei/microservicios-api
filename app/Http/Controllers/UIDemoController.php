@@ -2,14 +2,19 @@
 namespace App\Http\Controllers;
 
 use App\Services\UI\Support\UIDebug;
-use App\Services\UI\UIChangesCollector;
+use App\Services\UI\UIChangesCollector as AppChangesCollector;
+use Idei\Usim\Services\UIChangesCollector as PackageChangesCollector;
+use Idei\Usim\Services\AbstractUIService as PackageUIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
 class UIDemoController extends Controller
 {
 
-    public function __construct(protected UIChangesCollector $uiChanges)
+    public function __construct(
+        protected AppChangesCollector $appChanges,
+        protected PackageChangesCollector $packageChanges
+    )
     {
     }
 
@@ -43,7 +48,8 @@ class UIDemoController extends Controller
             ], 404);
         }
 
-        $this->uiChanges->setStorage($incomingStorage);
+        $this->appChanges->setStorage($incomingStorage);
+        $this->packageChanges->setStorage($incomingStorage);
 
         // Instantiate service using Laravel's service container
         // This allows dependency injection to work
@@ -61,7 +67,13 @@ class UIDemoController extends Controller
         );
         $service->finalizeEventContext(reload: true);
 
-        $result = $this->uiChanges->all();
+        // Resolve result based on Service Type
+        if ($service instanceof PackageUIService) {
+            $result = $this->packageChanges->all();
+        } else {
+            $result = $this->appChanges->all();
+        }
+
         return response()->json($result);
     }
 }

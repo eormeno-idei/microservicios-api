@@ -1,20 +1,20 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Support\UIDebug;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Support\UIDebug;
 use Illuminate\Support\Facades\Auth;
-use App\Services\UI\Enums\AlignItems;
-use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
+use Idei\Usim\Services\Enums\AlignItems;
+use Idei\Usim\Services\Enums\DialogType;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\AbstractUIService;
 use App\Services\Upload\UploadService;
-use App\Services\UI\Support\HttpClient;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Modals\ConfirmDialogService;
+use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\Enums\JustifyContent;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
-use App\Services\UI\Components\MenuDropdownBuilder;
+use Idei\Usim\Services\Components\MenuDropdownBuilder;
 
 /**
  * Demo Menu Service

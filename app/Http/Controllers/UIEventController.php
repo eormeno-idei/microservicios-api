@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Services\UI\UIChangesCollector;
-use App\Services\UI\Support\UIIdGenerator;
+use App\Services\UI\UIChangesCollector as AppChangesCollector;
+use Idei\Usim\Services\UIChangesCollector as PackageChangesCollector;
+use App\Services\UI\Support\UIIdGenerator as AppIdGenerator;
+use Idei\Usim\Services\Support\UIIdGenerator as PackageIdGenerator;
 
 /**
  * UI Event Controller
@@ -24,7 +26,10 @@ use App\Services\UI\Support\UIIdGenerator;
 class UIEventController extends Controller
 {
 
-    public function __construct(protected UIChangesCollector $uiChanges)
+    public function __construct(
+        protected AppChangesCollector $appChanges,
+        protected PackageChangesCollector $packageChanges
+    )
     {
     }
 
@@ -36,7 +41,7 @@ class UIEventController extends Controller
      */
     public function handleEvent(Request $request): JsonResponse
     {
-        $incomingStorage = $request->storage;
+        $incomingStorage = $request->storage ?? [];
 
         // Validate request
         $validated = $request->validate([
@@ -53,15 +58,18 @@ class UIEventController extends Controller
         try {
             // Check if there's a caller service ID (for modal callbacks)
             $callerServiceId = $parameters['_caller_service_id'] ?? null;
-            unset($parameters['_caller_service_id']); // Remove internal parameter
+            if (isset($parameters['_caller_service_id'])) {
+                unset($parameters['_caller_service_id']); // Remove internal parameter
+            }
 
             // Resolve service class from component ID or caller service ID
             if ($callerServiceId) {
-                // Use the caller service (the one that opened the modal)
-                $serviceClass = UIIdGenerator::getContextFromId($callerServiceId);
+                // Try Package first, then App
+                $serviceClass = PackageIdGenerator::getContextFromId((int)$callerServiceId)
+                             ?? AppIdGenerator::getContextFromId((int)$callerServiceId);
             } else {
-                // Use the component's service (normal flow)
-                $serviceClass = UIIdGenerator::getContextFromId($componentId);
+                $serviceClass = PackageIdGenerator::getContextFromId((int)$componentId)
+                             ?? AppIdGenerator::getContextFromId((int)$componentId);
             }
 
 
@@ -84,17 +92,36 @@ class UIEventController extends Controller
                 ], 404);
             }
 
-            $this->uiChanges->setStorage($incomingStorage);
+            // Init BOTH collectors
+            $this->appChanges->setStorage($incomingStorage);
+            $this->packageChanges->setStorage($incomingStorage);
+
             $service->initializeEventContext($incomingStorage);
             $service->$method($parameters);
             $service->finalizeEventContext();
-            $result = $this->uiChanges->all();
+
+            // Resolve and merge results from BOTH collectors
+            $pkgResult = $this->packageChanges->all();
+            $appResult = $this->appChanges->all();
+
+            // Custom merge to preserve numeric keys (Component IDs)
+            $result = $appResult;
+            foreach ($pkgResult as $key => $value) {
+                if (isset($result[$key]) && is_array($value) && is_array($result[$key])) {
+                    $result[$key] = array_merge_recursive($result[$key], $value);
+                } else {
+                    $result[$key] = $value;
+                }
+            }
 
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Internal server error',
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'message' => config('app.debug') ? $e->getMessage() : null,
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null,
             ], 500);
         }
     }

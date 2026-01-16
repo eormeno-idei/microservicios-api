@@ -1,0 +1,28 @@
+{
+    "name": "idei/usim",
+    "description": "UI Services Implementation Model Framework",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Idei Team",
+            "email": "dev@idei.cl"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^10.0|^11.0|^12.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Idei\\Usim\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Idei\\Usim\\UsimServiceProvider"
+            ]
+        }
+    }
+}
