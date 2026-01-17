@@ -1601,14 +1601,20 @@ class UIContainer implements UIElement
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
 
-        // Buscar en el stack trace la primera clase que NO sea del namespace UI
+        // Buscar en el stack trace la primera clase que NO sea del namespace UI (Legacy o Package)
         foreach ($trace as $frame) {
-            if (
-                isset($frame['class']) &&
-                !str_starts_with($frame['class'], 'App\\Services\\UI\\')
-            ) {
-                // Retornar el nombre completo con namespace (no solo el basename)
-                return $frame['class'];
+            if (isset($frame['class'])) {
+                 // Skip internal classes from Legacy Framework
+                 if (str_starts_with($frame['class'], 'App\\Services\\UI\\')) {
+                     continue;
+                 }
+                 // Skip internal classes from New Package Framework
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Services\\')) {
+                     continue;
+                 }
+
+                 // Found the consumer service!
+                 return $frame['class'];
             }
         }
 

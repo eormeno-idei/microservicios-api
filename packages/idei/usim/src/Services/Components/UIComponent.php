@@ -7,7 +7,7 @@ use Idei\Usim\Services\Support\UIIdGenerator;
 
 /**
  * Abstract base class for all leaf UI components (Button, Label, Table, etc.)
- * 
+ *
  * This class implements the common functionality for leaf nodes in the UI tree.
  * Leaf components cannot have children and represent atomic UI elements.
  */
@@ -42,7 +42,7 @@ abstract class UIComponent implements UIElement
             'visible' => true,
             'parent' => null,
         ], $this->getDefaultConfig());
-        
+
         // Only include 'name' if it's not null
         if ($this->name !== null) {
             $this->config['name'] = $this->name;
@@ -97,21 +97,27 @@ abstract class UIComponent implements UIElement
     /**
      * Detecta automáticamente la clase que está invocando el builder
      * Busca en el stack trace la primera clase fuera del namespace UI
-     * 
+     *
      * @return string El nombre completo con namespace de la clase invocante
      */
     private function detectCallingContext(): string
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
 
-        // Buscar en el stack trace la primera clase que NO sea del namespace UI
+        // Buscar en el stack trace la primera clase que NO sea del namespace UI (Legacy o Package)
         foreach ($trace as $frame) {
-            if (
-                isset($frame['class']) &&
-                !str_starts_with($frame['class'], 'App\\Services\\UI\\')
-            ) {
-                // Retornar el nombre completo con namespace (no solo el basename)
-                return $frame['class'];
+            if (isset($frame['class'])) {
+                 // Skip internal classes from Legacy Framework
+                 if (str_starts_with($frame['class'], 'App\\Services\\UI\\')) {
+                     continue;
+                 }
+                 // Skip internal classes from New Package Framework
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Services\\')) {
+                     continue;
+                 }
+
+                 // Found the consumer service!
+                 return $frame['class'];
             }
         }
 
@@ -121,7 +127,7 @@ abstract class UIComponent implements UIElement
     /**
      * Genera ID determinístico basado en contexto + nombre
      * Siempre retorna el mismo ID para el mismo contexto + nombre
-     * 
+     *
      * @param string $context Nombre completo de la clase invocante
      * @param string $name Nombre del componente
      * @return int ID determinístico
@@ -130,17 +136,17 @@ abstract class UIComponent implements UIElement
     {
         // Obtener offset del contexto (ej: 56150000)
         $offset = $this->getContextOffset($context);
-        
+
         // Hash del nombre (0-9999)
         $hash = abs(crc32($name)) % 9999;
-        
+
         // ID final: offset + hash + 1
         return $offset + $hash + 1;
     }
 
     /**
      * Obtener offset del contexto (mismo cálculo que UIIdGenerator)
-     * 
+     *
      * @param string $context Nombre completo de la clase
      * @return int Offset único para el contexto
      */
@@ -149,14 +155,14 @@ abstract class UIComponent implements UIElement
         if ($context === 'default') {
             return 0;
         }
-        
+
         // Generar un hash numérico único del nombre de la clase usando CRC32
         $hash = crc32($context);
-        
+
         // Convertir a positivo si es negativo y escalar al rango deseado
         // Múltiplos de 10000, máximo 9999 contextos diferentes
         $offset = (abs($hash) % 9999) * 10000;
-        
+
         return $offset;
     }
 
@@ -173,7 +179,7 @@ abstract class UIComponent implements UIElement
     /**
      * Get the default configuration for this component type
      * Must be implemented by each concrete component
-     * 
+     *
      * @return array Default configuration values
      */
     abstract protected function getDefaultConfig(): array;
@@ -188,7 +194,7 @@ abstract class UIComponent implements UIElement
 
     /**
      * Get the component name
-     * 
+     *
      * @return string|null Component name or null if not set
      */
     public function getName(): ?string
@@ -278,7 +284,7 @@ abstract class UIComponent implements UIElement
 
     /**
      * Fluent API for setting parent
-     * 
+     *
      * @param int|string|null $parent The parent (int = parent ID, string = parent name, null = delete)
      * @return static For method chaining
      */
@@ -289,7 +295,7 @@ abstract class UIComponent implements UIElement
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * For leaf components, returns the configuration wrapped in the component ID
      * Null values are filtered out from the configuration
      */
@@ -300,21 +306,21 @@ abstract class UIComponent implements UIElement
     {
         // Filter out null values from config
         $config = array_filter($this->config, fn($value) => $value !== null);
-        
+
         // Remove default visible value to save JSON size
         if (isset($config['visible']) && $config['visible'] === true) {
             unset($config['visible']);
         }
-        
+
         // Add _order if provided by parent
         if ($order !== null) {
             $config['_order'] = $order;
         }
-        
+
         // CRITICAL: Include component ID in config for frontend lookups
         // This is needed because JSON_FORCE_OBJECT reindexes array keys
         $config['_id'] = $this->id;
-        
+
         // Return as associative array with component ID as key
         return [$this->id => $config];
     }
@@ -322,7 +328,7 @@ abstract class UIComponent implements UIElement
     /**
      * Get list of config keys to exclude from JSON output
      * Override in subclasses to customize
-     * 
+     *
      * @return array List of keys to exclude
      */
     protected function getExcludedJsonKeys(): array
@@ -333,7 +339,7 @@ abstract class UIComponent implements UIElement
     /**
      * Get the component configuration (without ID wrapper)
      * Useful for internal operations
-     * 
+     *
      * @return array The configuration array
      */
     protected function getConfig(): array
@@ -343,7 +349,7 @@ abstract class UIComponent implements UIElement
 
     /**
      * Set a configuration value
-     * 
+     *
      * @param string $key The configuration key
      * @param mixed $value The configuration value
      * @return static For method chaining
@@ -356,10 +362,10 @@ abstract class UIComponent implements UIElement
 
     /**
      * Get a configuration value
-     * 
+     *
      * Allows reading component properties from event handlers.
      * Useful for getting current state like text, value, checked, etc.
-     * 
+     *
      * @param string $key The configuration key
      * @param mixed $default Default value if key doesn't exist
      * @return mixed The configuration value or default
@@ -371,7 +377,7 @@ abstract class UIComponent implements UIElement
 
     /**
      * Método de utilidad para debugging - obtiene información del contexto
-     * 
+     *
      * @param string $context Nombre del contexto
      * @return array Información del contexto (offset, contador, etc)
      */

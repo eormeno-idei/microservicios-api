@@ -42,6 +42,7 @@ class UIEventController extends Controller
     public function handleEvent(Request $request): JsonResponse
     {
         $incomingStorage = $request->storage ?? [];
+        // \Illuminate\Support\Facades\Log::info('UIEventController Incoming Storage:', $incomingStorage);
 
         // Validate request
         $validated = $request->validate([
@@ -105,6 +106,23 @@ class UIEventController extends Controller
             $appResult = $this->appChanges->all();
 
             // Custom merge to preserve numeric keys (Component IDs)
+            // Fix: Exclude 'storage' from generic recursive merge to avoid array conversion of encryption string
+            // Logic: Determine authoritative storage source based on service type
+
+            $authoritativeCollector = null;
+            if ($service instanceof \Idei\Usim\Services\AbstractUIService) {
+                $authoritativeCollector = $this->packageChanges;
+            } elseif ($service instanceof \App\Services\UI\AbstractUIService) {
+                $authoritativeCollector = $this->appChanges;
+            }
+
+            // Get the correct storage block
+            $finalStorage = $authoritativeCollector ? $authoritativeCollector->all()['storage'] ?? null : null;
+
+            // Remove storage from intermediate results to prevent dirty merge
+            if (isset($pkgResult['storage'])) unset($pkgResult['storage']);
+            if (isset($appResult['storage'])) unset($appResult['storage']);
+
             $result = $appResult;
             foreach ($pkgResult as $key => $value) {
                 if (isset($result[$key]) && is_array($value) && is_array($result[$key])) {
@@ -112,6 +130,11 @@ class UIEventController extends Controller
                 } else {
                     $result[$key] = $value;
                 }
+            }
+
+            // Re-attach the correct storage
+            if ($finalStorage) {
+                $result['storage'] = $finalStorage;
             }
 
             return response()->json($result);

@@ -146,10 +146,12 @@ abstract class AbstractUIService
 
             // Check if this key exists in incoming storage
             if (!array_key_exists($propertyName, $incomingStorage)) {
+                 // \Illuminate\Support\Facades\Log::info("Skipping inject $propertyName - Not in storage");
                 continue;
             }
 
             $value = $incomingStorage[$propertyName];
+            // \Illuminate\Support\Facades\Log::info("Injecting $propertyName = $value");
 
             // Set the value
             $property->setValue($this, $value);

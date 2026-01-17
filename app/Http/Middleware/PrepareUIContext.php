@@ -36,15 +36,30 @@ class PrepareUIContext
     private function decryptUsimStorage(Request $request): void
     {
         $storage = [];
+        $encrypted = null;
 
+        // 1. Intentar obtener desde Header (y verificar que no esté vacío)
         if ($request->hasHeader('X-USIM-Storage')) {
-            $encrypted = $request->header('X-USIM-Storage');
+            $headerValue = $request->header('X-USIM-Storage');
+            if (!empty($headerValue) && $headerValue !== 'null' && $headerValue !== 'undefined') {
+                $encrypted = $headerValue;
+            }
+        }
+
+        // 2. Si no hay header válido, intentar desde Input 'usim'
+        if (empty($encrypted) && $request->has('usim')) {
+            $encrypted = $request->input('usim');
+        }
+
+        if ($encrypted) {
             try {
                 // Desencripta el contenido utilizando la APP_KEY del proyecto
                 $decrypted = decrypt($encrypted);
                 $storage = json_decode($decrypted, true);
+                \Illuminate\Support\Facades\Log::info('UIContext Decrypted:', ['keys' => array_keys($storage ?? [])]);
 
             } catch (DecryptException $e) {
+                \Illuminate\Support\Facades\Log::warning('UIContext Decrypt Failed: ' . $e->getMessage());
                 // Silently fail - storage will be empty
             }
         }
