@@ -3,15 +3,15 @@ namespace App\Services\Screens;
 
 use App\Models\User;
 use App\Events\UsimEvent;
-use App\Services\UI\UIBuilder;
+use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Enums\JustifyContent;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Support\UIStateManager;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Enums\JustifyContent;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\LabelBuilder;
+use Idei\Usim\Services\Support\UIStateManager;
 
 class LoginService extends AbstractUIService
 {
