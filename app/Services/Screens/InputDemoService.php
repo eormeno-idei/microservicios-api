@@ -1,11 +1,11 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\InputBuilder;
-use App\Services\UI\Components\LabelBuilder;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\InputBuilder;
+use Idei\Usim\Services\Components\LabelBuilder;
 
 /**
  * Input Demo Service
