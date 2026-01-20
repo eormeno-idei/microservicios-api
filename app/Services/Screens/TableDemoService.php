@@ -3,21 +3,21 @@
 namespace App\Services\Screens;
 
 use App\Models\User;
-use App\Services\UI\UIBuilder;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\TableBuilder;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\TableBuilder;
 use App\Services\UI\DataTable\UsersTableModel;
 
 /**
  * Table Demo Service
- * 
+ *
  * Demonstrates table functionality with:
  * - AbstractDataTableModel for data management
  * - Pagination handled by the model
  * - Edit and Remove action buttons
  * - Column width constraints
- * 
+ *
  * Version: 2.0 (with DataTableModel abstraction)
  */
 class TableDemoService extends AbstractUIService

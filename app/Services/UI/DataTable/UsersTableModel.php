@@ -3,6 +3,7 @@
 namespace App\Services\UI\DataTable;
 
 use App\Models\User;
+use Idei\Usim\Services\DataTable\AbstractDataTableModel;
 
 /**
  * Users Table Model
