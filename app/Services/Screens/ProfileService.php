@@ -3,18 +3,18 @@
 namespace App\Services\Screens;
 
 use App\Events\UsimEvent;
-use App\Services\UI\UIBuilder;
+use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-use App\Services\UI\AbstractUIService;
+use Idei\Usim\Services\AbstractUIService;
 use App\Services\Upload\UploadService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Password;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\InputBuilder;
-use App\Services\UI\Components\LabelBuilder;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\InputBuilder;
+use Idei\Usim\Services\Components\LabelBuilder;
 use Illuminate\Auth\Notifications\VerifyEmail;
-use App\Services\UI\Components\UploaderBuilder;
+use Idei\Usim\Services\Components\UploaderBuilder;
 
 /**
  * Profile Service
