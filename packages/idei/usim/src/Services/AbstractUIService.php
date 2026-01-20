@@ -17,6 +17,7 @@ use Idei\Usim\Services\Components\TableHeaderRowBuilder;
 use Idei\Usim\Services\Components\TableRowBuilder;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\UploaderBuilder;
+use Idei\Usim\Services\Components\CalendarBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Support\UIDiffer;
@@ -409,7 +410,7 @@ abstract class AbstractUIService
             'tableheaderrow' => TableHeaderRowBuilder::class,
             'menudropdown' => MenuDropdownBuilder::class,
             'uploader' => UploaderBuilder::class,
-            'calendar' => \App\Services\UI\Components\CalendarBuilder::class,
+            'calendar' => CalendarBuilder::class,
             'default' => null,
         };
     }
