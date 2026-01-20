@@ -3,8 +3,9 @@
 namespace App\Services\UI\DataTable;
 
 use App\Services\UI\Support\UIDebug;
-use App\Services\UI\Support\HttpClient;
-use App\Services\UI\Support\UIStateManager;
+use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\Support\UIStateManager;
+use Idei\Usim\Services\DataTable\AbstractDataTableModel;
 
 /**
  * User API Table Model

@@ -1,17 +1,17 @@
 <?php
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Support\HttpClient;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\InputBuilder;
-use App\Services\UI\Components\TableBuilder;
-use App\Services\UI\Components\ButtonBuilder;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Enums\DialogType;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\InputBuilder;
+use Idei\Usim\Services\Components\TableBuilder;
+use Idei\Usim\Services\Components\ButtonBuilder;
 use App\Services\UI\DataTable\UserApiTableModel;
-use App\Services\UI\Modals\ConfirmDialogService;
+use Idei\Usim\Services\Modals\ConfirmDialogService;
 use App\Services\UI\Modals\EditUserDialogService;
 use App\Services\UI\Modals\RegisterDialogService;
 

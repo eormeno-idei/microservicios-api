@@ -62,18 +62,18 @@ class ProfileService extends AbstractUIService
         $container->add($this->input_email);
 
         // Nombre
-        $container->add(
-            UIBuilder::input('input_name')
-                ->label('Nombre Completo')
-                ->type('text')
-                ->placeholder('Tu nombre completo')
-                ->value($user->name ?? '')
-                ->required(true)
-                ->width('100%')
-        );
+        $this->input_name = UIBuilder::input('input_name')
+            ->label('Nombre Completo')
+            ->type('text')
+            ->placeholder('Tu nombre completo')
+            ->value($user->name ?? '')
+            ->required(true)
+            ->width('100%');
+
+        $container->add($this->input_name);
 
         // Foto de perfil
-        $uploaderProfile = UIBuilder::uploader('uploader_profile')
+        $this->uploader_profile = UIBuilder::uploader('uploader_profile')
             ->allowedTypes(['image/*'])
             ->label('Foto de Perfil')
             ->maxFiles(1)
@@ -81,7 +81,7 @@ class ProfileService extends AbstractUIService
             ->aspect('1:1')
             ->size(1);
 
-        $container->add($uploaderProfile);
+        $container->add($this->uploader_profile);
 
         // Botones de acción
         $container->add(
@@ -130,6 +130,7 @@ class ProfileService extends AbstractUIService
      */
     public function onSaveProfile(array $params): void
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         // Obtener datos del formulario
@@ -165,6 +166,7 @@ class ProfileService extends AbstractUIService
      */
     public function onResendVerification(array $params): void
     {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if ($user->email_verified_at) {
@@ -173,7 +175,7 @@ class ProfileService extends AbstractUIService
         }
 
         // Enviar notificación de verificación
-        $user->notify(new VerifyEmail());
+        $user->sendEmailVerificationNotification();
 
         $this->toast('Email de verificación enviado. Revisa tu bandeja de entrada', 'success');
     }
