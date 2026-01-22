@@ -4,7 +4,7 @@ namespace App\Services\UI\Components;
 
 use Idei\Usim\Services\Enums\AlignItems;
 use Idei\Usim\Services\Enums\LayoutType;
-use App\Services\UI\Contracts\UIElement;
+use Idei\Usim\Services\Contracts\UIElement;
 use Idei\Usim\Services\Enums\JustifyContent;
 use App\Services\UI\Support\UIIdGenerator;
 

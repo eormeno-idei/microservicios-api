@@ -3,7 +3,7 @@
 namespace App\Services\UI\Components;
 
 use Illuminate\Support\Facades\Log;
-use App\Services\UI\Contracts\UIElement;
+use Idei\Usim\Services\Contracts\UIElement;
 
 /**
  * Builder for Table Header Row UI components

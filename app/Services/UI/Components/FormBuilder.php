@@ -2,7 +2,7 @@
 
 namespace App\Services\UI\Components;
 
-use App\Services\UI\Contracts\UIElement;
+use Idei\Usim\Services\Contracts\UIElement;
 
 /**
  * Builder for Form UI components

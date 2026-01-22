@@ -5,7 +5,7 @@ namespace App\Services\UI\Components;
 use App\Services\UI\DataTable\UsersDataTableModel;
 use App\Services\UI\Support\UIDebug;
 use Illuminate\Support\Facades\Log;
-use App\Services\UI\Contracts\UIElement;
+use Idei\Usim\Services\Contracts\UIElement;
 use App\Services\UI\DataTable\AbstractDataTableModel;
 
 /**
