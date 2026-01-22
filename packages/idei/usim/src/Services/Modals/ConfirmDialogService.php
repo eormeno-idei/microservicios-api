@@ -53,6 +53,11 @@ class ConfirmDialogService implements UIModal
      */
     private function getUI(...$params): array
     {
+        // Support passing an entire config array as the first argument
+        if (isset($params[0]) && is_array($params[0])) {
+            $params = $params[0];
+        }
+
         // Extract dialog type (default to CONFIRM for backward compatibility)
         $type = $params['type'] ?? DialogType::CONFIRM;
         if (\is_string($type)) {
