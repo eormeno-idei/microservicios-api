@@ -2,7 +2,7 @@
 
 namespace App\Services\UI\Components;
 
-use App\Services\UI\Enums\Align;
+use Idei\Usim\Services\Enums\Align;
 
 /**
  * Builder for Table Cell UI components

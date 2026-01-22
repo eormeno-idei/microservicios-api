@@ -3,8 +3,8 @@
 namespace App\Services\UI\Modals;
 
 use App\Services\UI\UIBuilder;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\Enums\JustifyContent;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\Enums\JustifyContent;
 
 /**
  * Login Dialog Service

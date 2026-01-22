@@ -2,8 +2,8 @@
 
 namespace App\Services\UI\Components;
 
-use App\Services\UI\Enums\Align;
-use App\Services\UI\Enums\FontWeight;
+use Idei\Usim\Services\Enums\Align;
+use Idei\Usim\Services\Enums\FontWeight;
 
 /**
  * Builder for Table Header Cell UI components

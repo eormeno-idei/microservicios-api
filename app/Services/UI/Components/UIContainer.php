@@ -2,10 +2,10 @@
 
 namespace App\Services\UI\Components;
 
-use App\Services\UI\Enums\AlignItems;
-use App\Services\UI\Enums\LayoutType;
+use Idei\Usim\Services\Enums\AlignItems;
+use Idei\Usim\Services\Enums\LayoutType;
 use App\Services\UI\Contracts\UIElement;
-use App\Services\UI\Enums\JustifyContent;
+use Idei\Usim\Services\Enums\JustifyContent;
 use App\Services\UI\Support\UIIdGenerator;
 
 /**

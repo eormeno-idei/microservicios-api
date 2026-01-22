@@ -16,7 +16,7 @@ use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableRowBuilder;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Components\UploaderBuilder;
-use App\Services\UI\Enums\LayoutType;
+use Idei\Usim\Services\Enums\LayoutType;
 use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\UIDiffer;
 use App\Services\UI\Support\UIIdGenerator;
