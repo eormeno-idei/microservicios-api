@@ -2,12 +2,12 @@
 
 namespace App\Services\Screens;
 
-use App\Services\UI\UIBuilder;
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\Enums\LayoutType;
-use App\Services\UI\AbstractUIService;
-use App\Services\UI\Support\HttpClient;
-use App\Services\UI\Components\UIContainer;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Support\UIDebug;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\Components\UIContainer;
 
 class EmailVerifiedService extends AbstractUIService
 {
