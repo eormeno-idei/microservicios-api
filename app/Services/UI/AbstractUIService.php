@@ -1,21 +1,21 @@
 <?php
 namespace App\Services\UI;
 
-use App\Services\UI\Components\ButtonBuilder;
-use App\Services\UI\Components\CardBuilder;
-use App\Services\UI\Components\CheckboxBuilder;
-use App\Services\UI\Components\FormBuilder;
-use App\Services\UI\Components\InputBuilder;
-use App\Services\UI\Components\LabelBuilder;
-use App\Services\UI\Components\MenuDropdownBuilder;
-use App\Services\UI\Components\SelectBuilder;
-use App\Services\UI\Components\TableBuilder;
-use App\Services\UI\Components\TableCellBuilder;
-use App\Services\UI\Components\TableHeaderCellBuilder;
-use App\Services\UI\Components\TableHeaderRowBuilder;
-use App\Services\UI\Components\TableRowBuilder;
-use App\Services\UI\Components\UIContainer;
-use App\Services\UI\Components\UploaderBuilder;
+use Idei\Usim\Services\Components\ButtonBuilder;
+use Idei\Usim\Services\Components\CardBuilder;
+use Idei\Usim\Services\Components\CheckboxBuilder;
+use Idei\Usim\Services\Components\FormBuilder;
+use Idei\Usim\Services\Components\InputBuilder;
+use Idei\Usim\Services\Components\LabelBuilder;
+use Idei\Usim\Services\Components\MenuDropdownBuilder;
+use Idei\Usim\Services\Components\SelectBuilder;
+use Idei\Usim\Services\Components\TableBuilder;
+use Idei\Usim\Services\Components\TableCellBuilder;
+use Idei\Usim\Services\Components\TableHeaderCellBuilder;
+use Idei\Usim\Services\Components\TableHeaderRowBuilder;
+use Idei\Usim\Services\Components\TableRowBuilder;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\UploaderBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use App\Services\UI\Support\UIDebug;
 use App\Services\UI\Support\UIDiffer;
@@ -409,7 +409,7 @@ abstract class AbstractUIService
             'tableheaderrow' => TableHeaderRowBuilder::class,
             'menudropdown' => MenuDropdownBuilder::class,
             'uploader' => UploaderBuilder::class,
-            'calendar' => \App\Services\UI\Components\CalendarBuilder::class,
+            'calendar' => \Idei\Usim\Services\Components\CalendarBuilder::class,
             'default' => null,
         };
     }

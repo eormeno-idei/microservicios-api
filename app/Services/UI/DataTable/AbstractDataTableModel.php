@@ -2,7 +2,7 @@
 
 namespace App\Services\UI\DataTable;
 
-use App\Services\UI\Components\TableBuilder;
+use Idei\Usim\Services\Components\TableBuilder;
 
 /**
  * Abstract Data Table Model
