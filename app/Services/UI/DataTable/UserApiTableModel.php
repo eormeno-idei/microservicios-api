@@ -12,7 +12,7 @@ use Idei\Usim\Services\DataTable\AbstractDataTableModel;
  *
  * Implementation for real User model from database
  */
-class UserApiTableModel extends AbstractDataTableModel
+class UserApiTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTableModel
 {
     public function getColumns(): array
     {

@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
  * 
  * Implementation for the users demo data from users_data.php
  */
-class UsersDataTableModel extends AbstractDataTableModel
+class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTableModel
 {
     private static array $dataCache = [];
     private static bool $cacheInitialized = false;

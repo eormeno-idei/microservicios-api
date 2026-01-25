@@ -10,7 +10,7 @@ use Idei\Usim\Services\DataTable\AbstractDataTableModel;
  *
  * Implementation for real User model from database
  */
-class UsersTableModel extends AbstractDataTableModel
+class UsersTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTableModel
 {
     /**
      * Get all users data from database
