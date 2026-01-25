@@ -1,7 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Services\UI\Support\UIDebug;
+use Idei\Usim\Services\Support\UIDebug;
 use App\Services\UI\UIChangesCollector as AppChangesCollector;
 use Idei\Usim\Services\UIChangesCollector as PackageChangesCollector;
 use Idei\Usim\Services\AbstractUIService as PackageUIService;

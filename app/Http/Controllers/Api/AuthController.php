@@ -6,7 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Services\UI\Support\UIDebug;
+use Idei\Usim\Services\Support\UIDebug;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Services\UI\UIChangesCollector as AppChangesCollector;
 use Idei\Usim\Services\UIChangesCollector as PackageChangesCollector;
-use App\Services\UI\Support\UIIdGenerator as AppIdGenerator;
+use Idei\Usim\Services\Support\UIIdGenerator as AppIdGenerator;
 use Idei\Usim\Services\Support\UIIdGenerator as PackageIdGenerator;
 
 /**

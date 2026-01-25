@@ -2,7 +2,7 @@
 
 namespace App\Services\UI\DataTable;
 
-use App\Services\UI\Support\UIDebug;
+use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Support\HttpClient;
 use Idei\Usim\Services\Support\UIStateManager;
 use Idei\Usim\Services\DataTable\AbstractDataTableModel;

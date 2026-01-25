@@ -2,8 +2,8 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\UI\Support\UIDebug;
-use App\Services\UI\Support\UIStateManager;
+use Idei\Usim\Services\Support\UIDebug;
+use Idei\Usim\Services\Support\UIStateManager;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Encryption\DecryptException;

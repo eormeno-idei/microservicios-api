@@ -2,8 +2,8 @@
 namespace App\Listeners;
 
 use App\Events\UsimEvent;
-use App\Services\UI\Support\UIIdGenerator;
-use App\Services\UI\Support\UIStateManager;
+use Idei\Usim\Services\Support\UIIdGenerator;
+use Idei\Usim\Services\Support\UIStateManager;
 
 class UsimEventDispatcher
 {
