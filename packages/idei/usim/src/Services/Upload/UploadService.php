@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Upload;
+namespace Idei\Usim\Services\Upload;
 
 use Illuminate\Http\UploadedFile;
 

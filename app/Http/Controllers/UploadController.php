@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Upload\UploadService;
+use Idei\Usim\Services\Upload\UploadService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

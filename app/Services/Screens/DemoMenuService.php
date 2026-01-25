@@ -8,7 +8,7 @@ use Idei\Usim\Services\Enums\AlignItems;
 use Idei\Usim\Services\Enums\DialogType;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\AbstractUIService;
-use App\Services\Upload\UploadService;
+use Idei\Usim\Services\Upload\UploadService;
 use Idei\Usim\Services\Support\HttpClient;
 use Idei\Usim\Services\Enums\JustifyContent;
 use Idei\Usim\Services\Components\UIContainer;

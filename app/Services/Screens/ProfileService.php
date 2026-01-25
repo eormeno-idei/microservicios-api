@@ -7,7 +7,7 @@ use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Idei\Usim\Services\AbstractUIService;
-use App\Services\Upload\UploadService;
+use Idei\Usim\Services\Upload\UploadService;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Password;
 use Idei\Usim\Services\Components\UIContainer;
