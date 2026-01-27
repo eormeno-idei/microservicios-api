@@ -1,7 +1,6 @@
 <?php
 namespace Idei\Usim\Services;
 
-use Illuminate\Support\Facades\Log;
 use Idei\Usim\Services\Components\ButtonBuilder;
 use Idei\Usim\Services\Components\CardBuilder;
 use Idei\Usim\Services\Components\CheckboxBuilder;
@@ -17,7 +16,6 @@ use Idei\Usim\Services\Components\TableHeaderRowBuilder;
 use Idei\Usim\Services\Components\TableRowBuilder;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\UploaderBuilder;
-use Idei\Usim\Services\Components\CalendarBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Support\UIDiffer;
@@ -148,10 +146,12 @@ abstract class AbstractUIService
 
             // Check if this key exists in incoming storage
             if (!array_key_exists($propertyName, $incomingStorage)) {
+                 // \Illuminate\Support\Facades\Log::info("Skipping inject $propertyName - Not in storage");
                 continue;
             }
 
             $value = $incomingStorage[$propertyName];
+            // \Illuminate\Support\Facades\Log::info("Injecting $propertyName = $value");
 
             // Set the value
             $property->setValue($this, $value);
@@ -193,9 +193,7 @@ abstract class AbstractUIService
             $typeName = $propertyType->getName();
 
             // Only process UI component types
-            // Fix: Check for Package components OR Legacy App components
-            if (str_starts_with($typeName, 'Idei\\Usim\\Services\\Components\\') ||
-                str_starts_with($typeName, 'App\\Services\\UI\\Components\\')) {
+            if (str_starts_with($typeName, 'Idei\\Usim\\Services\\Components\\')) {
                 $componentName = $property->getName();
                 $component = $this->container->findByName($componentName);
 
@@ -292,6 +290,7 @@ abstract class AbstractUIService
      */
     protected function getStoredUI(string $parent = 'main', bool $debug = false, ...$params): array
     {
+        // Check if UI exists in cache
         $cachedUI = UIStateManager::get(static::class);
 
         if ($cachedUI !== null) {
@@ -410,7 +409,7 @@ abstract class AbstractUIService
             'tableheaderrow' => TableHeaderRowBuilder::class,
             'menudropdown' => MenuDropdownBuilder::class,
             'uploader' => UploaderBuilder::class,
-            'calendar' => CalendarBuilder::class,
+            'calendar' => \Idei\Usim\Services\Components\CalendarBuilder::class,
             'default' => null,
         };
     }

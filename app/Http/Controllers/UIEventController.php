@@ -112,7 +112,7 @@ class UIEventController extends Controller
             $authoritativeCollector = null;
             if ($service instanceof \Idei\Usim\Services\AbstractUIService) {
                 $authoritativeCollector = $this->packageChanges;
-            } elseif ($service instanceof \App\Services\UI\AbstractUIService) {
+            } elseif ($service instanceof \Idei\Usim\Services\AbstractUIService) {
                 $authoritativeCollector = $this->appChanges;
             }
 
