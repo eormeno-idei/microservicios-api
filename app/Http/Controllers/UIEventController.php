@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Services\UI\UIChangesCollector as AppChangesCollector;
-use Idei\Usim\Services\UIChangesCollector as PackageChangesCollector;
-use Idei\Usim\Services\Support\UIIdGenerator as AppIdGenerator;
-use Idei\Usim\Services\Support\UIIdGenerator as PackageIdGenerator;
+use Idei\Usim\Services\UIChangesCollector;
+use Idei\Usim\Services\Support\UIIdGenerator;
 
 /**
  * UI Event Controller
@@ -27,8 +25,7 @@ class UIEventController extends Controller
 {
 
     public function __construct(
-        protected AppChangesCollector $appChanges,
-        protected PackageChangesCollector $packageChanges
+        protected UIChangesCollector $uiChanges
     )
     {
     }
@@ -65,12 +62,9 @@ class UIEventController extends Controller
 
             // Resolve service class from component ID or caller service ID
             if ($callerServiceId) {
-                // Try Package first, then App
-                $serviceClass = PackageIdGenerator::getContextFromId((int)$callerServiceId)
-                             ?? AppIdGenerator::getContextFromId((int)$callerServiceId);
+                $serviceClass = UIIdGenerator::getContextFromId((int)$callerServiceId);
             } else {
-                $serviceClass = PackageIdGenerator::getContextFromId((int)$componentId)
-                             ?? AppIdGenerator::getContextFromId((int)$componentId);
+                $serviceClass = UIIdGenerator::getContextFromId((int)$componentId);
             }
 
 
@@ -93,51 +87,15 @@ class UIEventController extends Controller
                 ], 404);
             }
 
-            // Init BOTH collectors
-            $this->appChanges->setStorage($incomingStorage);
-            $this->packageChanges->setStorage($incomingStorage);
+            // Init collector
+            $this->uiChanges->setStorage($incomingStorage);
 
             $service->initializeEventContext($incomingStorage);
             $service->$method($parameters);
             $service->finalizeEventContext();
 
-            // Resolve and merge results from BOTH collectors
-            $pkgResult = $this->packageChanges->all();
-            $appResult = $this->appChanges->all();
-
-            // Custom merge to preserve numeric keys (Component IDs)
-            // Fix: Exclude 'storage' from generic recursive merge to avoid array conversion of encryption string
-            // Logic: Determine authoritative storage source based on service type
-
-            $authoritativeCollector = null;
-            if ($service instanceof \Idei\Usim\Services\AbstractUIService) {
-                $authoritativeCollector = $this->packageChanges;
-            } elseif ($service instanceof \Idei\Usim\Services\AbstractUIService) {
-                $authoritativeCollector = $this->appChanges;
-            }
-
-            // Get the correct storage block
-            $finalStorage = $authoritativeCollector ? $authoritativeCollector->all()['storage'] ?? null : null;
-
-            // Remove storage from intermediate results to prevent dirty merge
-            if (isset($pkgResult['storage'])) unset($pkgResult['storage']);
-            if (isset($appResult['storage'])) unset($appResult['storage']);
-
-            $result = $appResult;
-            foreach ($pkgResult as $key => $value) {
-                if (isset($result[$key]) && is_array($value) && is_array($result[$key])) {
-                    $result[$key] = array_merge_recursive($result[$key], $value);
-                } else {
-                    $result[$key] = $value;
-                }
-            }
-
-            // Re-attach the correct storage
-            if ($finalStorage) {
-                $result['storage'] = $finalStorage;
-            }
-
-            return response()->json($result);
+            // Return results from collector
+            return response()->json($this->uiChanges->all());
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Internal server error',

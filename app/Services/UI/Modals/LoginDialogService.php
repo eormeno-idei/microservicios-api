@@ -2,7 +2,7 @@
 
 namespace App\Services\UI\Modals;
 
-use App\Services\UI\UIBuilder;
+use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Enums\JustifyContent;
 
