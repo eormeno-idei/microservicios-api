@@ -5,7 +5,8 @@ use Idei\Usim\Http\Controllers\UIEventController;
 use Idei\Usim\Http\Controllers\UploadController;
 use Idei\Usim\Http\Controllers\UIController;
 
-Route::middleware('api')->prefix('api')->group(function () {
+// USIM routes require 'web' middleware (session) to maintain UI state
+Route::middleware('web')->prefix('api')->group(function () {
     // UI Screen Loader
     Route::get('/{demo}', [UIController::class, 'show'])->name('api.demo');
 
