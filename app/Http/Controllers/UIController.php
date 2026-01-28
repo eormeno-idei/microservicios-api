@@ -7,7 +7,7 @@ use Idei\Usim\Services\AbstractUIService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Str;
 
-class UIDemoController extends Controller
+class UIController extends Controller
 {
 
     public function __construct(

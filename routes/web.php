@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UIDemoController;
+use App\Http\Controllers\UIController;
 use App\Http\Controllers\UIEventController;
 use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\DocumentationController;
@@ -76,7 +76,7 @@ Route::get('/demo/{demo}', function (string $demo) {
 })->name('demo');
 
 // Demo UI API routes - Unified controller for all demo services
-Route::get('/api/{demo}', [UIDemoController::class, 'show'])->name('api.demo');
+Route::get('/api/{demo}', [UIController::class, 'show'])->name('api.demo');
 
 // UI Event Handler
 Route::post('/api/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
