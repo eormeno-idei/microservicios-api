@@ -3,6 +3,9 @@
 namespace Idei\Usim\Services\Upload;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Upload Service
@@ -202,7 +205,7 @@ class UploadService
     public static function persistTemporaryUpload(string $tempId, string $category, ?string $oldFilename = null): ?string
     {
         // Obtener archivo temporal
-        $file = \DB::table('temporary_uploads')
+        $file = DB::table('temporary_uploads')
             ->where('id', $tempId)
             ->first();
 
@@ -220,19 +223,19 @@ class UploadService
             $finalPath = "uploads/{$category}/{$file->stored_filename}";
 
             // Mover de temporal a definitivo
-            $content = \Storage::disk('local')->get($file->path);
-            \Storage::disk('uploads')->put($finalPath, $content);
+            $content = Storage::disk('local')->get($file->path);
+            Storage::disk('uploads')->put($finalPath, $content);
 
             // Eliminar temporal del storage
-            \Storage::disk('local')->delete($file->path);
+            Storage::disk('local')->delete($file->path);
 
             // Limpiar registro temporal
-            \DB::table('temporary_uploads')->where('id', $file->id)->delete();
+            DB::table('temporary_uploads')->where('id', $file->id)->delete();
 
             return $file->stored_filename;
 
         } catch (\Exception $e) {
-            \Log::error('UploadService: Error persistiendo archivo temporal', [
+            Log::error('UploadService: Error persistiendo archivo temporal', [
                 'temp_id' => $tempId,
                 'category' => $category,
                 'error' => $e->getMessage(),
@@ -253,13 +256,13 @@ class UploadService
         try {
             $path = "uploads/{$category}/{$filename}";
 
-            if (\Storage::disk('uploads')->exists($path)) {
-                return \Storage::disk('uploads')->delete($path);
+            if (Storage::disk('uploads')->exists($path)) {
+                return Storage::disk('uploads')->delete($path);
             }
 
             return true; // No existe, consideramos éxito
         } catch (\Exception $e) {
-            \Log::error('UploadService: Error eliminando archivo', [
+            Log::error('UploadService: Error eliminando archivo', [
                 'category' => $category,
                 'filename' => $filename,
                 'error' => $e->getMessage(),
