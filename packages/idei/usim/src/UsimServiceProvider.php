@@ -24,6 +24,8 @@ class UsimServiceProvider extends ServiceProvider
 
     public function boot(Dispatcher $events): void
     {
+        $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
         // Listener para resetear estado en Octane/RoadRunner
         $events->listen(RequestReceived::class, function () {
             UIIdGenerator::reset();
