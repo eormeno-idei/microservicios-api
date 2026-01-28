@@ -8,6 +8,10 @@ use Idei\Usim\Services\Support\UIIdGenerator;
 use Illuminate\Contracts\Events\Dispatcher;
 
 use Idei\Usim\Services\UIChangesCollector;
+use Idei\Usim\Events\UsimEvent;
+use Idei\Usim\Listeners\UsimEventDispatcher;
+use Illuminate\Auth\Events\Registered;
+use Idei\Usim\Listeners\SendEmailVerificationNotification;
 
 class UsimServiceProvider extends ServiceProvider
 {
@@ -25,6 +29,10 @@ class UsimServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
+        // Registrar Evento del Sistema
+        $events->listen(UsimEvent::class, UsimEventDispatcher::class);
+        $events->listen(Registered::class, SendEmailVerificationNotification::class);
 
         // Listener para resetear estado en Octane/RoadRunner
         $events->listen(RequestReceived::class, function () {

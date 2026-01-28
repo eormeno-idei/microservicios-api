@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Listeners;
+namespace Idei\Usim\Listeners;
 
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Queue\ShouldQueue;

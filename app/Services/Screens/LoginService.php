@@ -2,7 +2,7 @@
 namespace App\Services\Screens;
 
 use App\Models\User;
-use App\Events\UsimEvent;
+use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;

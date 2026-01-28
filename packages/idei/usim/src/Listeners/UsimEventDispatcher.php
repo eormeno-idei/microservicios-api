@@ -1,7 +1,7 @@
 <?php
-namespace App\Listeners;
+namespace Idei\Usim\Listeners;
 
-use App\Events\UsimEvent;
+use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Services\Support\UIIdGenerator;
 use Idei\Usim\Services\Support\UIStateManager;
 

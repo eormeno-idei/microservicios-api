@@ -7,8 +7,8 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
-use App\Notifications\ResetPasswordNotification;
-use App\Notifications\CustomVerifyEmailNotification;
+use Idei\Usim\Notifications\ResetPasswordNotification;
+use Idei\Usim\Notifications\CustomVerifyEmailNotification;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 

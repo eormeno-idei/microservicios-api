@@ -265,7 +265,7 @@ class UploaderBuilder extends UIComponent
 
         if ($isSingle) {
             // Archivo único
-            $filename = \App\Services\Upload\UploadService::persistTemporaryUpload(
+            $filename = \Idei\Usim\Services\Upload\UploadService::persistTemporaryUpload(
                 $tempIds[0],
                 $category,
                 $oldFiles
@@ -273,14 +273,14 @@ class UploaderBuilder extends UIComponent
 
             if ($filename) {
                 // Auto-actualizar vista del uploader
-                $url = \App\Services\Upload\UploadService::fileUrl("uploads/{$category}/{$filename}") . '?t=' . time();
+                $url = \Idei\Usim\Services\Upload\UploadService::fileUrl("uploads/{$category}/{$filename}") . '?t=' . time();
                 $this->existingFile($url);
             }
 
             return $filename;
         } else {
             // Múltiples archivos
-            $filenames = \App\Services\Upload\UploadService::persistMultipleTemporaryUploads($tempIds, $category);
+            $filenames = \Idei\Usim\Services\Upload\UploadService::persistMultipleTemporaryUploads($tempIds, $category);
 
             // TODO: implementar auto-actualización de vista para múltiples archivos
             // Requeriría un método existingFiles(array $urls) en lugar de existingFile($url)

@@ -2,7 +2,7 @@
 
 namespace App\Services\Screens;
 
-use App\Events\UsimEvent;
+use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -130,35 +130,40 @@ class ProfileService extends AbstractUIService
      */
     public function onSaveProfile(array $params): void
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        try {
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
 
-        // Obtener datos del formulario
-        $name = trim($params['input_name'] ?? '');
+            // Obtener datos del formulario
+            $name = trim($params['input_name'] ?? '');
 
-        if (empty($name)) {
-            $this->input_name->error('El nombre es requerido');
-            return;
+            if (empty($name)) {
+                $this->input_name->error('El nombre es requerido');
+                return;
+            }
+
+            // Actualizar nombre
+            $user->name = $name;
+
+            // Procesar imagen de perfil si fue subida
+            if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
+                $user->profile_image = $filename;
+            }
+
+            // Guardar cambios
+            $user->save();
+            $this->input_name->error(null);
+
+            event(new UsimEvent('updated_profile', [
+                'user' => $user
+            ]));
+
+            // Mostrar éxito
+            $this->toast('Perfil actualizado', 'success');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error saving profile: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            $this->toast('Error al guardar el perfil: ' . $e->getMessage(), 'error');
         }
-
-        // Actualizar nombre
-        $user->name = $name;
-
-        // Procesar imagen de perfil si fue subida
-        if ($filename = $this->uploader_profile->confirm($params, 'images', $user->profile_image)) {
-            $user->profile_image = $filename;
-        }
-
-        // Guardar cambios
-        $user->save();
-        $this->input_name->error(null);
-
-        event(new UsimEvent('updated_profile', [
-            'user' => $user
-        ]));
-
-        // Mostrar éxito
-        $this->toast('Perfil actualizado', 'success');
     }
 
     /**
