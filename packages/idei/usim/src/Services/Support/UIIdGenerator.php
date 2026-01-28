@@ -4,7 +4,7 @@ namespace Idei\Usim\Services\Support;
 
 /**
  * Centralized ID generator for UI components
- * 
+ *
  * Ensures unique IDs across all UI elements (containers and components)
  * by maintaining a single auto-increment counter per context.
  */
@@ -21,7 +21,7 @@ class UIIdGenerator
 
     /**
      * Generate a unique ID for a UI element
-     * 
+     *
      * @param string $context The calling context (class name)
      * @return int Unique ID
      */
@@ -42,10 +42,10 @@ class UIIdGenerator
 
     /**
      * Generate a deterministic ID based on component name
-     * 
+     *
      * This ensures the same component name always gets the same ID,
      * making IDs stable across requests for named components.
-     * 
+     *
      * @param string $context The calling context (full class name with namespace)
      * @param string $name The component name
      * @return int Deterministic ID
@@ -53,21 +53,21 @@ class UIIdGenerator
     public static function generateFromName(string $context, string $name): int
     {
         $offset = self::getContextOffset($context);
-        
+
         // Generate deterministic local ID from component name
         // Use crc32 to get a hash, then limit to 9999 to avoid offset collision
         $hash = crc32($name);
         $localId = (abs($hash) % 9999) + 1; // +1 to avoid ID 0
-        
+
         // Register offset → context mapping for reverse lookup
         self::$offsetToContext[$offset] = $context;
-        
+
         return $offset + $localId;
     }
 
     /**
      * Get context information for debugging
-     * 
+     *
      * @param string $context Context name
      * @return array Context information
      */
@@ -82,10 +82,10 @@ class UIIdGenerator
 
     /**
      * Get context class name from component ID
-     * 
+     *
      * Uses lazy loading to ensure all registered UI services are mapped.
      * Performance: ~0.001ms (in-memory array lookup)
-     * 
+     *
      * @param int $id Component ID
      * @return string|null Context class name or null if not found
      */
@@ -99,11 +99,11 @@ class UIIdGenerator
 
     /**
      * Lazy load registered UI services
-     * 
+     *
      * Loads the service registry only once per PHP worker process.
      * This ensures deterministic offset → service mapping without
      * requiring database or cache lookups.
-     * 
+     *
      * @return void
      */
     private static function ensureServicesLoaded(): void
@@ -114,7 +114,7 @@ class UIIdGenerator
 
         // Load all registered UI services from config
         $config = config('ui-services', []);
-        
+
         // Support new config structure or legacy array
         $services = isset($config['registry']) ? $config['registry'] : $config;
 
@@ -135,7 +135,7 @@ class UIIdGenerator
 
     /**
      * Reset all counters (useful for testing)
-     * 
+     *
      * @return void
      */
     public static function reset(): void
@@ -146,7 +146,7 @@ class UIIdGenerator
     /**
      * Convierte el nombre de clase en un número único usando hash CRC32
      * Genera offsets en múltiplos de 10000 para evitar colisiones
-     * 
+     *
      * @param string $context Nombre del contexto (clase invocante)
      * @return int Offset único para el contexto
      */
