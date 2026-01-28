@@ -113,9 +113,19 @@ class UIIdGenerator
         }
 
         // Load all registered UI services from config
-        $services = config('ui-services', []);
+        $config = config('ui-services', []);
         
+        // Support new config structure or legacy array
+        $services = isset($config['registry']) ? $config['registry'] : $config;
+
+        if (!is_array($services)) {
+            $services = [];
+        }
+
         foreach ($services as $serviceClass) {
+            // Skip keys if associative config is passed mistankenly as flat array
+            if (!is_string($serviceClass)) continue;
+
             $offset = self::getContextOffset($serviceClass);
             self::$offsetToContext[$offset] = $serviceClass;
         }

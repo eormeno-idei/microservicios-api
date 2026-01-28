@@ -3,8 +3,12 @@
 use Illuminate\Support\Facades\Route;
 use Idei\Usim\Http\Controllers\UIEventController;
 use Idei\Usim\Http\Controllers\UploadController;
+use Idei\Usim\Http\Controllers\UIController;
 
 Route::middleware('api')->prefix('api')->group(function () {
+    // UI Screen Loader
+    Route::get('/{demo}', [UIController::class, 'show'])->name('api.demo');
+
     // USIM Event Handler
     Route::post('/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
 
