@@ -1,6 +1,6 @@
 <?php
 
-use App\Jobs\CleanTemporaryUploadsJob;
+use Idei\Usim\Jobs\CleanTemporaryUploadsJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
