@@ -33,7 +33,7 @@ class UploadController extends Controller
 
         $file = $request->file('file');
         $componentId = $request->input('component_id');
-        $userId = auth()->id();
+        $userId = \Illuminate\Support\Facades\Auth::id();
 
         // Generar nombres únicos
         $tempId = (string) Str::uuid();
@@ -96,7 +96,7 @@ class UploadController extends Controller
      */
     public function deleteTemporary(string $id): JsonResponse
     {
-        $userId = auth()->id();
+        $userId = \Illuminate\Support\Facades\Auth::id();
 
         // Buscar registro temporal
         $temp = DB::table('temporary_uploads')
