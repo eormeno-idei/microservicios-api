@@ -69,8 +69,10 @@ class HttpClient
     public static function get(string $route, array $queryParams = [], array $routeParams = []): array
     {
         $url = route($route, $routeParams);
+        $cookieJar = self::getCookieJar();
 
         $response = Http::withHeaders(self::getHeaders())
+            ->withOptions(['cookies' => $cookieJar])
             ->get($url, $queryParams);
 
         return $response->json();
@@ -86,8 +88,10 @@ class HttpClient
     public static function post(string $route, array $data = [], array $routeParams = []): array
     {
         $url = route($route, $routeParams);
+        $cookieJar = self::getCookieJar();
 
         $response = Http::withHeaders(self::getHeaders())
+            ->withOptions(['cookies' => $cookieJar])
             ->post($url, $data);
 
         return $response->json();
@@ -103,8 +107,10 @@ class HttpClient
     public static function put(string $route, array $data = [], array $routeParams = []): array
     {
         $url = route($route, $routeParams);
+        $cookieJar = self::getCookieJar();
 
         $response = Http::withHeaders(self::getHeaders())
+            ->withOptions(['cookies' => $cookieJar])
             ->put($url, $data);
 
         return $response->json();
@@ -120,8 +126,10 @@ class HttpClient
     public static function patch(string $route, array $data = [], array $routeParams = []): array
     {
         $url = route($route, $routeParams);
+        $cookieJar = self::getCookieJar();
 
         $response = Http::withHeaders(self::getHeaders())
+            ->withOptions(['cookies' => $cookieJar])
             ->patch($url, $data);
 
         return $response->json();
@@ -137,8 +145,10 @@ class HttpClient
     public static function delete(string $route, array $data = [], array $routeParams = []): array
     {
         $url = route($route, $routeParams);
+        $cookieJar = self::getCookieJar();
 
         $response = Http::withHeaders(self::getHeaders())
+            ->withOptions(['cookies' => $cookieJar])
             ->delete($url, $data);
 
         return $response->json();
