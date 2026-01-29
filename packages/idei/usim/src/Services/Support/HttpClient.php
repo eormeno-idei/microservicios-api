@@ -71,11 +71,12 @@ class HttpClient
         $url = route($route, $routeParams);
         $cookieJar = self::getCookieJar();
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->withOptions(['cookies' => $cookieJar])
             ->get($url, $queryParams);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -90,11 +91,12 @@ class HttpClient
         $url = route($route, $routeParams);
         $cookieJar = self::getCookieJar();
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->withOptions(['cookies' => $cookieJar])
             ->post($url, $data);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -109,11 +111,12 @@ class HttpClient
         $url = route($route, $routeParams);
         $cookieJar = self::getCookieJar();
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->withOptions(['cookies' => $cookieJar])
             ->put($url, $data);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -128,11 +131,12 @@ class HttpClient
         $url = route($route, $routeParams);
         $cookieJar = self::getCookieJar();
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->withOptions(['cookies' => $cookieJar])
             ->patch($url, $data);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -147,11 +151,12 @@ class HttpClient
         $url = route($route, $routeParams);
         $cookieJar = self::getCookieJar();
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->withOptions(['cookies' => $cookieJar])
             ->delete($url, $data);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -161,10 +166,11 @@ class HttpClient
     {
         $url = route($route);
 
+        /** @var Response $response */
         $response = Http::withHeaders(self::getHeaders())
             ->send($method, $url, ['json' => $data]);
 
-        return $response->json();
+        return (array) $response->json();
     }
 
     /**
@@ -174,8 +180,11 @@ class HttpClient
     {
         $url = route($route);
 
-        return Http::withHeaders(self::getHeaders())
+        /** @var Response $response */
+        $response = Http::withHeaders(self::getHeaders())
             ->get($url, $queryParams);
+
+        return $response;
     }
 
     /**
@@ -185,7 +194,10 @@ class HttpClient
     {
         $url = route($route);
 
-        return Http::withHeaders(self::getHeaders())
+        /** @var Response $response */
+        $response = Http::withHeaders(self::getHeaders())
             ->post($url, $data);
+
+        return $response;
     }
 }
