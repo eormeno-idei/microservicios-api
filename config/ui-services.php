@@ -29,6 +29,7 @@ return [
 
     \App\Services\Screens\DemoUiService::class,
     \App\Services\Screens\ForgotPasswordService::class,
+    \App\Services\Screens\ResetPasswordService::class,
     \App\Services\Screens\LoginService::class,
     \App\Services\Screens\InputDemoService::class,
     \App\Services\Screens\SelectDemoService::class,

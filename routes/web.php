@@ -37,6 +37,15 @@ Route::get('/email/verify/{id}/{hash}', function () {
     ]);
 })->middleware('signed')->name('verification.notice');
 
+// Reset Password Route (Landing from Email)
+Route::get('/password/reset/{token?}', function () {
+    $reset = request()->query('reset', false);
+    return view('demo', [
+        'demo' => 'reset-password',
+        'reset' => $reset
+    ]);
+})->name('password.reset');
+
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
     Route::get('/admin/dashboard', function () {
