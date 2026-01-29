@@ -10,7 +10,7 @@ Route::middleware('web')->prefix('api')->group(function () {
     // UI Screen Loader - Exclude API resource roots that collide (GET requests)
     Route::get('/{demo}', [UIController::class, 'show'])
         ->name('api.demo')
-        ->where('demo', '^(?!users|user|files|ping|email|password).*$');
+        ->where('demo', '^(?!users|user|files|ping|email\/verify|password).*$');
 
     // USIM Event Handler
     Route::post('/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
