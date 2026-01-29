@@ -252,12 +252,9 @@ class CardBuilder extends UIComponent
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 15);
 
-        // Look for the first class outside UI namespace
         foreach ($trace as $frame) {
-            if (
-                isset($frame['class']) &&
-                !str_starts_with($frame['class'], 'App\\Services\\UI\\')
-            ) {
+            if (isset($frame['class']) &&
+                is_subclass_of($frame['class'], \Idei\Usim\Services\AbstractUIService::class)) {
                 return $frame['class'];
             }
         }
