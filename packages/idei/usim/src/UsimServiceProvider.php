@@ -10,8 +10,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Idei\Usim\Services\UIChangesCollector;
 use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Listeners\UsimEventDispatcher;
-use Illuminate\Auth\Events\Registered;
-use Idei\Usim\Listeners\SendEmailVerificationNotification;
 
 use Illuminate\Console\Scheduling\Schedule;
 
@@ -39,7 +37,6 @@ class UsimServiceProvider extends ServiceProvider
 
         // Registrar Evento del Sistema
         $events->listen(UsimEvent::class, UsimEventDispatcher::class);
-        $events->listen(Registered::class, SendEmailVerificationNotification::class);
 
         // Listener para resetear estado en Octane/RoadRunner
         $events->listen(RequestReceived::class, function () {

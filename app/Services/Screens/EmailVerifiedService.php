@@ -63,8 +63,25 @@ class EmailVerifiedService extends AbstractUIService
 
         // Llamar a la API de verificación
         try {
+            // Generamos una URL firmada válida para la API, ya que la firma original es para la ruta Web
+            // y no coincide con la ruta de la API.
+            // Como estamos en un contexto seguro (backend), podemos autofirmar la petición.
+            $signedApiUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $id, 'hash' => $hash]
+            );
+
+            // Extraemos query params de la URL firmada (expires, signature)
+            $parsed = parse_url($signedApiUrl);
+            $queryParams = [];
+            if (isset($parsed['query'])) {
+                parse_str($parsed['query'], $queryParams);
+            }
+
             $response = HttpClient::get(
                 'verification.verify',
+                queryParams: $queryParams,
                 routeParams: ['id' => $id, 'hash' => $hash]
             );
 

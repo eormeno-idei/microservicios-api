@@ -6,13 +6,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
 {
-    // Removed $listen array - Laravel 11 autodiscovery handles this automatically
-    // based on type-hints in Listener::handle() methods
-
     public function boot(): void
     {
         // Log cuando se procesa un job exitosamente
