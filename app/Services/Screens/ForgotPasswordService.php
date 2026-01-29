@@ -6,8 +6,11 @@ use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Support\HttpClient;
 
+class ForgotPasswordService extends AbstractUIService
+{
     protected LabelBuilder $lbl_result;
     protected \Idei\Usim\Services\Components\InputBuilder $email;
 
@@ -86,8 +89,8 @@ use Idei\Usim\Services\Support\HttpClient;
         // or to ensure we have the instance if it wasn't auto-injected.
         // In a perfect USIM, properties matching ID are auto-injected.
         if (!isset($this->lbl_result)) {
-             // Fallback or ensure we defined it in buildBaseUI properly with matching ID. 
-             // Ideally USIM reflects on properties. 
+             // Fallback or ensure we defined it in buildBaseUI properly with matching ID.
+             // Ideally USIM reflects on properties.
              // For now, let's assume the framework injects them if they are protected properties.
         }
 
