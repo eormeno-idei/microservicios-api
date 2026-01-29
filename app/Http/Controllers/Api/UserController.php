@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
@@ -235,7 +236,7 @@ class UserController extends Controller
     public function destroy(User $user): JsonResponse
     {
         // Delete the user if it is different from the currently authenticated user
-        if (auth()->id() === $user->id) {
+        if (Auth::id() === $user->id) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'No se puede eliminar el usuario autenticado actualmente',
