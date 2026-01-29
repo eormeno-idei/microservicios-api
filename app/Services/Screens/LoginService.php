@@ -83,12 +83,17 @@ class LoginService extends AbstractUIService
                 ->justifyContent('center')
                 ->padding('15px 0 0 0')
                 ->add(
-                    UIBuilder::link('lnk_forgot_password')
+                    UIBuilder::button('btn_forgot_password')
                         ->label('¿Olvidaste tu contraseña?')
-                        ->to('/demo/forgot-password') // UI Loader route
-                        ->style('text-sm text-blue-600 hover:text-blue-800')
+                        ->style('text-blue-600 hover:text-blue-800 bg-transparent border-0') // Style as link
+                        ->action('navigate_forgot_password')
                 )
         );
+    }
+
+    public function onNavigateForgotPassword(array $params): void
+    {
+        $this->redirect('/demo/forgot-password');
     }
 
     public function onSubmitLogin(array $params): void

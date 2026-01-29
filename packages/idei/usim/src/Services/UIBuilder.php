@@ -15,7 +15,6 @@ use Idei\Usim\Services\Components\MenuDropdownBuilder;
 use Idei\Usim\Services\Components\CardBuilder;
 use Idei\Usim\Services\Components\UploaderBuilder;
 use Idei\Usim\Services\Components\CalendarBuilder;
-use Idei\Usim\Services\Components\LinkBuilder;
 
 /**
  * Factory class for creating UI components
@@ -170,10 +169,4 @@ class UIBuilder
     {
         return new CalendarBuilder($name);
     }
-    /**
-     * Create a Link component
-     */
-    public static function link(string $id): LinkBuilder
-    {
-        return new LinkBuilder($id);
-    }}
+}

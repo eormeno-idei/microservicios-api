@@ -30,8 +30,8 @@ class ForgotPasswordService extends AbstractUIService
             ->padding(30)
             ->width('400px')
             ->gap('15px')
-            ->borderRadius('8px')
-            ->background('#ffffff');
+            ->borderRadius('8px');
+            // ->background('#ffffff') removed to avoid error, handled by default or style
 
         $formCard->add(
             UIBuilder::label('lbl_title')
@@ -67,7 +67,7 @@ class ForgotPasswordService extends AbstractUIService
             UIBuilder::button('btn_back')
                 ->label('Volver al Login')
                 ->style('secondary')
-                ->onClickNavigate('/login')
+                ->action('navigate_to_login')
         );
 
         $buttons->add(
@@ -79,6 +79,11 @@ class ForgotPasswordService extends AbstractUIService
 
         $formCard->add($buttons);
         $container->add($formCard);
+    }
+
+    public function onNavigateToLogin(array $params): void
+    {
+        $this->redirect('/login');
     }
 
     public function onSendLink(array $params): void
