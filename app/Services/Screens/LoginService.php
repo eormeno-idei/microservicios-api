@@ -75,6 +75,20 @@ class LoginService extends AbstractUIService
         );
 
         $container->add($buttonsContainer);
+
+        // Forgot Password Link
+        $container->add(
+            UIBuilder::container('forgot_pwd_container')
+                ->layout(LayoutType::HORIZONTAL)
+                ->justifyContent('center')
+                ->padding('15px 0 0 0')
+                ->add(
+                    UIBuilder::link('lnk_forgot_password')
+                        ->label('¿Olvidaste tu contraseña?')
+                        ->to('/demo/forgot-password') // UI Loader route
+                        ->style('text-sm text-blue-600 hover:text-blue-800')
+                )
+        );
     }
 
     public function onSubmitLogin(array $params): void
