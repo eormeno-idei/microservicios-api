@@ -27,7 +27,7 @@ class ResetPasswordService extends AbstractUIService
             ->alignItems('center')
             ->padding(40)
             ->minHeight('100vh');
-            
+
         $formCard = UIBuilder::container('reset_password_card')
             ->layout(LayoutType::VERTICAL)
             ->shadow(true)
@@ -111,7 +111,7 @@ class ResetPasswordService extends AbstractUIService
                 'password' => $password,
                 'password_confirmation' => $passwordConfirmation,
             ]);
-            
+
             $status = $response['status'] ?? 'error';
             $message = $response['message'] ?? 'Error desconocido';
 
@@ -120,9 +120,9 @@ class ResetPasswordService extends AbstractUIService
                     ->text('¡Contraseña actualizada! Redirigiendo...')
                     ->style('text-green-600 font-medium')
                     ->visible(true);
-                
+
                 $this->toast('Contraseña actualizada correctamente', 'success');
-                
+
                 // Redirect to login after short delay (handled by frontend if possible, or immediate)
                 $this->redirect('/login');
             } else {

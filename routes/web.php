@@ -38,7 +38,7 @@ Route::get('/email/verify/{id}/{hash}', function () {
 })->middleware('signed')->name('verification.notice');
 
 // Reset Password Route (Landing from Email)
-Route::get('/password/reset/{token?}', function () {
+Route::get('/reset-password', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
         'demo' => 'reset-password',
