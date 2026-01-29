@@ -2,10 +2,8 @@
 // app/Providers/EventServiceProvider.php
 namespace App\Providers;
 
-use Idei\Usim\Events\UsimEvent;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Event;
-use Idei\Usim\Listeners\UsimEventDispatcher;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
