@@ -49,8 +49,9 @@ class EmailVerifiedService extends AbstractUIService
         }
 
         // Obtener parámetros de la URL (id y hash)
-        $id = request()->route('id');
-        $hash = request()->route('hash');
+        // El frontend envía los parámetros de ruta como query params con prefijo 'route_'
+        $id = request('route_id') ?? request()->route('id');
+        $hash = request('route_hash') ?? request()->route('hash');
 
         if (!$id || !$hash) {
             $this->errorMessage = 'Enlace de verificación inválido. Faltan parámetros requeridos.';
