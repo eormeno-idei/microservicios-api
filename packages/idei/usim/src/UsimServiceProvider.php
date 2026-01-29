@@ -13,6 +13,8 @@ use Idei\Usim\Listeners\UsimEventDispatcher;
 use Illuminate\Auth\Events\Registered;
 use Idei\Usim\Listeners\SendEmailVerificationNotification;
 
+use Illuminate\Console\Scheduling\Schedule;
+
 class UsimServiceProvider extends ServiceProvider
 {
     public function register(): void
@@ -29,6 +31,11 @@ class UsimServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+
+        // Programar limpieza de archivos temporales (Self-healing maintenance)
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->job(new \Idei\Usim\Jobs\CleanTemporaryUploadsJob)->hourly();
+        });
 
         // Registrar Evento del Sistema
         $events->listen(UsimEvent::class, UsimEventDispatcher::class);
