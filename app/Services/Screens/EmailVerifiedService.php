@@ -19,9 +19,10 @@ class EmailVerifiedService extends AbstractUIService
         $container
             ->layout(LayoutType::VERTICAL)
             ->shadow(false)
-            ->justifyContent('center')
+            ->justifyContent('start')
             ->alignItems('center')
             ->padding(40)
+            ->paddingTop('80px')
             ->minHeight('100vh');
 
         // Determinar qué mostrar según el estado

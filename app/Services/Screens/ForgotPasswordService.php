@@ -18,9 +18,10 @@ class ForgotPasswordService extends AbstractUIService
     {
         $container
             ->layout(LayoutType::VERTICAL)
-            ->justifyContent('center')
+            ->justifyContent('start')
             ->alignItems('center')
             ->padding(40)
+            ->paddingTop('80px')
             ->minHeight('100vh');
 
         // Icono superior
@@ -29,32 +30,56 @@ class ForgotPasswordService extends AbstractUIService
                 ->text('🔒') // O un ícono similar
                 ->style('h1')
                 ->center()
-                ->fontSize('60px')
+                ->fontSize('80px')
         );
 
-        $formCard = UIBuilder::container('forgot_password_card')
-            ->layout(LayoutType::VERTICAL)
-            ->shadow(true)
-            ->padding(30)
-            ->width('450px')
-            ->gap('20px')
-            ->borderRadius('8px');
-            // ->style('border-left: 4px solid #3b82f6;'); // UIContainer does not support style()
-
-        $formCard->add(
+        $container->add(
             UIBuilder::label('lbl_title')
                 ->text('Recuperar Contraseña')
-                ->style('h2') // Uses h2 style from the verified screen
+                ->style('h2')
                 ->center()
-                ->color('#1f2937') // Dark grey
+                ->color('#3b82f6') // Blue to match theme
         );
 
-        $formCard->add(
+        /*
+        // Subtitle removed from outside to be inside the card as description
+        $container->add(
             UIBuilder::label('lbl_instruction')
                 ->text('Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.')
                 ->style('p')
                 ->center()
                 ->color('#6b7280')
+                ->marginTop('10px')
+        );
+        */
+
+        // Card Container
+        $formCard = UIBuilder::container('forgot_password_card')
+            ->layout(LayoutType::VERTICAL)
+            ->shadow(true)
+            ->maxWidth('600px')
+            ->width('100%')
+            ->borderRadius('8px')
+            ->marginTop('30px')
+            ->padding(30)
+            ->gap('20px')
+            ->backgroundColor('white')
+            ->customStyle('border-left: 5px solid #3b82f6; overflow: hidden;');
+
+        $formCard->add(
+            UIBuilder::label('card_title')
+                ->text('Recuperación de Cuenta')
+                ->style('h3')
+                ->color('#1f2937')
+                ->marginBottom('5px')
+        );
+
+        $formCard->add(
+            UIBuilder::label('lbl_instruction')
+                ->text('Ingresa tu email registrado y te enviaremos un enlace seguro para restablecer tu contraseña y recuperar el acceso.')
+                ->style('p')
+                ->color('#6b7280')
+                ->marginBottom('15px')
         );
 
         $formCard->add(
@@ -74,25 +99,26 @@ class ForgotPasswordService extends AbstractUIService
 
         $buttons = UIBuilder::container('buttons')
             ->layout(LayoutType::HORIZONTAL)
-            ->justifyContent('space-between')
+            ->justifyContent('start')
             ->gap('15px')
             ->marginTop('10px');
 
         $buttons->add(
-            UIBuilder::button('btn_back')
-                ->label('Volver al Login')
-                ->style('outline w-full') // Outline style matches "Volver al Inicio"
-                ->action('navigate_to_login')
-        );
-
-        $buttons->add(
             UIBuilder::button('btn_send')
                 ->label('Enviar Enlace')
-                ->style('primary w-full') // Primary style matches "Ir al Login"
+                ->style('primary')
                 ->action('send_link')
         );
 
+        $buttons->add(
+            UIBuilder::button('btn_back')
+                ->label('Volver al Login')
+                ->style('outline')
+                ->action('navigate_to_login')
+        );
+
         $formCard->add($buttons);
+
         $container->add($formCard);
     }
 
