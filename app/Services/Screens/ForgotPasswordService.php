@@ -18,62 +18,77 @@ class ForgotPasswordService extends AbstractUIService
     {
         $container
             ->layout(LayoutType::VERTICAL)
-            ->shadow(false)
             ->justifyContent('center')
             ->alignItems('center')
             ->padding(40)
             ->minHeight('100vh');
 
+        // Icono superior
+        $container->add(
+            UIBuilder::label('lock_icon')
+                ->text('🔒') // O un ícono similar
+                ->style('h1')
+                ->center()
+                ->fontSize('60px')
+        );
+
         $formCard = UIBuilder::container('forgot_password_card')
             ->layout(LayoutType::VERTICAL)
             ->shadow(true)
             ->padding(30)
-            ->width('400px')
-            ->gap('15px')
+            ->width('450px')
+            ->gap('20px')
             ->borderRadius('8px');
-            // ->background('#ffffff') removed to avoid error, handled by default or style
+            // ->style('border-left: 4px solid #3b82f6;'); // UIContainer does not support style()
 
         $formCard->add(
             UIBuilder::label('lbl_title')
                 ->text('Recuperar Contraseña')
-                ->style('header')
+                ->style('h2') // Uses h2 style from the verified screen
+                ->center()
+                ->color('#1f2937') // Dark grey
         );
 
         $formCard->add(
             UIBuilder::label('lbl_instruction')
                 ->text('Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña.')
-                ->style('text-sm text-gray-600')
+                ->style('p')
+                ->center()
+                ->color('#6b7280')
         );
 
         $formCard->add(
             UIBuilder::input('email')
-                ->label('Email')
+                ->label('Correo Electrónico')
                 ->type('email')
-                ->placeholder('ejemplo@correo.com')
+                ->placeholder('nombre@empresa.com')
+                ->width('100%')
         );
 
         $formCard->add(
             UIBuilder::label('lbl_result')
                 ->text('')
                 ->visible(false)
+                ->center()
         );
 
         $buttons = UIBuilder::container('buttons')
             ->layout(LayoutType::HORIZONTAL)
             ->justifyContent('space-between')
-            ->gap('10px');
+            ->gap('15px')
+            ->marginTop('10px');
 
         $buttons->add(
             UIBuilder::button('btn_back')
                 ->label('Volver al Login')
-                ->style('secondary')
+                ->style('outline w-full') // Outline style matches "Volver al Inicio"
                 ->action('navigate_to_login')
         );
 
         $buttons->add(
             UIBuilder::button('btn_send')
                 ->label('Enviar Enlace')
-                ->style('primary')
+                ->style('primary w-full') // Primary style matches "Ir al Login"
                 ->action('send_link')
         );
 

@@ -28,18 +28,38 @@ class ResetPasswordService extends AbstractUIService
             ->padding(40)
             ->minHeight('100vh');
 
+        // Icono superior
+        $container->add(
+            UIBuilder::label('key_icon')
+                ->text('🔑')
+                ->style('h1')
+                ->center()
+                ->fontSize('60px')
+        );
+
         $formCard = UIBuilder::container('reset_password_card')
             ->layout(LayoutType::VERTICAL)
             ->shadow(true)
             ->padding(30)
-            ->width('400px')
-            ->gap('15px')
+            ->width('450px')
+            ->gap('20px')
             ->borderRadius('8px');
+            // ->style('border-left: 4px solid #10b981;'); // Green accent for action
 
         $formCard->add(
             UIBuilder::label('lbl_title')
                 ->text('Restablecer Contraseña')
-                ->style('text-2xl font-bold text-gray-800 text-center mb-2')
+                ->style('h2')
+                ->center()
+                ->color('#1f2937')
+        );
+
+        $formCard->add(
+            UIBuilder::label('lbl_subtitle')
+                ->text('Por favor ingresa tu nueva contraseña segura.')
+                ->style('p')
+                ->center()
+                ->color('#6b7280')
         );
 
         // Hidden fields for token and email
@@ -56,6 +76,7 @@ class ResetPasswordService extends AbstractUIService
                 ->type('password')
                 ->placeholder('Mínimo 8 caracteres')
                 ->required(true)
+                ->width('100%')
         );
 
         $formCard->add(
@@ -64,19 +85,22 @@ class ResetPasswordService extends AbstractUIService
                 ->type('password')
                 ->placeholder('Repite la contraseña')
                 ->required(true)
+                ->width('100%')
         );
 
         $formCard->add(
             UIBuilder::label('lbl_result')
                 ->text('')
                 ->visible(false)
+                ->center()
         );
 
         $formCard->add(
             UIBuilder::button('btn_reset')
                 ->label('Cambiar Contraseña')
-                ->style('primary w-full') // w-full if supported by CSS class mapping
+                ->style('success w-full') // Success style matches the theme
                 ->action('reset_password')
+                ->marginTop('10px')
         );
 
         $container->add($formCard);
