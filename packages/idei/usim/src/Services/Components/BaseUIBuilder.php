@@ -17,7 +17,7 @@ abstract class BaseUIBuilder
 
         // Detectar automáticamente el contexto desde la clase que invoca
         $context = $this->detectCallingContext();
-        
+
         // Usar el generador centralizado de IDs
         // Si tiene nombre, generar ID determinístico basado en el nombre
         if ($name !== null) {
@@ -25,13 +25,13 @@ abstract class BaseUIBuilder
         } else {
             $this->id = UIIdGenerator::generate($context);
         }
-        
+
         $this->type = $this->getTypeFromClassName();
         $this->config = array_merge([
             'type' => $this->type,
             'visible' => true,
         ], $this->getDefaultConfig());
-        
+
         // Only include 'name' if it's not null
         if ($this->name !== null) {
             $this->config['name'] = $this->name;
@@ -41,21 +41,21 @@ abstract class BaseUIBuilder
     /**
      * Detecta automáticamente la clase que está invocando el builder
      * Busca en el stack trace la primera clase fuera del namespace UI
-     * 
+     *
      * @return string El nombre completo con namespace de la clase invocante
      */
     private function detectCallingContext(): string
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
-        
-        // Buscar en el stack trace la primera clase que NO sea del namespace UI
+
+        // Buscar en el stack trace la primera clase que NO sea del namespace Components (antes UI)
         foreach ($trace as $frame) {
-            if (isset($frame['class']) && 
-                !str_starts_with($frame['class'], 'App\\Services\\UI\\')) {
+            if (isset($frame['class']) &&
+                !str_starts_with($frame['class'], 'App\\Services\\Components\\')) {
                 return $frame['class']; // Retornar nombre completo con namespace
             }
         }
-        
+
         return 'default';
     }
 
@@ -90,10 +90,10 @@ abstract class BaseUIBuilder
     {
         return [$this->id => $this->config];
     }
-    
+
     /**
      * Método de utilidad para debugging - obtiene información del contexto
-     * 
+     *
      * @param string $context Nombre del contexto
      * @return array Información del contexto (offset, contador, etc)
      */

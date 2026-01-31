@@ -107,8 +107,8 @@ abstract class UIComponent implements UIElement
         // Buscar en el stack trace la primera clase que NO sea del namespace UI (Legacy o Package)
         foreach ($trace as $frame) {
             if (isset($frame['class'])) {
-                 // Skip internal classes from Legacy Framework
-                 if (str_starts_with($frame['class'], 'App\\Services\\UI\\')) {
+                 // Skip internal classes from Legacy Framework (Components/UI)
+                 if (str_starts_with($frame['class'], 'App\\Services\\Components\\')) {
                      continue;
                  }
                  // Skip internal classes from New Package Framework

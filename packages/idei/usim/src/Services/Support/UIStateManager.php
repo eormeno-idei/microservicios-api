@@ -223,7 +223,7 @@ class UIStateManager
         foreach ($stack as $frame) {
             if (
                 isset($frame['class']) &&
-                str_starts_with($frame['class'], 'App\\Services\\UI\\') &&
+                str_starts_with($frame['class'], 'App\\Services\\Components\\') &&
                 $frame['class'] !== self::class
             ) {
                 $className = class_basename($frame['class']);

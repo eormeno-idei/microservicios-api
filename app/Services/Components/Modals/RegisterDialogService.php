@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Services\UI\Modals;
+namespace App\Services\Components\Modals;
 
-use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Enums\JustifyContent;
 use Idei\Usim\Services\UIChangesCollector;
+use Idei\Usim\Services\Support\FakeDataHelper;
 
 /**
  * Register Dialog Service
  *
  * Provides a modal dialog with registration form
  */
-class EditUserDialogService
+class RegisterDialogService
 {
 
     public static function open(...$params): void
@@ -33,28 +33,30 @@ class EditUserDialogService
      * @return array UI components for the modal
      */
     public function getUI(
-        string $submitAction = 'submit_update_user',
+        string $submitAction = 'submit_register',
         ?string $cancelAction = 'close_modal',
-        array $user = null,
+        bool $fakeData = false,
+        bool $askForRole = false,
         ?int $callerServiceId = null
     ): array {
-        $name = $user ? $user['name'] : '';
-        $email = $user ? $user['email'] : '';
-        $role = $user ? $user['roles'][0]['name'] ?? 'user' : 'user';
-        $emailVerified = $user ? $user['email_verified_at'] !== null : false;
-
+        $name = '';
+        $email = '';
+        $password = '';
+        $password_confirmation = '';
+        $role = 'user';
+        if ($fakeData) {
+            $userData = FakeDataHelper::userData(['user', 'admin']);
+            $name = $userData['name'];
+            $email = $userData['email'];
+            $password = $userData['password'];
+            $password_confirmation = $userData['password_confirmation'];
+            $role = $userData['role'];
+        }
         // Main container for the modal
         $registerContainer = UIBuilder::container('register_dialog')
             ->parent('modal')
             ->shadow(false)
             ->padding('20px');
-
-        // Id input (hidden)
-        $registerContainer->add(
-            UIBuilder::input('user_id')
-                ->type('hidden')
-                ->value($user ? $user['id'] : '')
-        );
 
         // Name input
         $registerContainer->add(
@@ -76,31 +78,47 @@ class EditUserDialogService
                 ->autocomplete('off')
         );
 
-        // Role select
+        // Password input
         $registerContainer->add(
-            UIBuilder::select('roles')
-                ->label('Role')
-                ->options([
-                    ['value' => 'user', 'label' => 'User'],
-                    ['value' => 'admin', 'label' => 'Admin'],
-                ])
-                ->value($role)
+            UIBuilder::input('password')
+                ->label('Password')
+                ->type('password')
+                ->placeholder('Enter your password (min 8 characters)')
                 ->required(true)
+                ->value($password)
+                ->autocomplete('new-password')
         );
 
-        // Checkbox for sending reset password email
+        // Password confirmation
         $registerContainer->add(
-            UIBuilder::checkbox('send_reset_email')
-                ->label('Send password reset email to user')
-                ->checked(false)
+            UIBuilder::input('password_confirmation')
+                ->label('Confirm Password')
+                ->type('password')
+                ->placeholder('Confirm your password')
+                ->required(true)
+                ->value($password_confirmation)
+                ->autocomplete('new-password')
         );
 
-        // If the email is not verified, checkbox to send verification email
-        if (!$emailVerified) {
+        if ($askForRole) {
+
+            // Role select
+            $registerContainer->add(
+                UIBuilder::select('roles')
+                    ->label('Role')
+                    ->options([
+                        ['value' => 'user', 'label' => 'User'],
+                        ['value' => 'admin', 'label' => 'Admin'],
+                    ])
+                    ->value($role)
+                    ->required(true)
+            );
+
+            // Checkbox for sending verification email
             $registerContainer->add(
                 UIBuilder::checkbox('send_verification_email')
-                    ->label('Send email verification to user')
-                    ->checked(false)
+                    ->label('Send verification email')
+                    ->checked(true)
             );
         }
 
@@ -127,7 +145,7 @@ class EditUserDialogService
         // Submit button
         $buttonsContainer->add(
             UIBuilder::button('btn_submit_register')
-                ->label('Update User')
+                ->label('Register')
                 ->style('primary')
                 ->action($submitAction, [
                     '_caller_service_id' => $callerServiceId

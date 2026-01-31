@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\UI\DataTable;
+namespace App\Services\Components\DataTable;
 
 use App\Models\User;
 use Idei\Usim\Services\DataTable\AbstractDataTableModel;

@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services\UI\DataTable;
+namespace App\Services\Components\DataTable;
 
 use Illuminate\Support\Facades\Log;
 
 /**
  * Users Data Table Model
- * 
+ *
  * Implementation for the users demo data from users_data.php
  */
 class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTableModel
@@ -32,7 +32,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Get all users data from cache
-     * 
+     *
      * @return array
      */
     protected function getAllData(): array
@@ -42,7 +42,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Get table columns definition
-     * 
+     *
      * @return array
      */
     public function getColumns(): array
@@ -58,7 +58,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Get formatted data for table display
-     * 
+     *
      * @return array
      */
     public function getFormattedPageData(int $currentPage, int $perPage): array
@@ -105,7 +105,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Find user by ID
-     * 
+     *
      * @param int $userId
      * @return array|null
      */
@@ -122,7 +122,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Update user data in cache
-     * 
+     *
      * @param int $userId
      * @param array $data
      * @return bool
@@ -162,7 +162,7 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Remove user from cache (mark as removed)
-     * 
+     *
      * @param int $userId
      * @return bool
      */
@@ -181,9 +181,9 @@ class UsersDataTableModel extends \Idei\Usim\Services\DataTable\AbstractDataTabl
 
     /**
      * Get the configuration for "removed" user display
-     * 
+     *
      * Customizes how removed users appear in the table.
-     * 
+     *
      * @return array Configuration for removed user display
      */
     public function getRemovedRowConfig(): array

@@ -10,10 +10,10 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Components\TableBuilder;
 use Idei\Usim\Services\Components\ButtonBuilder;
-use App\Services\UI\DataTable\UserApiTableModel;
+use App\Services\Components\DataTable\UserApiTableModel;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
-use App\Services\UI\Modals\EditUserDialogService;
-use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\Components\Modals\EditUserDialogService;
+use App\Services\Components\Modals\RegisterDialogService;
 
 class AdminDashboardService extends AbstractUIService
 {

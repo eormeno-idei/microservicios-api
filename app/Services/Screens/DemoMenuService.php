@@ -13,7 +13,7 @@ use Idei\Usim\Services\Support\HttpClient;
 use Idei\Usim\Services\Enums\JustifyContent;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
-use App\Services\UI\Modals\RegisterDialogService;
+use App\Services\Components\Modals\RegisterDialogService;
 use Idei\Usim\Services\Components\MenuDropdownBuilder;
 
 /**

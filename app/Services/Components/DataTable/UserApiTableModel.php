@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\UI\DataTable;
+namespace App\Services\Components\DataTable;
 
 use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Support\HttpClient;

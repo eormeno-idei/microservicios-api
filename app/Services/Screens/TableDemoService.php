@@ -7,7 +7,7 @@ use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\TableBuilder;
-use App\Services\UI\DataTable\UsersTableModel;
+use App\Services\Components\DataTable\UsersTableModel;
 
 /**
  * Table Demo Service
