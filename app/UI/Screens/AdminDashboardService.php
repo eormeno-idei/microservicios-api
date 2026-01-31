@@ -11,9 +11,9 @@ use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Components\TableBuilder;
 use Idei\Usim\Services\Components\ButtonBuilder;
 use App\UI\Components\DataTable\UserApiTableModel;
-use Idei\Usim\Services\Modals\ConfirmDialogService;
 use App\UI\Components\Modals\EditUserDialogService;
 use App\UI\Components\Modals\RegisterDialogService;
+use Idei\Usim\Services\Modals\ConfirmDialogService;
 
 class AdminDashboardService extends AbstractUIService
 {
