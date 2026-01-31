@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Components\DataTable;
+namespace App\UI\Components\DataTable;
 
 use Illuminate\Support\Facades\Log;
 

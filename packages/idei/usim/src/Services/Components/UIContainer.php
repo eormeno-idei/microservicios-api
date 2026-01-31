@@ -1604,8 +1604,8 @@ class UIContainer implements UIElement
         // Buscar en el stack trace la primera clase que NO sea del namespace UI (Legacy o Package)
         foreach ($trace as $frame) {
             if (isset($frame['class'])) {
-                 // Skip internal classes from Legacy Framework (Components/UI)
-                 if (str_starts_with($frame['class'], 'App\\Services\\Components\\')) {
+                 // Skip internal classes from Legacy Framework (App/UI/Components)
+                 if (str_starts_with($frame['class'], 'App\\UI\\Components\\')) {
                      continue;
                  }
                  // Skip internal classes from New Package Framework

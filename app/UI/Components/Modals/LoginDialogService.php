@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Components\Modals;
+namespace App\UI\Components\Modals;
 
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\LayoutType;

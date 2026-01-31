@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Screens;
+namespace App\UI\Screens;
 
 use App\Models\User;
 use Idei\Usim\Events\UsimEvent;

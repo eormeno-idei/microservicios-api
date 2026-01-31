@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Services\Screens;
+namespace App\UI\Screens;
 
 use App\Models\User;
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\TableBuilder;
-use App\Services\Components\DataTable\UsersTableModel;
+use App\UI\Components\DataTable\UsersTableModel;
 
 /**
  * Table Demo Service

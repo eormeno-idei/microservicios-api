@@ -36,7 +36,7 @@ class UIController extends Controller
         // Example: 'demo-ui' -> 'DemoUi' -> 'DemoUiService'
         $serviceName = Str::studly($demo) . 'Service';
 
-        $namespace = config('ui-services.screens_namespace', 'App\\Services\\Screens');
+        $namespace = config('ui-services.screens_namespace', 'App\\UI\\Screens');
 
         // Build fully qualified class name
         $serviceClass = "{$namespace}\\{$serviceName}";

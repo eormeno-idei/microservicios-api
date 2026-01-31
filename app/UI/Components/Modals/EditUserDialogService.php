@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Components\Modals;
+namespace App\UI\Components\Modals;
 
 use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\UIBuilder;

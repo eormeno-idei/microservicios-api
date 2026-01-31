@@ -51,7 +51,7 @@ abstract class BaseUIBuilder
         // Buscar en el stack trace la primera clase que NO sea del namespace Components (antes UI)
         foreach ($trace as $frame) {
             if (isset($frame['class']) &&
-                !str_starts_with($frame['class'], 'App\\Services\\Components\\')) {
+                !str_starts_with($frame['class'], 'App\\UI\\Components\\')) {
                 return $frame['class']; // Retornar nombre completo con namespace
             }
         }

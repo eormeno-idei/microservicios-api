@@ -8,7 +8,7 @@ return [
     |
     | Namespace base donde se buscan los servicios de pantallas (screens).
     */
-    'screens_namespace' => 'App\\Services\\Screens',
+    'screens_namespace' => 'App\\UI\\Screens',
 
     /*
     |--------------------------------------------------------------------------

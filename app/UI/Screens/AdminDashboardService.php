@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Screens;
+namespace App\UI\Screens;
 
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\DialogType;
@@ -10,10 +10,10 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Components\TableBuilder;
 use Idei\Usim\Services\Components\ButtonBuilder;
-use App\Services\Components\DataTable\UserApiTableModel;
+use App\UI\Components\DataTable\UserApiTableModel;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
-use App\Services\Components\Modals\EditUserDialogService;
-use App\Services\Components\Modals\RegisterDialogService;
+use App\UI\Components\Modals\EditUserDialogService;
+use App\UI\Components\Modals\RegisterDialogService;
 
 class AdminDashboardService extends AbstractUIService
 {

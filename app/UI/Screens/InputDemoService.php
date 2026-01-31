@@ -1,5 +1,5 @@
 <?php
-namespace App\Services\Screens;
+namespace App\UI\Screens;
 
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\AbstractUIService;

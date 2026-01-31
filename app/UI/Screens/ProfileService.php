@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Screens;
+namespace App\UI\Screens;
 
 use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Services\UIBuilder;
