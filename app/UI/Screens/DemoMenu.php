@@ -21,7 +21,7 @@ use Idei\Usim\Services\Components\MenuDropdownBuilder;
  *
  * Builds the main navigation menu for demo screens
  */
-class DemoMenuService extends AbstractUIService
+class DemoMenu extends AbstractUIService
 {
     protected MenuDropdownBuilder $main_menu;
     protected MenuDropdownBuilder $user_menu;

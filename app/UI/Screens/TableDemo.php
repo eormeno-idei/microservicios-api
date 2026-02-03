@@ -20,7 +20,7 @@ use App\UI\Components\DataTable\UsersTableModel;
  *
  * Version: 2.0 (with DataTableModel abstraction)
  */
-class TableDemoService extends AbstractUIService
+class TableDemo extends AbstractUIService
 {
     protected TableBuilder $users_table;
 

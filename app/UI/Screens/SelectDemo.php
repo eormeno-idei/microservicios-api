@@ -23,7 +23,7 @@ use Idei\Usim\Services\UIBuilder;
  * Uses AbstractUIService for automatic event lifecycle management.
  * Event handlers only need to modify components, no return needed.
  */
-class SelectDemoService extends AbstractUIService
+class SelectDemo extends AbstractUIService
 {
     protected SelectBuilder $sel_country;
     protected SelectBuilder $sel_city;

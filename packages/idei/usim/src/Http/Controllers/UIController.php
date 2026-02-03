@@ -32,9 +32,9 @@ class UIController extends Controller
 
         $incomingStorage = request()->storage;
 
-        // Convert kebab-case to PascalCase and append 'Service'
-        // Example: 'demo-ui' -> 'DemoUi' -> 'DemoUiService'
-        $serviceName = Str::studly($demo) . 'Service';
+        // Convert kebab-case to PascalCase
+        // Example: 'demo-ui' -> 'DemoUi'
+        $serviceName = Str::studly($demo);
 
         $namespace = config('ui-services.screens_namespace', 'App\\UI\\Screens');
 

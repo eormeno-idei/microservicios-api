@@ -13,7 +13,7 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Support\UIStateManager;
 
-class LoginService extends AbstractUIService
+class Login extends AbstractUIService
 {
     protected string $store_email = 'admin@email.com';
     protected string $store_password = '2444';

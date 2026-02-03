@@ -15,7 +15,7 @@ use App\UI\Components\Modals\EditUserDialogService;
 use App\UI\Components\Modals\RegisterDialogService;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
 
-class AdminDashboardService extends AbstractUIService
+class AdminDashboard extends AbstractUIService
 {
     protected TableBuilder $users_table;
     protected InputBuilder $search_users;

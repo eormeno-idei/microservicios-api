@@ -9,7 +9,7 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Support\HttpClient;
 
-class ForgotPasswordService extends AbstractUIService
+class ForgotPassword extends AbstractUIService
 {
     protected LabelBuilder $lbl_result;
     protected \Idei\Usim\Services\Components\InputBuilder $email;

@@ -57,25 +57,27 @@ The framework uses `debug_backtrace` to auto-wire components. We modified the co
 **File:** `config/ui-services.php`
 *   **Logic Change:** All service registrations updated to `App\UI\Screens\...`.
 
-### C. Automation
-*   We used a PHP script (not `sed`) to safely replace namespaces across the project to handle backslash escaping correctly.
-*   `composer dump-autoload` has been executed to update the class map.
+### C. Naming Convention Standardized
+*   **Action:** Removed "Service" suffix from all Screen classes in `App\UI\Screens`.
+*   **Old:** `LoginService`, `AdminDashboardService`.
+*   **New:** `Login`, `AdminDashboard`.
+*   **Update:** `UIController` no longer appends "Service" automatically.
 
 ## 4. Current System State
 *   **Repo Status:** Changes committed locally (Refactor `App\Services` -> `App\UI`).
 *   **Code Integrity:** No static analysis errors in main services (`AdminDashboard`, `DemoMenu`, etc.).
-*   **Location of Demos:** Currently, `DemoUiService`, `DemoMenuService`, etc., reside in `App\UI\Screens`.
+*   **Location of Demos:** Currently, `DemoUi`, `DemoMenu`, etc., reside in `App\UI\Screens`.
     *   *Context:* These currently act as "User Land" code.
 
 ## 5. Roadmap / Next Steps for AI Agent
 The next phase is "Productization".
 
-1.  **IMMEDIATE PRIORITY: Remove "Service" Suffix from Screens**
-    *   **Issue:** Screen classes currently end in `Service` (e.g., `LoginService`). This name is hardcoded in the `UIController` routing logic.
-    *   **Goal:** Rename them to simple nouns (e.g., `Login`, `AdminDashboard`, `Profile`). The suffix is redundant and misleading.
-    *   **Action Required:** Rename files/classes and update the resolution logic in `UIController` to stop appending "Service" automatically or to support cleaner names.
+1.  **Define Strategy for Defaults:**
+    *   *Question:* Should the "Landing Page" and "Menu" come pre-compiled inside `vendor/idei/usim`?
+    *   *Alternative:* Should they be "Stubs" that get published to `App\UI` when running `usim:install`?
+    *   *Current leaning:* The goal mentions "Out of the Box", implying the package should serve them by default if no `App\UI` overrides exist.
 
-2.  **Define Strategy for Defaults:**
+2.  **Create Installer Command:**
     *   *Question:* Should the "Landing Page" and "Menu" come pre-compiled inside `vendor/idei/usim`?
     *   *Alternative:* Should they be "Stubs" that get published to `App\UI` when running `usim:install`?
     *   *Current leaning:* The goal mentions "Out of the Box", implying the package should serve them by default if no `App\UI` overrides exist.

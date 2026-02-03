@@ -9,7 +9,7 @@ use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Support\HttpClient;
 use Idei\Usim\Services\Components\UIContainer;
 
-class EmailVerifiedService extends AbstractUIService
+class EmailVerified extends AbstractUIService
 {
     protected string $verificationStatus = 'loading';
     protected string $errorMessage = '';

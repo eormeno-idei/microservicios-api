@@ -20,7 +20,7 @@ use Idei\Usim\Services\Components\LabelBuilder;
  * Uses AbstractUIService for automatic event lifecycle management.
  * Event handlers only need to modify components, no return needed.
  */
-class InputDemoService extends AbstractUIService
+class InputDemo extends AbstractUIService
 {
     protected InputBuilder $input_text;
     protected LabelBuilder $lbl_result;

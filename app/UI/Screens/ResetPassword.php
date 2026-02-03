@@ -10,7 +10,7 @@ use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Support\HttpClient;
 
-class ResetPasswordService extends AbstractUIService
+class ResetPassword extends AbstractUIService
 {
     protected LabelBuilder $lbl_result;
     protected InputBuilder $password;

@@ -7,7 +7,7 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\UIBuilder;
 use Illuminate\Support\Facades\Log;
 
-class ButtonDemoService extends AbstractUIService
+class ButtonDemo extends AbstractUIService
 {
     protected ButtonBuilder $btn_toggle;
     protected bool $store_state = false;

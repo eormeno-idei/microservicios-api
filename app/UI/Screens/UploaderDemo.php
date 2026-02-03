@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
  *
  * Demuestra el uso del componente UploaderBuilder
  */
-class UploaderDemoService extends AbstractUIService
+class UploaderDemo extends AbstractUIService
 {
     protected UploaderBuilder $uploader_profile;
     protected UploaderBuilder $uploader_banner;

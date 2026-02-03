@@ -8,7 +8,7 @@ use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\UIBuilder;
 
-class CheckboxDemoService extends AbstractUIService
+class CheckboxDemo extends AbstractUIService
 {
     protected LabelBuilder $lbl_instruction;
     protected CheckboxBuilder $chk_javascript;

@@ -18,7 +18,7 @@ use Idei\Usim\Services\UIBuilder;
  * - Handling user responses from modals
  * - Modal lifecycle (open → user action → close)
  */
-class ModalDemoService extends AbstractUIService
+class ModalDemo extends AbstractUIService
 {
     protected LabelBuilder $lbl_result;
     protected LabelBuilder $lbl_instruction;

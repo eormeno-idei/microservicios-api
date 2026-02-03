@@ -7,7 +7,7 @@ use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\CalendarBuilder;
 
-class CalendarDemoService extends AbstractUIService
+class CalendarDemo extends AbstractUIService
 {
     protected CalendarBuilder $academic_calendar;
 

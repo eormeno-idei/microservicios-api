@@ -25,7 +25,7 @@ use Idei\Usim\Services\Components\UploaderBuilder;
  * - Reenviar email de verificación
  * - Cambiar contraseña
  */
-class ProfileService extends AbstractUIService
+class Profile extends AbstractUIService
 {
     protected InputBuilder $input_email;
     protected InputBuilder $input_name;

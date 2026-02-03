@@ -8,7 +8,7 @@ use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\UIBuilder;
 
-class DemoUiService extends AbstractUIService
+class DemoUi extends AbstractUIService
 {
     protected LabelBuilder $lbl_welcome;
     protected LabelBuilder $lbl_counter;

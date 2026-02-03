@@ -27,26 +27,26 @@ return [
     |
     */
 
-    \App\UI\Screens\DemoUiService::class,
-    \App\UI\Screens\ForgotPasswordService::class,
-    \App\UI\Screens\ResetPasswordService::class,
-    \App\UI\Screens\LoginService::class,
-    \App\UI\Screens\InputDemoService::class,
-    \App\UI\Screens\SelectDemoService::class,
-    \App\UI\Screens\CheckboxDemoService::class,
-    \App\UI\Screens\FormDemoService::class,
-    \App\UI\Screens\ButtonDemoService::class,
-    \App\UI\Screens\TableDemoService::class,
-    \App\UI\Screens\ModalDemoService::class,
-    \App\UI\Screens\DemoMenuService::class,
-    \App\UI\Screens\UploaderDemoService::class,
-    \App\UI\Screens\CalendarDemoService::class,
+    \App\UI\Screens\DemoUi::class,
+    \App\UI\Screens\ForgotPassword::class,
+    \App\UI\Screens\ResetPassword::class,
+    \App\UI\Screens\Login::class,
+    \App\UI\Screens\InputDemo::class,
+    \App\UI\Screens\SelectDemo::class,
+    \App\UI\Screens\CheckboxDemo::class,
+    \App\UI\Screens\FormDemo::class,
+    \App\UI\Screens\ButtonDemo::class,
+    \App\UI\Screens\TableDemo::class,
+    \App\UI\Screens\ModalDemo::class,
+    \App\UI\Screens\DemoMenu::class,
+    \App\UI\Screens\UploaderDemo::class,
+    \App\UI\Screens\CalendarDemo::class,
 
     // Servicio de dashboard admin
-    \App\UI\Screens\AdminDashboardService::class,
+    \App\UI\Screens\AdminDashboard::class,
     // Servicio de verificación de email
-    \App\UI\Screens\EmailVerifiedService::class,
+    \App\UI\Screens\EmailVerified::class,
     // Servicio de perfil de usuario
-    \App\UI\Screens\ProfileService::class,
+    \App\UI\Screens\Profile::class,
 
 ];

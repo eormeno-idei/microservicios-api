@@ -8,7 +8,7 @@ use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Components\ButtonBuilder;
 
-class FormDemoService extends AbstractUIService
+class FormDemo extends AbstractUIService
 {
     protected LabelBuilder $lbl_instruction;
     protected InputBuilder $input_name;
