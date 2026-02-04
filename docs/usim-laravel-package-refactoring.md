@@ -57,11 +57,15 @@ The framework uses `debug_backtrace` to auto-wire components. We modified the co
 **File:** `config/ui-services.php`
 *   **Logic Change:** All service registrations updated to `App\UI\Screens\...`.
 
-### C. Naming Convention Standardized
+### C. Naming Convention Standardized (Latest Action)
 *   **Action:** Removed "Service" suffix from all Screen classes in `App\UI\Screens`.
+*   **Rationale:** The suffix was redundant and hardcoded in the generic Controller, causing coupling.
 *   **Old:** `LoginService`, `AdminDashboardService`.
 *   **New:** `Login`, `AdminDashboard`.
-*   **Update:** `UIController` no longer appends "Service" automatically.
+*   **Implementation Details:**
+    *   Renamed files and classes.
+    *   Updated `UIController` resolution logic (no longer auto-appends "Service").
+    *   Updated `config/ui-services.php` registry.
 
 ## 4. Current System State
 *   **Repo Status:** Changes committed locally (Refactor `App\Services` -> `App\UI`).
