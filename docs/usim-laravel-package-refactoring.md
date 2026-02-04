@@ -70,24 +70,26 @@ The framework uses `debug_backtrace` to auto-wire components. We modified the co
     *   *Context:* These currently act as "User Land" code.
 
 ## 5. Roadmap / Next Steps for AI Agent
-The next phase is "Productization".
+The next phase is "Productization" and **Security Consolidation**.
 
-1.  **Define Strategy for Defaults:**
-    *   *Question:* Should the "Landing Page" and "Menu" come pre-compiled inside `vendor/idei/usim`?
-    *   *Alternative:* Should they be "Stubs" that get published to `App\UI` when running `usim:install`?
-    *   *Current leaning:* The goal mentions "Out of the Box", implying the package should serve them by default if no `App\UI` overrides exist.
+### IMMEDIATE PRIORITY: Security Architecture
+The user validated the current refactor but identified authorized access as a critical next step before packaging.
 
-2.  **Create Installer Command:**
-    *   *Question:* Should the "Landing Page" and "Menu" come pre-compiled inside `vendor/idei/usim`?
-    *   *Alternative:* Should they be "Stubs" that get published to `App\UI` when running `usim:install`?
-    *   *Current leaning:* The goal mentions "Out of the Box", implying the package should serve them by default if no `App\UI` overrides exist.
+1.  **Authorization Gate (`authorize(): bool`)**:
+    *   **Goal:** Implement a self-contained security check within `AbstractUIService`.
+    *   **Proposal:** Add `public function authorize(): bool` (defaulting to true) to the base class.
+    *   **Implementation:** Before rendering any Screen or handling an Event, the Controller MUST call this method. If `false`, abort with 403.
+    *   **Benefit:** Keeps security logic inside the Screen class (e.g., `AdminDashboard::authorize()` checks `auth()->user()->isAdmin()`).
 
-2.  **Create Installer Command:**
-    *   Implement `php artisan usim:install`.
-    *   This command should publish assets (CSS/JS) and potentially create the directory structure in `App\UI`.
+2.  **Menu Visibility Automation**:
+    *   **Goal:** The Menu Builder currently sends ALL items to the frontend (leaving hiding logic to JS). This is insecure (info disclosure).
+    *   **Proposal:** Move the filtering logic to the Backend (`toJson` method of `MenuDropdownBuilder`). It should check permissions against the user *before* sending the payload.
+    *   **Advanced Idea:** Could the Menu Builder automatically check the `authorize()` method of the target Screen class instead of relying on manual string permissions like `'auth'`? (To be discussed).
 
-3.  **Package Isolation Check:**
-    *   Ensure `packages/idei/usim` does not have any hardcoded dependencies on `App\Models` or specific implementations of this specific app.
+3.  **Productization Strategy (Defaults):**
+    *   Define if Landing/Menu should be internal defaults or published stubs.
 
-4.  **Physical Extraction:**
-    *   Prepare the `packages/idei/usim` folder to be moved to its own git repository eventually.
+## 6. Rules of Engagement for AI Agent
+1.  **NO AUTO-COMMITS:** Do NOT commit any code unless explicitly asked by the user.
+2.  **PLAN FIRST:** Before implementing any feature (especially the `authorize` logic), summarize your plan and wait for user confirmation ("Go ahead").
+3.  **Context Awareness:** Always assume the user is continuing from a previous session on a different machine. Check the git status and file system first.
