@@ -5,6 +5,7 @@ namespace Idei\Usim\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Idei\Usim\Services\UIChangesCollector;
 use Idei\Usim\Services\Support\UIIdGenerator;
 
@@ -78,6 +79,22 @@ class UIEventController extends Controller
             // Instantiate service
             $service = app($serviceClass);
 
+            // Init collector
+            $this->uiChanges->setStorage($incomingStorage);
+
+            if (! $service->authorize()) {
+                $result = $service->failedAuthorization();
+
+                // Support standard Laravel redirects by converting them to JSON instructions
+                if ($result instanceof RedirectResponse) {
+                    $this->uiChanges->add([
+                        'redirect' => $result->getTargetUrl()
+                    ]);
+                }
+
+                return response()->json($this->uiChanges->all());
+            }
+
             // Convert action to method name: test_action → onTestAction
             $method = $this->actionToMethodName($action);
 
@@ -87,9 +104,6 @@ class UIEventController extends Controller
                     'error' => "Action '{$action}' not implemented",
                 ], 404);
             }
-
-            // Init collector
-            $this->uiChanges->setStorage($incomingStorage);
 
             $service->initializeEventContext($incomingStorage);
             $service->$method($parameters);

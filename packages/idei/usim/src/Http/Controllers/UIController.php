@@ -6,6 +6,7 @@ use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\UIChangesCollector;
 use Idei\Usim\Services\AbstractUIService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 
 class UIController extends Controller
@@ -54,6 +55,19 @@ class UIController extends Controller
         // Instantiate service using Laravel's service container
         // This allows dependency injection to work
         $service = app($serviceClass);
+
+        if (! $service->authorize()) {
+            $result = $service->failedAuthorization();
+
+            // Support standard Laravel redirects by converting them to JSON instructions
+            if ($result instanceof RedirectResponse) {
+                $this->uiChanges->add([
+                    'redirect' => $result->getTargetUrl()
+                ]);
+            }
+
+            return response()->json($this->uiChanges->all());
+        }
 
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {

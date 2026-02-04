@@ -71,6 +71,26 @@ abstract class AbstractUIService
     }
 
     /**
+     * Determine if the user is authorized to access this service.
+     *
+     * @return bool
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     *
+     * @return mixed|void|\Symfony\Component\HttpFoundation\Response
+     */
+    public function failedAuthorization()
+    {
+        abort(403, 'Unauthorized access to this screen.');
+    }
+
+    /**
      * Build base UI structure
      *
      * Override this method in your service to define the base UI.
