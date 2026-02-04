@@ -69,31 +69,35 @@ The framework uses `debug_backtrace` to auto-wire components. We modified the co
 
 ## 4. Current System State
 *   **Repo Status:** Changes committed locally (Refactor `App\Services` -> `App\UI`).
+    *   **Completed:** `AbstractUIService` now enforces `authorize()` via controllers.
 *   **Code Integrity:** No static analysis errors in main services (`AdminDashboard`, `DemoMenu`, etc.).
 *   **Location of Demos:** Currently, `DemoUi`, `DemoMenu`, etc., reside in `App\UI\Screens`.
     *   *Context:* These currently act as "User Land" code.
 
 ## 5. Roadmap / Next Steps for AI Agent
-The next phase is "Productization" and **Security Consolidation**.
+The next phase is **Security Consolidation: Menu Visibility**.
 
-### IMMEDIATE PRIORITY: Security Architecture
-The user validated the current refactor but identified authorized access as a critical next step before packaging.
+### IMMEDIATE PRIORITY: Security Architecture (Phase 2)
+The user has completed "Phase 1: Authorization Gate" (Server-side checks are live).
+Now we must solve "Phase 2: Menu Visibility Automation".
 
-1.  **Authorization Gate (`authorize(): bool`)**:
-    *   **Goal:** Implement a self-contained security check within `AbstractUIService`.
-    *   **Proposal:** Add `public function authorize(): bool` (defaulting to true) to the base class.
-    *   **Implementation:** Before rendering any Screen or handling an Event, the Controller MUST call this method. If `false`, abort with 403.
-    *   **Benefit:** Keeps security logic inside the Screen class (e.g., `AdminDashboard::authorize()` checks `auth()->user()->isAdmin()`).
+1.  **Authorization Gate (`authorize(): bool`)** [COMPLETED]
+    *   Added `authorize()` and `failedAuthorization()` to `AbstractUIService`.
+    *   Updated `UIController` and `UIEventController` to block unauthorized access (403 or Redirect).
 
-2.  **Menu Visibility Automation**:
-    *   **Goal:** The Menu Builder currently sends ALL items to the frontend (leaving hiding logic to JS). This is insecure (info disclosure).
-    *   **Proposal:** Move the filtering logic to the Backend (`toJson` method of `MenuDropdownBuilder`). It should check permissions against the user *before* sending the payload.
-    *   **Advanced Idea:** Could the Menu Builder automatically check the `authorize()` method of the target Screen class instead of relying on manual string permissions like `'auth'`? (To be discussed).
+2.  **Menu Visibility Automation** [NEXT STEP]
+    *   **Goal:** The Menu Builder is currently sending ALL items to the frontend (insecure info disclosure). We must filter this *Server Side*.
+    *   **Status:** The current agent has analyzed `MenuDropdownBuilder.php` and `DemoMenu.php`.
+    *   **The Plan (Ready to Execute via `MenuDropdownBuilder::toJson`):**
+        1.  Modify `toJson` in `MenuDropdownBuilder`.
+        2.  Implement logic to filter `$this->items` based on comparing `$item['permission']` vs `$this->config['permissions']`.
+        3.  Recursive filtering for submenus.
+        4.  This ensures that if a user lacks the 'auth' tag, the "Admin Dashboard" item is physically removed from the JSON payload *before* it leaves the server.
 
 3.  **Productization Strategy (Defaults):**
     *   Define if Landing/Menu should be internal defaults or published stubs.
 
 ## 6. Rules of Engagement for AI Agent
 1.  **NO AUTO-COMMITS:** Do NOT commit any code unless explicitly asked by the user.
-2.  **PLAN FIRST:** Before implementing any feature (especially the `authorize` logic), summarize your plan and wait for user confirmation ("Go ahead").
+2.  **PLAN FIRST:** Before implementing the Menu Builder logic, review the plan above.
 3.  **Context Awareness:** Always assume the user is continuing from a previous session on a different machine. Check the git status and file system first.
