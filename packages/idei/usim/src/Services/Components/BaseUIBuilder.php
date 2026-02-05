@@ -51,11 +51,18 @@ abstract class BaseUIBuilder
         // Buscar en el stack trace la primera clase que NO sea del namespace Components (antes UI)
         foreach ($trace as $frame) {
             if (isset($frame['class']) &&
-                !str_starts_with($frame['class'], 'App\\UI\\Components\\')) {
+                !str_starts_with($frame['class'], 'App\\UI\\Components\\') &&
+                !str_starts_with($frame['class'], 'Idei\\Usim\\Services\\Components\\') &&
+                !str_starts_with($frame['class'], 'Idei\\Usim\\Http\\') &&
+                $frame['class'] !== 'Idei\\Usim\\Services\\AbstractUIService' &&
+                $frame['class'] !== 'Idei\\Usim\\Services\\UIBuilder'
+            ) {
+                \Illuminate\Support\Facades\Log::info("UI Context Detected: " . $frame['class']);
                 return $frame['class']; // Retornar nombre completo con namespace
             }
         }
 
+        \Illuminate\Support\Facades\Log::warning("Context Detection Failed, defaulting to 'default'. Trace available if needed.");
         return 'default';
     }
 

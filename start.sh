@@ -66,6 +66,10 @@ php artisan view:clear
 #     echo "  Open this URL manually in your browser"
 # fi
 
+# Register UI Screens/Components
+echo "Discovering UI Screens..."
+php artisan usim:discover
+
 # Start the Laravel server (this will block the terminal)
 echo "Starting Laravel server..."
 

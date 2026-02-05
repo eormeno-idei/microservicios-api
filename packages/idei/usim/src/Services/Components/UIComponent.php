@@ -28,9 +28,8 @@ abstract class UIComponent implements UIElement
 
         // Generar ID según si tiene nombre o no
         if ($this->name !== null) {
-            // ID DETERMINÍSTICO: Basado en contexto + nombre
-            // Siempre genera el mismo ID para el mismo contexto + nombre
-            $this->id = $this->generateDeterministicId($context, $this->name);
+            // Updated to use Centralized Generator (Aware of Manifest)
+            $this->id = UIIdGenerator::generateFromName($context, $this->name);
         } else {
             // ID AUTO-INCREMENT: Para componentes temporales sin nombre
             $this->id = UIIdGenerator::generate($context);
@@ -113,6 +112,10 @@ abstract class UIComponent implements UIElement
                  }
                  // Skip internal classes from New Package Framework
                  if (str_starts_with($frame['class'], 'Idei\\Usim\\Services\\')) {
+                     continue;
+                 }
+                 // Skip Http Controllers
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Http\\')) {
                      continue;
                  }
 

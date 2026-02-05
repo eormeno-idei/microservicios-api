@@ -228,8 +228,12 @@ class CardBuilder extends UIComponent
         if (!isset($parameters['_caller_service_id'])) {
             // Get the service class that's calling this component
             $serviceClass = $this->detectCallingService();
-            // Get the service ID (offset) for that class
-            $serviceId = $this->getServiceIdFromClass($serviceClass);
+
+            // Get the service ID (offset) using reflection to access private method of UIIdGenerator
+             $reflection = new \ReflectionMethod(\Idei\Usim\Services\Support\UIIdGenerator::class, 'getContextOffset');
+             $reflection->setAccessible(true);
+             $serviceId = $reflection->invoke(null, $serviceClass);
+
             $parameters['_caller_service_id'] = $serviceId;
         }
 
@@ -256,6 +260,17 @@ class CardBuilder extends UIComponent
             if (isset($frame['class']) &&
                 is_subclass_of($frame['class'], \Idei\Usim\Services\AbstractUIService::class)) {
                 return $frame['class'];
+            }
+        }
+
+        // If not found via subclass check, try standard recursive detection (fallback)
+        // Similar logic to UIComponent::detectCallingContext but for Services
+         foreach ($trace as $frame) {
+            if (isset($frame['class'])) {
+                 if (str_starts_with($frame['class'], 'App\\UI\\Components\\')) continue;
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Services\\')) continue;
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Http\\')) continue;
+                 return $frame['class'];
             }
         }
 

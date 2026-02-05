@@ -10,6 +10,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Idei\Usim\Services\UIChangesCollector;
 use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Listeners\UsimEventDispatcher;
+use Idei\Usim\Console\Commands\DiscoverScreensCommand;
 
 use Illuminate\Console\Scheduling\Schedule;
 
@@ -24,6 +25,10 @@ class UsimServiceProvider extends ServiceProvider
         $this->app->scoped(UIChangesCollector::class, function ($app) {
             return new UIChangesCollector();
         });
+
+        $this->commands([
+            DiscoverScreensCommand::class,
+        ]);
     }
 
     public function boot(Dispatcher $events): void

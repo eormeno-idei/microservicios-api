@@ -16,8 +16,12 @@ class UIIdGenerator
     /** @var array<int, string> Mapping from offset to context class name */
     private static array $offsetToContext = [];
 
+    /** @var array<string, int> Mapping from context class name to offset */
+    private static array $contextOffsets = [];
+
     /** @var bool Flag to ensure services are loaded only once */
     private static bool $servicesLoaded = false;
+
 
     /**
      * Generate a unique ID for a UI element
@@ -100,9 +104,8 @@ class UIIdGenerator
     /**
      * Lazy load registered UI services
      *
-     * Loads the service registry only once per PHP worker process.
-     * This ensures deterministic offset → service mapping without
-     * requiring database or cache lookups.
+     * Loads the service registry from the generated manifest file.
+     * Use 'php artisan usim:discover' to generate it.
      *
      * @return void
      */
@@ -112,22 +115,18 @@ class UIIdGenerator
             return;
         }
 
-        // Load all registered UI services from config
-        $config = config('ui-services', []);
+        $manifestPath = app()->bootstrapPath('cache/usim_screens.php');
 
-        // Support new config structure or legacy array
-        $services = isset($config['registry']) ? $config['registry'] : $config;
-
-        if (!is_array($services)) {
-            $services = [];
+        if (!file_exists($manifestPath)) {
+             $manifest = [];
+        } else {
+            $manifest = require $manifestPath;
         }
 
-        foreach ($services as $serviceClass) {
-            // Skip keys if associative config is passed mistankenly as flat array
-            if (!is_string($serviceClass)) continue;
-
-            $offset = self::getContextOffset($serviceClass);
-            self::$offsetToContext[$offset] = $serviceClass;
+        foreach ($manifest as $className => $metadata) {
+            $offset = $metadata['id_offset'];
+            self::$offsetToContext[$offset] = $className;
+            self::$contextOffsets[$className] = $offset;
         }
 
         self::$servicesLoaded = true;
@@ -152,17 +151,27 @@ class UIIdGenerator
      */
     private static function getContextOffset(string $context): int
     {
+        // Ensure map is loaded
+        self::ensureServicesLoaded();
+
         if ($context === 'default') {
             return 0;
         }
 
-        // Generar un hash numérico único del nombre de la clase usando CRC32
-        $hash = crc32($context);
+        // Return from manifest if available
+        if (isset(self::$contextOffsets[$context])) {
+            return self::$contextOffsets[$context];
+        }
 
-        // Convertir a positivo si es negativo y escalar al rango deseado
-        // Múltiplos de 10000, máximo 9999 contextos diferentes
-        $offset = (abs($hash) % 9999) * 10000;
+        // Fallback: Determine deterministic ID using CRC32
+        // Must match ScreenDiscoveryService logic
+        $val = abs((int) crc32($context));
+        $bucket = $val % 100000;
+        $offset = $bucket * 10000;
+
+        self::$contextOffsets[$context] = $offset;
 
         return $offset;
+
     }
 }

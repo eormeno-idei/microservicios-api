@@ -41,8 +41,8 @@ class UIContainer implements UIElement
 
         // Generar ID según si tiene nombre o no
         if ($this->name !== null) {
-            // ID DETERMINÍSTICO: Basado en contexto + nombre
-            $this->id = $this->generateDeterministicId($context, $this->name);
+            // ID DETERMINÍSTICO: Usar generador centralizado
+            $this->id = UIIdGenerator::generateFromName($context, $this->name);
         } else {
             // ID AUTO-INCREMENT: Para contenedores temporales
             $this->id = UIIdGenerator::generate($context);
@@ -1610,6 +1610,10 @@ class UIContainer implements UIElement
                  }
                  // Skip internal classes from New Package Framework
                  if (str_starts_with($frame['class'], 'Idei\\Usim\\Services\\')) {
+                     continue;
+                 }
+                 // Skip Http Controllers
+                 if (str_starts_with($frame['class'], 'Idei\\Usim\\Http\\')) {
                      continue;
                  }
 
