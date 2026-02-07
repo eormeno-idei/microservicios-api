@@ -7,7 +7,7 @@ use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\UIContainer;
 
-class LandingDemo extends AbstractUIService
+class Landing extends AbstractUIService
 {
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {

@@ -2,7 +2,6 @@
 namespace App\UI\Screens;
 
 use Idei\Usim\Services\UIBuilder;
-use Idei\Usim\Services\Support\UIDebug;
 use Illuminate\Support\Facades\Auth;
 use Idei\Usim\Services\Enums\AlignItems;
 use Idei\Usim\Services\Enums\DialogType;
@@ -17,11 +16,11 @@ use App\UI\Components\Modals\RegisterDialogService;
 use Idei\Usim\Services\Components\MenuDropdownBuilder;
 
 /**
- * Demo Menu Service
+ * Menu Service
  *
- * Builds the main navigation menu for demo screens
+ * Builds the main navigation menu for screens
  */
-class DemoMenu extends AbstractUIService
+class Menu extends AbstractUIService
 {
     protected MenuDropdownBuilder $main_menu;
     protected MenuDropdownBuilder $user_menu;

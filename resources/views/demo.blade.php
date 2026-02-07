@@ -37,7 +37,7 @@
         // Pass service name from Laravel to JavaScript
         window.DEMO_NAME = '{{ $demo }}';
         window.RESET_DEMO = {{ $reset ? 'true' : 'false' }};
-        window.MENU_SERVICE = 'demo-menu';
+        window.MENU_SERVICE = 'menu';
         window.PARAMS = @json($allParams);
         window.QUERY_PARAMS = new URLSearchParams(window.location.search);
     </script>

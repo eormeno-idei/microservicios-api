@@ -16,7 +16,7 @@ Route::prefix('logs')->group(function () {
 Route::get('/', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
-        'demo' => 'landing-demo',
+        'demo' => 'landing',
         'reset' => $reset
     ]);
 });
