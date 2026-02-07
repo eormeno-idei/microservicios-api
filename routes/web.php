@@ -24,7 +24,7 @@ Route::get('/', function () {
 Route::get('/login', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
-        'demo' => 'login',
+        'demo' => 'auth/login',
         'reset' => $reset
     ]);
 })->name('login');
@@ -48,13 +48,19 @@ Route::get('/reset-password', function () {
 
 Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
 
+    /*
+     * Auto-Discovery handles this route dynamically now via the catch-all below.
+     * Keeping this block commented as reference or deletion candidate.
+     */
+    /*
     Route::get('/admin/dashboard', function () {
         $reset = request()->query('reset', false);
         return view('demo', [
-            'demo' => 'admin-dashboard',
+            'demo' => 'admin/dashboard',
             'reset' => $reset
         ]);
     })->name('admin.dashboard');
+    */
 
 });
 
@@ -69,14 +75,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     })->name('profile');
 });
 
-// Demo route - Dynamic demo viewer
-Route::get('/demo/{demo}', function (string $demo) {
+
+// Dynamic UI Screen Catcher (Catch-All)
+// Allows URLs like /admin/dashboard to resolve to Admin\Dashboard screen class
+// Must be the LAST route definition to not intercept other specific routes
+Route::get('/{screen}', function (string $screen) {
+    if ($screen === 'favicon.ico') return abort(404);
+
     $reset = request()->query('reset', false);
     return view('demo', [
-        'demo' => $demo,
+        'demo' => $screen,
         'reset' => $reset
     ]);
-})->name('demo');
+})->where('screen', '^(?!api|storage|css|js|images|telescope|_debugbar).*$')->name('ui.catchall');
 
 // Rutas para documentación
 Route::prefix('docs')->group(function () {

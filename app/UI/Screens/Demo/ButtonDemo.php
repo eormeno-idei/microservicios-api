@@ -1,11 +1,10 @@
 <?php
-namespace App\UI\Screens;
+namespace App\UI\Screens\Demo;
 
-use Idei\Usim\Services\AbstractUIService;
-use Idei\Usim\Services\Components\ButtonBuilder;
-use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\UIBuilder;
-use Illuminate\Support\Facades\Log;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\ButtonBuilder;
 
 class ButtonDemo extends AbstractUIService
 {

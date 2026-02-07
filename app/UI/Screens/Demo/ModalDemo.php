@@ -1,14 +1,14 @@
 <?php
-namespace App\UI\Screens;
+namespace App\UI\Screens\Demo;
 
-use Idei\Usim\Services\AbstractUIService;
-use Idei\Usim\Services\Components\LabelBuilder;
-use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Enums\TimeUnit;
 use Idei\Usim\Services\Enums\DialogType;
 use Idei\Usim\Services\Enums\LayoutType;
-use Idei\Usim\Services\Enums\TimeUnit;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\LabelBuilder;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
-use Idei\Usim\Services\UIBuilder;
 
 /**
  * Modal Demo Service

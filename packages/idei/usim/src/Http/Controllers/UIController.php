@@ -33,9 +33,12 @@ class UIController extends Controller
 
         $incomingStorage = request()->storage;
 
-        // Convert kebab-case to PascalCase
-        // Example: 'demo-ui' -> 'DemoUi'
-        $serviceName = Str::studly($demo);
+        // Convert path to namespace class name
+        // Supports nested folders: 'admin/dashboard' -> 'Admin\Dashboard'
+        // Supports kebab-case files: 'demos/input-demo' -> 'Demos\InputDemo'
+        $serviceName = collect(explode('/', $demo))
+            ->map(fn($segment) => Str::studly($segment))
+            ->join('\\');
 
         $namespace = config('ui-services.screens_namespace', 'App\\UI\\Screens');
 

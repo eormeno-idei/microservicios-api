@@ -1528,6 +1528,12 @@ class UIRenderer {
     render() {
         // console.log('🎨 Rendering UI with data:', this.data);
 
+        // Check for redirect instruction immediately
+        if (this.data.redirect) {
+            window.location.href = this.data.redirect;
+            return;
+        }
+
         // Step 1: Build a map of internal ID -> JSON key
         // Each component now has _id in its config
         const internalIdToKey = new Map();
@@ -1539,7 +1545,7 @@ class UIRenderer {
             const config = this.data[key];
 
             // Skip special keys that are not UI components
-            if (key === 'storage' || key === 'action') {
+            if (key === 'storage' || key === 'action' || key === 'redirect' || key === 'toast') {
                 continue;
             }
 
@@ -1552,7 +1558,7 @@ class UIRenderer {
         // Step 2: Create all component instances
         for (const id of componentIds) {
             // Skip special keys that are not UI components
-            if (id === 'storage' || id === 'action') {
+            if (id === 'storage' || id === 'action' || id === 'redirect' || id === 'toast') {
                 continue;
             }
 
@@ -2528,7 +2534,8 @@ async function loadDemoUI(demoName = null) {
 
         const usimStorage = localStorage.getItem('usim') || '';
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const response = await fetch(`/api/${demo}${queryString}`, {
+        // Use /api/ui/ prefix to separate UI definitions from Data API
+        const response = await fetch(`/api/ui/${demo}${queryString}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -3264,7 +3271,8 @@ async function loadMenuUI() {
         const usimStorage = localStorage.getItem('usim') || '';
         const parentElement = 'parent=menu';
 
-        const response = await fetch(`/api/${window.MENU_SERVICE}?${parentElement}&${resetQuery}`,
+        // Use /api/ui/ prefix for menu as well
+        const response = await fetch(`/api/ui/${window.MENU_SERVICE}?${parentElement}&${resetQuery}`,
             {
                 method: 'GET',
                 headers: {

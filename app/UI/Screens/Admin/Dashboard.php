@@ -1,5 +1,5 @@
 <?php
-namespace App\UI\Screens;
+namespace App\UI\Screens\Admin;
 
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\DialogType;
@@ -15,8 +15,27 @@ use App\UI\Components\Modals\EditUserDialogService;
 use App\UI\Components\Modals\RegisterDialogService;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
 
-class AdminDashboard extends AbstractUIService
+class Dashboard extends AbstractUIService
 {
+    /**
+     * Determine if the user is authorized to access this screen.
+     */
+    public function authorize(): bool
+    {
+        /** @var \App\Models\User|null $user */
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        return $user && $user->hasRole('admin');
+    }
+
+    /**
+     * Handle a failed authorization attempt.
+     */
+    public function failedAuthorization()
+    {
+        $this->redirect('/login');
+    }
+
     protected TableBuilder $users_table;
     protected InputBuilder $search_users;
     protected ButtonBuilder $add_user_btn;

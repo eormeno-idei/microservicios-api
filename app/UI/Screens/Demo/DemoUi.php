@@ -1,12 +1,11 @@
 <?php
-namespace App\UI\Screens;
+namespace App\UI\Screens\Demo;
 
-use Idei\Usim\Services\AbstractUIService;
-use Idei\Usim\Services\Components\LabelBuilder;
-use Idei\Usim\Services\Components\UIContainer;
-use Idei\Usim\Services\Enums\LayoutType;
-use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Enums\LayoutType;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\LabelBuilder;
 
 class DemoUi extends AbstractUIService
 {

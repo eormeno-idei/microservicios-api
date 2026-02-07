@@ -1,6 +1,6 @@
 <?php
 
-namespace App\UI\Screens;
+namespace App\UI\Screens\Demo;
 
 use DateTime;
 

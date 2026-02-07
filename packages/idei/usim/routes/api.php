@@ -7,10 +7,10 @@ use Idei\Usim\Http\Controllers\UIController;
 
 // USIM routes require 'web' middleware (session) to maintain UI state
 Route::middleware('web')->prefix('api')->group(function () {
-    // UI Screen Loader - Exclude API resource roots that collide (GET requests)
-    Route::get('/{demo}', [UIController::class, 'show'])
+    // UI Screen Loader - Namespaced to /ui/ to avoid collision with REST API
+    Route::get('/ui/{demo}', [UIController::class, 'show'])
         ->name('api.demo')
-        ->where('demo', '^(?!users|user|files|ping|email\/verify|password).*$');
+        ->where('demo', '.*');
 
     // USIM Event Handler
     Route::post('/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
