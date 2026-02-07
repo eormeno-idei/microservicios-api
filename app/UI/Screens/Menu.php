@@ -121,9 +121,9 @@ class Menu extends AbstractUIService
             ->position('bottom-right')
             ->width(180);
         $user_menu->trigger("⚙️");
-        $user_menu->link('Login', '/login', '🔑', permission: 'no-auth');
+        $user_menu->link('Login', '/auth/login', '🔑', permission: 'no-auth');
         $user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
-        $user_menu->link('Profile', '/profile', '👤', permission: 'auth');
+        $user_menu->link('Profile', '/auth/profile', '👤', permission: 'auth');
         $user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
         return $user_menu;
     }

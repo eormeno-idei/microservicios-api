@@ -1,19 +1,15 @@
 <?php
 
-namespace App\UI\Screens;
+namespace App\UI\Screens\Auth;
 
 use Idei\Usim\Events\UsimEvent;
 use Idei\Usim\Services\UIBuilder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Password;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Upload\UploadService;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Password;
 use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\InputBuilder;
-use Idei\Usim\Services\Components\LabelBuilder;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Idei\Usim\Services\Components\UploaderBuilder;
 
 /**
