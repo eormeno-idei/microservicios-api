@@ -1,14 +1,14 @@
 <?php
 
-namespace App\UI\Screens;
+namespace App\UI\Screens\Auth;
 
 use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\AbstractUIService;
-use Idei\Usim\Services\Components\UIContainer;
-use Idei\Usim\Services\Components\LabelBuilder;
-use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Components\InputBuilder;
+use Idei\Usim\Services\Components\LabelBuilder;
 
 class ResetPassword extends AbstractUIService
 {
@@ -173,7 +173,7 @@ class ResetPassword extends AbstractUIService
                 $this->toast('Contraseña actualizada correctamente', 'success');
 
                 // Redirect to login after short delay (handled by frontend if possible, or immediate)
-                $this->redirect('/login');
+                $this->redirect('/auth/login');
             } else {
                 // Extract validation errors if any
                 if (isset($response['errors']) && is_array($response['errors'])) {
