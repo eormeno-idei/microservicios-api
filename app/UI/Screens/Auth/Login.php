@@ -93,7 +93,7 @@ class Login extends AbstractUIService
 
     public function onNavigateForgotPassword(array $params): void
     {
-        $this->redirect('/demo/forgot-password');
+        $this->redirect('/auth/forgot-password');
     }
 
     public function onSubmitLogin(array $params): void
