@@ -32,7 +32,7 @@ Route::get('/', function () {
 Route::get('/email/verify/{id}/{hash}', function () {
     $reset = request()->query('reset', false);
     return view('demo', [
-        'demo' => 'email-verified',
+        'demo' => 'auth/email-verified',
         'reset' => $reset
     ]);
 })->middleware('signed')->name('verification.notice');

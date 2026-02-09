@@ -1,9 +1,8 @@
 <?php
 
-namespace App\UI\Screens;
+namespace App\UI\Screens\Auth;
 
 use Idei\Usim\Services\UIBuilder;
-use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Support\HttpClient;

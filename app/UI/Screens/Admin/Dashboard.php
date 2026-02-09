@@ -33,7 +33,7 @@ class Dashboard extends AbstractUIService
      */
     public function failedAuthorization()
     {
-        $this->redirect('/login');
+        $this->redirect('/auth/login');
     }
 
     protected TableBuilder $users_table;
