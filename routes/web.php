@@ -84,7 +84,7 @@ Route::get('/{screen?}', function (?string $screen = 'home') {
     if ($screen === 'favicon.ico') return abort(404);
 
     $reset = request()->query('reset', false);
-    return view('demo', [
+    return view('usim::demo', [
         'demo' => $screen,
         'reset' => $reset
     ]);

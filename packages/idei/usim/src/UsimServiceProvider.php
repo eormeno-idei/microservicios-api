@@ -34,6 +34,13 @@ class UsimServiceProvider extends ServiceProvider
     public function boot(Dispatcher $events): void
     {
         $this->loadRoutesFrom(__DIR__.'/../routes/api.php');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'usim');
+
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../resources/assets' => public_path('vendor/idei/usim'),
+            ], 'usim-assets');
+        }
 
         // Programar limpieza de archivos temporales (Self-healing maintenance)
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
