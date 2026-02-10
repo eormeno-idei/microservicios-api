@@ -81,13 +81,98 @@ abstract class AbstractUIService
     }
 
     /**
+     * Helper to require authentication.
+     * Use this inside your authorize() method.
+     *
+     * @return bool
+     */
+    protected function requireAuth(): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Helper to require a role (implies authentication).
+     * Use this inside your authorize() method.
+     *
+     * @param string|array $roles
+     * @param string $guard
+     * @return bool
+     */
+    protected function requireRole(string|array $roles, string $guard = null): bool
+    {
+        // Implicitly require authentication first
+        if (! $this->requireAuth()) {
+            return false;
+        }
+
+        $user = auth()->guard($guard)->user();
+
+        if (! $user || ! method_exists($user, 'hasAnyRole')) {
+            // User exists but trait is missing or logic fails
+            return false;
+        }
+
+        if (! $user->hasAnyRole($roles)) {
+             // User is authenticated but lacks role
+             // Instead of aborting, we return false.
+             // The framework will catch this in authorize() and call failedAuthorization()
+             // where we can gracefully handle the error (toast + redirect).
+             return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Helper to require a permission (implies authentication).
+     * Use this inside your authorize() method.
+     *
+     * @param string|array $permissions
+     * @param string $guard
+     * @return bool
+     */
+    protected function requirePermission(string|array $permissions, string $guard = null): bool
+    {
+        // Implicitly require authentication first
+        if (! $this->requireAuth()) {
+            return false;
+        }
+
+        $user = auth()->guard($guard)->user();
+
+        if (! $user || ! method_exists($user, 'hasAnyPermission')) {
+            return false;
+        }
+
+        if (! $user->hasAnyPermission($permissions)) {
+             return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Handle a failed authorization attempt.
      *
      * @return mixed|void|\Symfony\Component\HttpFoundation\Response
      */
     public function failedAuthorization()
     {
-        abort(403, 'Unauthorized access to this screen.');
+        // 1. If user is NOT authenticated -> Redirect to login
+        if (! auth()->check()) {
+            $this->toast('Please login to access this page.', 'warning');
+            $this->redirect(url('/auth/login'));
+            return;
+        }
+
+        // 2. If user IS authenticated but logic failed -> 403 Forbidden Toast + Redirect Home
+        $this->toast('Unauthorized: Insufficient permissions.', 'error');
+        //$this->redirect(url('/')); // Or dashboard
     }
 
     /**
