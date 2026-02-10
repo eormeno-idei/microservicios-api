@@ -80,7 +80,7 @@ use App\Http\Controllers\DocumentationController;
 // Allows URLs like /admin/dashboard to resolve to Admin\Dashboard screen class
 // Now also handles the root path '/' defaulting to 'landing'
 // Must be the LAST route definition to not intercept other specific routes
-Route::get('/{screen?}', function (?string $screen = 'landing') {
+Route::get('/{screen?}', function (?string $screen = 'home') {
     if ($screen === 'favicon.ico') return abort(404);
 
     $reset = request()->query('reset', false);
