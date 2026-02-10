@@ -49,9 +49,8 @@ class EmailVerified extends AbstractUIService
         }
 
         // Obtener parámetros de la URL (id y hash)
-        // El frontend envía los parámetros de ruta como query params con prefijo 'route_'
-        $id = request('route_id') ?? request()->route('id');
-        $hash = request('route_hash') ?? request()->route('hash');
+        $id = request('id');
+        $hash = request('hash');
 
         if (!$id || !$hash) {
             $this->errorMessage = 'Enlace de verificación inválido. Faltan parámetros requeridos.';
@@ -63,8 +62,8 @@ class EmailVerified extends AbstractUIService
 
         // Llamar a la API de verificación
         try {
-            // Generamos una URL firmada válida para la API, ya que la firma original es para la ruta Web
-            // y no coincide con la ruta de la API.
+            // Generamos una URL firmada válida para la API, ya que el enlace de entrada es público (sin firma)
+            // pero el endpoint de API requiere firma.
             // Como estamos en un contexto seguro (backend), podemos autofirmar la petición.
             $signedApiUrl = \Illuminate\Support\Facades\URL::temporarySignedRoute(
                 'verification.verify',
@@ -247,7 +246,7 @@ class EmailVerified extends AbstractUIService
      */
     public function onGoToLogin(array $params): void
     {
-        $this->redirect('/login');
+        $this->redirect('/auth/login');
     }
 
     /**
@@ -264,6 +263,6 @@ class EmailVerified extends AbstractUIService
     public function onResendVerification(array $params): void
     {
         $this->toast('Por favor, inicie sesión para solicitar un nuevo enlace de verificación', 'info');
-        $this->redirect('/login');
+        $this->redirect('/auth/login');
     }
 }

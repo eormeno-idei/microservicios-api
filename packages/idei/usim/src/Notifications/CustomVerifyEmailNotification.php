@@ -54,21 +54,10 @@ class CustomVerifyEmailNotification extends Notification implements ShouldQueue
     protected function verificationUrl($notifiable): string
     {
         $appUrl = config('app.url');
-        // Obtiene el tiempo de expiración en minutos (por defecto 1440 = 24h)
-        $expireMinutes = (int) env('AUTH_VERIFICATION_EXPIRE', 1440);
+        $id = $notifiable->getKey();
+        $hash = sha1($notifiable->getEmailForVerification());
 
-        // Crea la URL temporal firmada para la verificación
-        $temporaryUrl = URL::temporarySignedRoute(
-            'verification.notice',
-            Carbon::now()->addMinutes($expireMinutes),
-            [
-                'id' => $notifiable->getKey(),
-                'hash' => sha1($notifiable->getEmailForVerification()),
-            ]
-        );
-        // Reemplaza la base de la URL por APP_URL
-        // return preg_replace('/^https?:\/\/[^\/]+/', $appUrl, $temporaryUrl);
-        return $temporaryUrl;
+        return "{$appUrl}/auth/email-verified?id={$id}&hash={$hash}";
     }
 
     /**

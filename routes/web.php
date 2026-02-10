@@ -13,13 +13,13 @@ use App\Http\Controllers\DocumentationController;
 // });
 
 // Demo route - Default landing demo
-Route::get('/', function () {
-    $reset = request()->query('reset', false);
-    return view('demo', [
-        'demo' => 'landing',
-        'reset' => $reset
-    ]);
-});
+// Route::get('/', function () {
+//     $reset = request()->query('reset', false);
+//     return view('demo', [
+//         'demo' => 'landing',
+//         'reset' => $reset
+//     ]);
+// });
 
 // Route::get('/login', function () {
 //     $reset = request()->query('reset', false);
@@ -29,13 +29,13 @@ Route::get('/', function () {
 //     ]);
 // })->name('login');
 
-Route::get('/email/verify/{id}/{hash}', function () {
-    $reset = request()->query('reset', false);
-    return view('demo', [
-        'demo' => 'auth/email-verified',
-        'reset' => $reset
-    ]);
-})->middleware('signed')->name('verification.notice');
+// Route::get('/email/verify/{id}/{hash}', function () {
+//     $reset = request()->query('reset', false);
+//     return view('demo', [
+//         'demo' => 'auth/email-verified',
+//         'reset' => $reset
+//     ]);
+// })->middleware('signed')->name('verification.notice');
 
 // Reset Password Route (Landing from Email)
 // Route::get('/reset-password', function () {
@@ -78,8 +78,9 @@ Route::get('/email/verify/{id}/{hash}', function () {
 
 // Dynamic UI Screen Catcher (Catch-All)
 // Allows URLs like /admin/dashboard to resolve to Admin\Dashboard screen class
+// Now also handles the root path '/' defaulting to 'landing'
 // Must be the LAST route definition to not intercept other specific routes
-Route::get('/{screen}', function (string $screen) {
+Route::get('/{screen?}', function (?string $screen = 'landing') {
     if ($screen === 'favicon.ico') return abort(404);
 
     $reset = request()->query('reset', false);
