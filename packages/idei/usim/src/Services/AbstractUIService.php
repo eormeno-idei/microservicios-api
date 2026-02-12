@@ -21,21 +21,25 @@ use Idei\Usim\Services\Support\UIDebug;
 use Idei\Usim\Services\Support\UIDiffer;
 use Idei\Usim\Services\Support\UIIdGenerator;
 use Idei\Usim\Services\Support\UIStateManager;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\UIChangesCollector;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
 
 /**
- * Abstract UI Service
+ * Abstract user Interface Service
  *
- * Base class for all UI services that handles:
- * - UI state storage and retrieval
+ * Base class for all user Interface services that handles:
+ * - user Interface state storage and retrieval
  * - Automatic diff calculation
  * - Event lifecycle management
  * - Response formatting
  *
  * Child classes only need to:
- * 1. Implement buildBaseUI() to define UI structure
+ * 1. Implement buildBaseUI() to define the component structure
  * 2. Implement event handlers that modify components (no return needed)
  *
  * The lifecycle is managed by UIEventController:
@@ -46,17 +50,17 @@ use RuntimeException;
 abstract class AbstractUIService
 {
     /**
-     * Current UI container instance
+     * Current container instance
      */
     protected UIContainer $container;
 
     /**
-     * UI state before modifications (for diff calculation)
+     * State before modifications (for diff calculation)
      */
     protected ?array $oldUI = null;
 
     /**
-     * UI state after modifications (for diff calculation)
+     * State after modifications (for diff calculation)
      */
     protected ?array $newUI = null;
 
@@ -88,7 +92,7 @@ abstract class AbstractUIService
      */
     protected function requireAuth(): bool
     {
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             return false;
         }
 
@@ -103,22 +107,23 @@ abstract class AbstractUIService
      * @param string $guard
      * @return bool
      */
-    protected function requireRole(string|array $roles, string $guard = null): bool
+    protected function requireRole(string|array $roles, ?string $guard = null): bool
     {
         // Implicitly require authentication first
         if (! $this->requireAuth()) {
             return false;
         }
 
-        $user = auth()->guard($guard)->user();
+        /** @var mixed $user */
+        $user = Auth::guard($guard)->user();
 
         if (! $user || ! method_exists($user, 'hasAnyRole')) {
-            // User exists but trait is missing or logic fails
+            // user exists but trait is missing or logic fails
             return false;
         }
 
         if (! $user->hasAnyRole($roles)) {
-             // User is authenticated but lacks role
+             // user is authenticated but lacks role
              // Instead of aborting, we return false.
              // The framework will catch this in authorize() and call failedAuthorization()
              // where we can gracefully handle the error (toast + redirect).
@@ -136,14 +141,15 @@ abstract class AbstractUIService
      * @param string $guard
      * @return bool
      */
-    protected function requirePermission(string|array $permissions, string $guard = null): bool
+    protected function requirePermission(string|array $permissions, ?string $guard = null): bool
     {
         // Implicitly require authentication first
         if (! $this->requireAuth()) {
             return false;
         }
 
-        $user = auth()->guard($guard)->user();
+        /** @var mixed $user */
+        $user = Auth::guard($guard)->user();
 
         if (! $user || ! method_exists($user, 'hasAnyPermission')) {
             return false;
@@ -164,7 +170,7 @@ abstract class AbstractUIService
     public function failedAuthorization()
     {
         // 1. If user is NOT authenticated -> Redirect to login
-        if (! auth()->check()) {
+        if (! Auth::check()) {
             $this->toast('Please login to access this page.', 'warning');
             $this->redirect(url('/auth/login'));
             return;
@@ -176,13 +182,13 @@ abstract class AbstractUIService
     }
 
     /**
-     * Build base UI structure
+     * Build base user Interface structure
      *
-     * Override this method in your service to define the base UI.
+     * Override this method in your service to define the base user Interface.
      * This will be called automatically if the cache expires.
      *
-     * @param mixed ...$params Optional parameters for UI construction
-     * @return UIContainer Base UI structure
+     * @param mixed ...$params Optional parameters for user Interface construction
+     * @return UIContainer Base user Interface structure
      */
     abstract protected function buildBaseUI(UIContainer $container, ...$params): void;
 
@@ -194,7 +200,7 @@ abstract class AbstractUIService
      * Initialize event context
      *
      * Called by UIEventController before invoking event handler.
-     * Loads UI container and captures state for diff calculation.
+     * Loads user Interface container and captures state for diff calculation.
      * Also injects storage values and component references into protected properties.
      *
      * @param array $incomingStorage Storage data from frontend (decrypted)
@@ -268,7 +274,7 @@ abstract class AbstractUIService
     /**
      * Inject component references into protected properties
      *
-     * Uses reflection to find protected properties with UI component type hints.
+     * Uses reflection to find protected properties with user Interface component type hints.
      * If a property name matches a component name in the container,
      * the component is injected into that property.
      *
@@ -297,7 +303,7 @@ abstract class AbstractUIService
 
             $typeName = $propertyType->getName();
 
-            // Only process UI component types
+            // Only process user Interface component types
             if (str_starts_with($typeName, 'Idei\\Usim\\Services\\Components\\')) {
                 $componentName = $property->getName();
                 $component = $this->container->findByName($componentName);
@@ -308,7 +314,7 @@ abstract class AbstractUIService
                 } elseif (!$propertyType->allowsNull()) {
                     // Component not found and property is not nullable
                     throw new RuntimeException(
-                        "Component '{$componentName}' not found in UI container. " .
+                        "Component '{$componentName}' not found in user Interface container. " .
                         "Make sure the component exists or make the property nullable: protected ?{$typeName} \${$componentName};"
                     );
                 }
@@ -320,7 +326,7 @@ abstract class AbstractUIService
      * Finalize event context
      *
      * Called by UIEventController after event handler completes.
-     * Automatically detects changes by comparing UI state, stores updated UI,
+     * Automatically detects changes by comparing user Interface state, stores updated user Interface,
      * and returns formatted response.
      *
      * @return void
@@ -332,11 +338,11 @@ abstract class AbstractUIService
             $this->postLoadUI();
         }
 
-        // Get current UI state
+        // Get current user Interface state
         $this->newUI = $this->container->toJson();
 
         if (!$reload) {
-            // Store updated UI
+            // Store updated user Interface
             $this->storeUI($this->container);
         }
 
@@ -373,13 +379,13 @@ abstract class AbstractUIService
     }
 
     // /**
-    //  * Get the UI structure
+    //  * Get the user Interface structure
     //  *
-    //  * Returns the UI from cache or regenerates if not exists.
-    //  * This is the standard public method to retrieve UI for all services.
+    //  * Returns the user Interface from cache or regenerates if not exists.
+    //  * This is the standard public method to retrieve user Interface for all services.
     //  *
     //  * @param mixed ...$params Optional parameters that can be used by child classes
-    //  * @return array UI structure in JSON format
+    //  * @return array user Interface structure in JSON format
     //  */
     // public function getUI(string $parent = 'main', ...$params): array
     // {
@@ -388,14 +394,14 @@ abstract class AbstractUIService
     // }
 
     /**
-     * Get stored UI state, regenerate if missing
+     * Get stored user Interface state, regenerate if missing
      *
      * @param mixed ...$params Optional parameters passed to buildBaseUI
-     * @return array UI structure in JSON format
+     * @return array user Interface structure in JSON format
      */
     protected function getStoredUI(string $parent = 'main', bool $debug = false, ...$params): array
     {
-        // Check if UI exists in cache
+        // Check if user Interface exists in cache
         $cachedUI = UIStateManager::get(static::class);
 
         if ($cachedUI !== null) {
@@ -411,7 +417,7 @@ abstract class AbstractUIService
             ->justifyContent('center')
             ->alignItems('center');
 
-        // Generate and cache new UI
+        // Generate and cache new user Interface
         $this->buildBaseUI($container, ...$params);
 
         $ui = $container
@@ -425,9 +431,9 @@ abstract class AbstractUIService
     }
 
     /**
-     * Get UI container instance from cache, regenerate if missing
+     * Get user Interface container instance from cache, regenerate if missing
      *
-     * @return UIContainer UI container instance
+     * @return UIContainer user Interface container instance
      */
     protected function getUIContainer(bool $debug = false): UIContainer
     {
