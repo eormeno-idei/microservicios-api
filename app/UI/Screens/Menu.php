@@ -71,7 +71,7 @@ class Menu extends AbstractUIService
             $this->user_menu->triggerImage(
                 imageUrl: $imageUrl,
                 alt: $user->name,
-                label: null  // Solo imagen, sin texto
+                label: $user->name
             );
         } else {
             // Caso 2: Usuario sin imagen de perfil - icono + nombre
