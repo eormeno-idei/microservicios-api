@@ -36,7 +36,7 @@ use RuntimeException;
  * - user Interface state storage and retrieval
  * - Automatic diff calculation
  * - Event lifecycle management
- * - Response formatting
+ * - response formatting
  *
  * Child classes only need to:
  * 1. Implement buildBaseUI() to define the component structure
@@ -177,8 +177,9 @@ abstract class AbstractUIService
         }
 
         // 2. If user IS authenticated but logic failed -> 403 Forbidden Toast + Redirect Home
-        $this->toast('Unauthorized: Insufficient permissions.', 'error');
+        //$this->toast('Unauthorized: Insufficient permissions.', 'error');
         //$this->redirect(url('/')); // Or dashboard
+        $this->abort(403, 'Unauthorized: Insufficient permissions.');
     }
 
     /**
@@ -689,6 +690,23 @@ abstract class AbstractUIService
 
         $this->uiChanges()->add([
             'redirect' => $url,
+        ]);
+    }
+
+    /**
+     * Requests to front to display an error message.
+     *
+     * @param int  $statusCode The HTTP status code (e.g., 403 for forbidden, 404 for not found)
+     * @param string $message The error message to display
+     * @return void
+     */
+    protected function abort(int $statusCode, string $message = ''): void
+    {
+        $this->uiChanges()->add([
+            'abort' => [
+                'status_code' => $statusCode,
+                'message' => $message,
+            ],
         ]);
     }
 

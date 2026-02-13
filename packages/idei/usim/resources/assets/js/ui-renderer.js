@@ -1526,7 +1526,12 @@ class UIRenderer {
     }
 
     render() {
-        // console.log('🎨 Rendering UI with data:', this.data);
+
+        // Handle abort if present (checks for truthy value OR explicit action)
+        if (this.data.abort || this.data.action === 'abort') {
+             this.handleAbort(this.data.abort);
+             return;
+        }
 
         // Check for redirect instruction immediately
         if (this.data.redirect) {
@@ -1905,6 +1910,43 @@ class UIRenderer {
     }
 
     /**
+     * Handle abort instruction
+     * @param {object|boolean} abortData
+     */
+    handleAbort(abortData) {
+        // Normalize abortData
+        const data = (typeof abortData === 'object') ? abortData : {};
+        const code = data.status_code || data.code || 'ERROR';
+        const message = data.message || 'La operación ha sido abortada.';
+
+        // Try to find main container
+        const mainContainer = document.getElementById('main');
+        if (mainContainer) {
+            mainContainer.innerHTML = `
+                <div class="ui-error-screen">
+                    <div class="ui-error-icon">⛔</div>
+                    <p class="ui-error-message">
+                        <span class="ui-error-code">${code}</span> ${message}
+                    </p>
+                    <button onclick="window.location = '/'" class="ui-error-button">
+                        Recargar Página
+                    </button>
+                </div>
+            `;
+        } else {
+            // Fallback if no main container
+            document.body.classList.add('ui-error-screen');
+            document.body.innerHTML = `
+                <div class="ui-error-icon">⛔</div>
+                <p class="ui-error-message">
+                    <span class="ui-error-code">${code}</span> ${message}
+                </p>
+                <button onclick="window.location = '/'" class="ui-error-button">Recargar Página</button>
+            `;
+        }
+    }
+
+    /**
      * Handle UI updates from backend
      *
      * @param {object} uiUpdate - UI update object (same structure as initial render)
@@ -1913,6 +1955,15 @@ class UIRenderer {
         // Handle storage updates if present
         if (uiUpdate.storage) {
             this.handleStorageUpdate(uiUpdate.storage);
+        }
+
+        console.log('🔄 Handling UI update:', uiUpdate);
+        console.log('🔍 Checking for abort instruction. uiUpdate.abort:', uiUpdate.abort, 'Type:', typeof uiUpdate.abort);
+
+        // Handle abort if present (checks for truthy value OR explicit action)
+        if (uiUpdate.abort || uiUpdate.action === 'abort') {
+            this.handleAbort(uiUpdate.abort);
+            return;
         }
 
         // Handle toast notifications if present (but only if no redirect)

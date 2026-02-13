@@ -25,14 +25,6 @@ class Dashboard extends AbstractUIService
         return $this->requireRole('admin');
     }
 
-    /**
-     * Handle a failed authorization attempt.
-     */
-    // public function failedAuthorization()
-    // {
-    //     $this->redirect('/auth/login');
-    // }
-
     protected TableBuilder $users_table;
     protected InputBuilder $search_users;
     protected ButtonBuilder $add_user_btn;
