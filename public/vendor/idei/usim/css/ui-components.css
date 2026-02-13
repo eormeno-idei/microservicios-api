@@ -1884,7 +1884,9 @@ body.modal-open #menu {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 50vh;
+    width: 60vw;
+    margin: 0 auto;
     text-align: center;
     color: #721c24;
     background-color: #f8d7da;
