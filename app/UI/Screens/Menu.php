@@ -32,7 +32,7 @@ class Menu extends AbstractUIService
         $container
             ->parent('menu') // Important to set parent!
             ->shadow(0)
-            ->borderRadius(2)
+            ->borderRadius(1)
             ->layout(LayoutType::HORIZONTAL)
             ->justifyContent(JustifyContent::SPACE_BETWEEN)
             ->alignItems(AlignItems::CENTER)
@@ -105,6 +105,7 @@ class Menu extends AbstractUIService
             $submenu->link('Demo UI', '/demo/demo-ui', '🎨');
             $submenu->link('Table Demo', '/demo/table-demo', '📊');
             $submenu->link('Modal Demo', '/demo/modal-demo', '🪟');
+            $submenu->item('Abort Error', 'show_error_info', [], '❌');
             $submenu->link('Form Demo', '/demo/form-demo', '📝');
             $submenu->link('Button Demo', '/demo/button-demo', '🔘');
             $submenu->link('Input Demo', '/demo/input-demo', '⌨️');
@@ -184,6 +185,11 @@ class Menu extends AbstractUIService
             Soporta: Tables, Modals, Forms, Menus y más.",
             callerServiceId: $serviceId
         );
+    }
+
+    public function onShowErrorInfo(array $params): void
+    {
+        $this->abort(500, "This is a simulated error for testing error handling.");
     }
 
     /**

@@ -1529,8 +1529,8 @@ class UIRenderer {
 
         // Handle abort if present (checks for truthy value OR explicit action)
         if (this.data.abort || this.data.action === 'abort') {
-             this.handleAbort(this.data.abort);
-             return;
+            this.handleAbort(this.data.abort);
+            return;
         }
 
         // Check for redirect instruction immediately
@@ -1921,8 +1921,7 @@ class UIRenderer {
 
         // Try to find main container
         const mainContainer = document.getElementById('main');
-        if (mainContainer) {
-            mainContainer.innerHTML = `
+        mainContainer.innerHTML = `
                 <div class="ui-error-screen">
                     <div class="ui-error-icon">⛔</div>
                     <p class="ui-error-message">
@@ -1933,17 +1932,6 @@ class UIRenderer {
                     </button>
                 </div>
             `;
-        } else {
-            // Fallback if no main container
-            document.body.classList.add('ui-error-screen');
-            document.body.innerHTML = `
-                <div class="ui-error-icon">⛔</div>
-                <p class="ui-error-message">
-                    <span class="ui-error-code">${code}</span> ${message}
-                </p>
-                <button onclick="window.location = '/'" class="ui-error-button">Recargar Página</button>
-            `;
-        }
     }
 
     /**
@@ -1956,9 +1944,6 @@ class UIRenderer {
         if (uiUpdate.storage) {
             this.handleStorageUpdate(uiUpdate.storage);
         }
-
-        console.log('🔄 Handling UI update:', uiUpdate);
-        console.log('🔍 Checking for abort instruction. uiUpdate.abort:', uiUpdate.abort, 'Type:', typeof uiUpdate.abort);
 
         // Handle abort if present (checks for truthy value OR explicit action)
         if (uiUpdate.abort || uiUpdate.action === 'abort') {
