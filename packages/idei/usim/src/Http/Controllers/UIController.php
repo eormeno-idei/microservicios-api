@@ -4,7 +4,6 @@ namespace Idei\Usim\Http\Controllers;
 use Illuminate\Routing\Controller;
 use Idei\Usim\Services\UIChangesCollector;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 
 class UIController extends Controller
@@ -51,24 +50,33 @@ class UIController extends Controller
             ], 404);
         }
 
+        // Check Access Permissions (Static Check - No instantiation needed)
+        // Returns ['allowed' => bool, 'action' => string|null, 'params' => array]
+        /** @var array $access */
+        $access = $serviceClass::checkAccess();
+
+        if (!$access['allowed']) {
+            $action = $access['action']; // 'redirect', 'abort', 'toast', etc.
+            $params = $access['params'];
+            $response = [];
+
+            if ($action === 'redirect') {
+                $response['redirect'] = $params['url'];
+            } elseif ($action === 'abort') {
+                $response['abort'] = [
+                    'code' => $params['code'],
+                    'message' => $params['message'],
+                ];
+            }
+
+            return response()->json($response);
+        }
+
         $this->uiChanges->setStorage($incomingStorage);
 
         // Instantiate service using Laravel's service container
         // This allows dependency injection to work
         $service = app($serviceClass);
-
-        if (! $service->authorize()) {
-            $result = $service->failedAuthorization();
-
-            // Support standard Laravel redirects by converting them to JSON instructions
-            if ($result instanceof RedirectResponse) {
-                $this->uiChanges->add([
-                    'redirect' => $result->getTargetUrl()
-                ]);
-            }
-
-            return response()->json($this->uiChanges->all());
-        }
 
         // If the 'reset' url parameter is present, clear any cached data
         if ($reset) {

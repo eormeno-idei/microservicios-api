@@ -32,7 +32,7 @@ class Menu extends AbstractUIService
         $container
             ->parent('menu') // Important to set parent!
             ->shadow(0)
-            ->borderRadius(1)
+            ->borderRadius(0)
             ->layout(LayoutType::HORIZONTAL)
             ->justifyContent(JustifyContent::SPACE_BETWEEN)
             ->alignItems(AlignItems::CENTER)
@@ -87,8 +87,8 @@ class Menu extends AbstractUIService
             ->width(200);
 
         $main_menu->link('Home', '/', '🏠');
-        $this->buildDemosMenu($main_menu);
         $main_menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
+        $this->buildDemosMenu($main_menu);
         $main_menu->separator();
         $main_menu->item('About', 'show_about_info', [], 'ℹ️');
         return $main_menu;

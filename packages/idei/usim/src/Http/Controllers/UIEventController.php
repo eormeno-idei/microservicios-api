@@ -5,7 +5,6 @@ namespace Idei\Usim\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Idei\Usim\Services\UIChangesCollector;
 use Idei\Usim\Services\Support\UIIdGenerator;
 
@@ -28,8 +27,7 @@ class UIEventController extends Controller
 
     public function __construct(
         protected UIChangesCollector $uiChanges
-    )
-    {
+    ) {
     }
 
     /**
@@ -64,9 +62,9 @@ class UIEventController extends Controller
 
             // Resolve service class from component ID or caller service ID
             if ($callerServiceId) {
-                $serviceClass = UIIdGenerator::getContextFromId((int)$callerServiceId);
+                $serviceClass = UIIdGenerator::getContextFromId((int) $callerServiceId);
             } else {
-                $serviceClass = UIIdGenerator::getContextFromId((int)$componentId);
+                $serviceClass = UIIdGenerator::getContextFromId((int) $componentId);
             }
 
 
@@ -76,24 +74,39 @@ class UIEventController extends Controller
                 ], 404);
             }
 
+            // Check Permission (Static)
+            /** @var array $access */
+            $access = $serviceClass::checkAccess();
+
+            if (!$access['allowed']) {
+                $action = $access['action'];
+                $params = $access['params'];
+                $response = [];
+
+                if ($action === 'abort') {
+                    $response['abort'] = [
+                        'code' => $params['code'],
+                        'message' => $params['message'],
+                    ];
+                } elseif ($action === 'toast') {
+                    $response['toast'] = [
+                        'message' => $params['message'],
+                        'type' => $params['type'] ?? 'warning',
+                    ];
+                } elseif ($action === 'redirect') {
+                    $response['redirect'] = $params['url'];
+                } else {
+                    $response['error'] = 'Access denied';
+                }
+
+                return response()->json($response);
+            }
+
             // Instantiate service
             $service = app($serviceClass);
 
             // Init collector
             $this->uiChanges->setStorage($incomingStorage);
-
-            if (! $service->authorize()) {
-                $result = $service->failedAuthorization();
-
-                // Support standard Laravel redirects by converting them to JSON instructions
-                if ($result instanceof RedirectResponse) {
-                    $this->uiChanges->add([
-                        'redirect' => $result->getTargetUrl()
-                    ]);
-                }
-
-                return response()->json($this->uiChanges->all());
-            }
 
             // Convert action to method name: test_action → onTestAction
             $method = $this->actionToMethodName($action);

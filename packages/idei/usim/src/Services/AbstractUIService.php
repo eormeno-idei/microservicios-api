@@ -75,11 +75,47 @@ abstract class AbstractUIService
     }
 
     /**
+     * Check access permission and return result structure.
+     * This method is static to allow checking permissions without instantiating the service.
+     *
+     * @return array{allowed: bool, action: ?string, params: array}
+     */
+    public static function checkAccess(): array
+    {
+        // 1. Check authorization logic
+        if (static::authorize()) {
+            return ['allowed' => true, 'action' => null, 'params' => []];
+        }
+
+        // 2. Handle failure based on authentication state
+        if (! Auth::check()) {
+            return [
+                'allowed' => false,
+                'action' => 'redirect',
+                'params' => [
+                    'url' => url('/auth/login'),
+                    'message' => 'Please login to access this page.'
+                ]
+            ];
+        }
+
+        // 3. Authenticated but unauthorized
+        return [
+            'allowed' => false,
+            'action' => 'abort',
+            'params' => [
+                'code' => 403,
+                'message' => 'Unauthorized: Insufficient permissions.'
+            ]
+        ];
+    }
+
+    /**
      * Determine if the user is authorized to access this service.
      *
      * @return bool
      */
-    public function authorize(): bool
+    public static function authorize(): bool
     {
         return true;
     }
@@ -90,7 +126,7 @@ abstract class AbstractUIService
      *
      * @return bool
      */
-    protected function requireAuth(): bool
+    protected static function requireAuth(): bool
     {
         if (! Auth::check()) {
             return false;
@@ -107,10 +143,10 @@ abstract class AbstractUIService
      * @param string $guard
      * @return bool
      */
-    protected function requireRole(string|array $roles, ?string $guard = null): bool
+    protected static function requireRole(string|array $roles, ?string $guard = null): bool
     {
         // Implicitly require authentication first
-        if (! $this->requireAuth()) {
+        if (! self::requireAuth()) {
             return false;
         }
 
@@ -141,10 +177,10 @@ abstract class AbstractUIService
      * @param string $guard
      * @return bool
      */
-    protected function requirePermission(string|array $permissions, ?string $guard = null): bool
+    protected static function requirePermission(string|array $permissions, ?string $guard = null): bool
     {
         // Implicitly require authentication first
-        if (! $this->requireAuth()) {
+        if (! self::requireAuth()) {
             return false;
         }
 
@@ -160,26 +196,6 @@ abstract class AbstractUIService
         }
 
         return true;
-    }
-
-    /**
-     * Handle a failed authorization attempt.
-     *
-     * @return mixed|void|\Symfony\Component\HttpFoundation\Response
-     */
-    public function failedAuthorization()
-    {
-        // 1. If user is NOT authenticated -> Redirect to login
-        if (! Auth::check()) {
-            $this->toast('Please login to access this page.', 'warning');
-            $this->redirect(url('/auth/login'));
-            return;
-        }
-
-        // 2. If user IS authenticated but logic failed -> 403 Forbidden Toast + Redirect Home
-        //$this->toast('Unauthorized: Insufficient permissions.', 'error');
-        //$this->redirect(url('/')); // Or dashboard
-        $this->abort(403, 'Unauthorized: Insufficient permissions.');
     }
 
     /**

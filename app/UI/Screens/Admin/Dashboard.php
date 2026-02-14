@@ -20,9 +20,9 @@ class Dashboard extends AbstractUIService
     /**
      * Determine if the user is authorized to access this screen.
      */
-    public function authorize(): bool
+    public static function authorize(): bool
     {
-        return $this->requireRole('admin');
+        return self::requireRole('admin');
     }
 
     protected TableBuilder $users_table;
