@@ -124,7 +124,7 @@ class ForgotPassword extends AbstractUIService
 
     public function onNavigateToLogin(array $params): void
     {
-        $this->redirect('/login');
+        $this->redirect('/auth/login');
     }
 
     public function onSendLink(array $params): void
