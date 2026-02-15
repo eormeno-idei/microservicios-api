@@ -12,20 +12,27 @@ use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Components\InputBuilder;
 use Idei\Usim\Services\Components\UploaderBuilder;
 
-/**
- * Profile Service
- *
- * Permite al usuario autenticado:
- * - Editar nombre y apellido
- * - Actualizar foto de perfil (1:1)
- * - Reenviar email de verificación
- * - Cambiar contraseña
- */
 class Profile extends AbstractUIService
 {
     protected InputBuilder $input_email;
     protected InputBuilder $input_name;
     protected UploaderBuilder $uploader_profile;
+
+    public static function authorize(): bool
+    {
+        // This screen should only be accessible to authenticated users
+        return self::requireAuth();
+    }
+
+    public static function getMenuLabel(): string
+    {
+        return 'Profile';
+    }
+
+    public static function getMenuIcon(): ?string
+    {
+        return '👤';
+    }
 
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {

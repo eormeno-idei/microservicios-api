@@ -17,9 +17,6 @@ use Idei\Usim\Services\Modals\ConfirmDialogService;
 
 class Dashboard extends AbstractUIService
 {
-    /**
-     * Determine if the user is authorized to access this screen.
-     */
     public static function authorize(): bool
     {
         return self::requireRole('admin');

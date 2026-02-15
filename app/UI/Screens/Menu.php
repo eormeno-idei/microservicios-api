@@ -3,6 +3,8 @@ namespace App\UI\Screens;
 
 use App\UI\Components\Modals\RegisterDialogService;
 use App\UI\Screens\Admin\Dashboard;
+use App\UI\Screens\Auth\Login;
+use App\UI\Screens\Auth\Profile;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\MenuDropdownBuilder;
 use Idei\Usim\Services\Components\UIContainer;
@@ -54,6 +56,10 @@ class Menu extends AbstractUIService
             // Rebuild main menu to check permissions for screen() items
             $this->main_menu->clearItems();
             $this->populateMainMenu($this->main_menu);
+
+            // Rebuild user menu to check permissions for items
+            $this->user_menu->clearItems();
+            $this->populateUserMenu($this->user_menu);
 
             $this->main_menu->setUserPermissions(['auth']);
             $this->user_menu->setUserPermissions(['auth']);
@@ -133,11 +139,18 @@ class Menu extends AbstractUIService
             ->position('bottom-right')
             ->width(180);
         $user_menu->trigger("⚙️");
-        $user_menu->link('Login', '/auth/login', '🔑', permission: 'no-auth');
-        $user_menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
-        $user_menu->link('Profile', '/auth/profile', '👤', permission: 'auth');
-        $user_menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
+        $this->populateUserMenu($user_menu);
         return $user_menu;
+    }
+
+    private function populateUserMenu(MenuDropdownBuilder $menu): void
+    {
+        // $menu->link('Login', '/auth/login', '🔑', permission: 'no-auth');
+        $menu->screen(Login::class);
+        $menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
+        //$menu->link('Profile', '/auth/profile', '👤', permission: 'auth');
+        $menu->screen(Profile::class);
+        $menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
     }
 
     public function onLoggedUser(array $params): void
@@ -145,6 +158,10 @@ class Menu extends AbstractUIService
         $user = Auth::user();
         if ($user) {
             $this->updateUserMenuTrigger($user);
+
+            // Rebuild user menu to check permissions for items
+            $this->user_menu->clearItems();
+            $this->populateUserMenu($this->user_menu);
 
             // Rebuild main menu to check permissions for screen() items
             $this->main_menu->clearItems();
@@ -179,6 +196,10 @@ class Menu extends AbstractUIService
         // Update menu permissions
         $this->user_menu->trigger("⚙️");
         $this->user_menu->setUserPermissions(['no-auth']);
+
+        // Rebuild user menu to update screen() items
+        $this->user_menu->clearItems();
+        $this->populateUserMenu($this->user_menu);
 
         // Rebuild main menu to remove restricted screen() items
         $this->main_menu->clearItems();

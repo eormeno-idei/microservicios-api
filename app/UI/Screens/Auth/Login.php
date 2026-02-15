@@ -20,6 +20,22 @@ class Login extends AbstractUIService
     protected string $store_token = '';
     protected LabelBuilder $lbl_login_result;
 
+    public static function authorize(): bool
+    {
+        // This screen should only be accessible to guests (not authenticated users)
+        return !self::requireAuth();
+    }
+
+    public static function getMenuLabel(): string
+    {
+        return 'Login';
+    }
+
+    public static function getMenuIcon(): ?string
+    {
+        return '🔑';
+    }
+
     protected function buildBaseUI(UIContainer $container, ...$params): void
     {
         $container
