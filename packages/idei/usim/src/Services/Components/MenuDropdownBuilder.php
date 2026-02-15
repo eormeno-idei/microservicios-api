@@ -281,21 +281,21 @@ class MenuDropdownBuilder extends UIComponent
         return $this;
     }
 
-    /**
-     * Set user permissions for menu visibility control
-     *
-     * @param array|null $permissions Array of user permissions, or null to clear
-     * @return self
-     */
-    public function setUserPermissions(?array $permissions = null): self
-    {
-        if ($permissions === null || empty($permissions)) {
-            // No authenticated user - add 'no-auth' marker
-            $this->config['permissions'] = ['no-auth'];
-        } else {
-            // Set permissions as provided (no automatic additions)
-            $this->config['permissions'] = $permissions;
-        }
-        return $this;
-    }
+    // /**
+    //  * Set user permissions for menu visibility control
+    //  *
+    //  * @param array|null $permissions Array of user permissions, or null to clear
+    //  * @return self
+    //  */
+    // public function setUserPermissions(?array $permissions = null): self
+    // {
+    //     if ($permissions === null || empty($permissions)) {
+    //         // No authenticated user - add 'no-auth' marker
+    //         $this->config['permissions'] = ['no-auth'];
+    //     } else {
+    //         // Set permissions as provided (no automatic additions)
+    //         $this->config['permissions'] = $permissions;
+    //     }
+    //     return $this;
+    // }
 }
