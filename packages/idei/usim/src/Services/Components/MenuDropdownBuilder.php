@@ -20,6 +20,17 @@ class MenuDropdownBuilder extends UIComponent
     }
 
     /**
+     * Clear all menu items
+     *
+     * @return self
+     */
+    public function clearItems(): self
+    {
+        $this->items = [];
+        return $this;
+    }
+
+    /**
      * Override toJson to ensure items are included in config
      */
     public function toJson(?int $order = null): array
@@ -95,6 +106,38 @@ class MenuDropdownBuilder extends UIComponent
             'type' => 'separator',
         ];
         return $this;
+    }
+
+    /**
+     * Add a screen item to the menu automatically using its metadata.
+     * Checks access permissions before adding.
+     *
+     * @param string $screenClass The fully qualified class name of the screen
+     * @return self
+     */
+    public function screen(string $screenClass): self
+    {
+        if (!class_exists($screenClass) || !is_subclass_of($screenClass, \Idei\Usim\Services\AbstractUIService::class)) {
+            return $this;
+        }
+
+        // Check if user has access to this screen
+        /** @var array $access */
+        $access = $screenClass::checkAccess();
+        if (!$access['allowed']) {
+            return $this;
+        }
+
+        // Get Metadata
+        $label = $screenClass::getMenuLabel();
+        $icon = $screenClass::getMenuIcon();
+        $url = $screenClass::getRoutePath();
+
+        // Add link without explicit permission check (already checked above)
+        // We use 'no-auth' effectively/implicitly because we already filtered it,
+        // but passing null lets the rendering engine decide if it needs any client-side protection.
+        // Since we resolved it server-side, we can just add it.
+        return $this->link($label, $url, $icon);
     }
 
     /**

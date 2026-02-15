@@ -1,19 +1,20 @@
 <?php
 namespace App\UI\Screens;
 
-use Idei\Usim\Services\UIBuilder;
-use Illuminate\Support\Facades\Auth;
+use App\UI\Components\Modals\RegisterDialogService;
+use App\UI\Screens\Admin\Dashboard;
+use Idei\Usim\Services\AbstractUIService;
+use Idei\Usim\Services\Components\MenuDropdownBuilder;
+use Idei\Usim\Services\Components\UIContainer;
 use Idei\Usim\Services\Enums\AlignItems;
 use Idei\Usim\Services\Enums\DialogType;
-use Idei\Usim\Services\Enums\LayoutType;
-use Idei\Usim\Services\AbstractUIService;
-use Idei\Usim\Services\Upload\UploadService;
-use Idei\Usim\Services\Support\HttpClient;
 use Idei\Usim\Services\Enums\JustifyContent;
-use Idei\Usim\Services\Components\UIContainer;
+use Idei\Usim\Services\Enums\LayoutType;
 use Idei\Usim\Services\Modals\ConfirmDialogService;
-use App\UI\Components\Modals\RegisterDialogService;
-use Idei\Usim\Services\Components\MenuDropdownBuilder;
+use Idei\Usim\Services\Support\HttpClient;
+use Idei\Usim\Services\UIBuilder;
+use Idei\Usim\Services\Upload\UploadService;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Menu Service
@@ -50,6 +51,10 @@ class Menu extends AbstractUIService
         if (Auth::check()) {
             $user = Auth::user();
             $this->updateUserMenuTrigger($user);
+            // Rebuild main menu to check permissions for screen() items
+            $this->main_menu->clearItems();
+            $this->populateMainMenu($this->main_menu);
+
             $this->main_menu->setUserPermissions(['auth']);
             $this->user_menu->setUserPermissions(['auth']);
         } else {
@@ -86,12 +91,18 @@ class Menu extends AbstractUIService
             ->position('bottom-left')
             ->width(200);
 
-        $main_menu->link('Home', '/', '🏠');
-        $main_menu->link('Admin Dashboard', '/admin/dashboard', '🛠️', permission: 'auth');
-        $this->buildDemosMenu($main_menu);
-        $main_menu->separator();
-        $main_menu->item('About', 'show_about_info', [], 'ℹ️');
+        $this->populateMainMenu($main_menu);
+
         return $main_menu;
+    }
+
+    private function populateMainMenu(MenuDropdownBuilder $menu): void
+    {
+        $menu->link('Home', '/', '🏠');
+        $menu->screen(Dashboard::class);
+        $this->buildDemosMenu($menu);
+        $menu->separator();
+        $menu->item('About', 'show_about_info', [], 'ℹ️');
     }
 
     private function buildDemosMenu(MenuDropdownBuilder $menu): void
@@ -134,6 +145,10 @@ class Menu extends AbstractUIService
         $user = Auth::user();
         if ($user) {
             $this->updateUserMenuTrigger($user);
+
+            // Rebuild main menu to check permissions for screen() items
+            $this->main_menu->clearItems();
+            $this->populateMainMenu($this->main_menu);
         }
         $this->main_menu->setUserPermissions(['auth']);
         $this->user_menu->setUserPermissions(['auth']);
@@ -164,7 +179,12 @@ class Menu extends AbstractUIService
         // Update menu permissions
         $this->user_menu->trigger("⚙️");
         $this->user_menu->setUserPermissions(['no-auth']);
+
+        // Rebuild main menu to remove restricted screen() items
+        $this->main_menu->clearItems();
+        $this->populateMainMenu($this->main_menu);
         $this->main_menu->setUserPermissions(['no-auth']);
+
         $this->toast('You have been logged out successfully.');
         $this->redirect();
     }

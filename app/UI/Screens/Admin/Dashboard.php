@@ -25,6 +25,16 @@ class Dashboard extends AbstractUIService
         return self::requireRole('admin');
     }
 
+    public static function getMenuLabel(): string
+    {
+        return 'Admin Dashboard';
+    }
+
+    public static function getMenuIcon(): ?string
+    {
+        return '🛠️';
+    }
+
     protected TableBuilder $users_table;
     protected InputBuilder $search_users;
     protected ButtonBuilder $add_user_btn;

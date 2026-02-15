@@ -25,6 +25,7 @@ use Idei\Usim\Services\UIBuilder;
 use Idei\Usim\Services\UIChangesCollector;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
@@ -196,6 +197,45 @@ abstract class AbstractUIService
         }
 
         return true;
+    }
+
+    /**
+     * Get the menu label for this screen.
+     * Defaults to the class name (spaced and capitalized).
+     * Override this in child classes to customize.
+     */
+    public static function getMenuLabel(): string
+    {
+        return class_basename(static::class);
+    }
+
+    /**
+     * Get the menu icon for this screen.
+     * Override this in child classes to customize.
+     */
+    public static function getMenuIcon(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * Get the route path for this screen.
+     * Auto-generates based on namespace location relative to Screen root.
+     * E.g. App\UI\Screens\Admin\Dashboard -> /admin/dashboard
+     */
+    public static function getRoutePath(): string
+    {
+        $class = static::class;
+        $prefix = config('ui-services.screens_namespace', 'App\\UI\\Screens');
+
+        if (str_starts_with($class, $prefix)) {
+            $relative = substr($class, strlen($prefix));
+            $segments = explode('\\', trim($relative, '\\'));
+            $urlSegments = array_map(fn($s) => Str::kebab($s), $segments);
+            return '/' . implode('/', $urlSegments);
+        }
+
+        return '/';
     }
 
     /**
