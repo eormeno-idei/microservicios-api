@@ -61,13 +61,13 @@ class Menu extends AbstractUIService
             $this->user_menu->clearItems();
             $this->populateUserMenu($this->user_menu);
 
-            $this->main_menu->setUserPermissions(['auth']);
-            $this->user_menu->setUserPermissions(['auth']);
+            // $this->main_menu->setUserPermissions(['auth']);
+            // $this->user_menu->setUserPermissions(['auth']);
         } else {
             // Caso 1: Usuario no autenticado - trigger con icono de configuración
             $this->user_menu->trigger("⚙️");
-            $this->user_menu->setUserPermissions(['no-auth']);
-            $this->main_menu->setUserPermissions(['no-auth']);
+            // $this->user_menu->setUserPermissions(['no-auth']);
+            // $this->main_menu->setUserPermissions(['no-auth']);
         }
     }
 
@@ -145,12 +145,10 @@ class Menu extends AbstractUIService
 
     private function populateUserMenu(MenuDropdownBuilder $menu): void
     {
-        // $menu->link('Login', '/auth/login', '🔑', permission: 'no-auth');
         $menu->screen(Login::class);
-        $menu->item('Register', 'show_register_form', [], '📝', permission: 'no-auth');
-        //$menu->link('Profile', '/auth/profile', '👤', permission: 'auth');
+        $menu->item('Register', 'show_register_form', [], '📝', visible: !Auth::check());
         $menu->screen(Profile::class);
-        $menu->item('Logout', 'confirm_logout', [], '🚪', permission: 'auth');
+        $menu->item('Logout', 'confirm_logout', [], '🚪', visible: Auth::check());
     }
 
     public function onLoggedUser(array $params): void
@@ -167,8 +165,8 @@ class Menu extends AbstractUIService
             $this->main_menu->clearItems();
             $this->populateMainMenu($this->main_menu);
         }
-        $this->main_menu->setUserPermissions(['auth']);
-        $this->user_menu->setUserPermissions(['auth']);
+        // $this->main_menu->setUserPermissions(['auth']);
+        // $this->user_menu->setUserPermissions(['auth']);
     }
 
     public function onUpdatedProfile(array $params): void
@@ -195,7 +193,7 @@ class Menu extends AbstractUIService
 
         // Update menu permissions
         $this->user_menu->trigger("⚙️");
-        $this->user_menu->setUserPermissions(['no-auth']);
+        // $this->user_menu->setUserPermissions(['no-auth']);
 
         // Rebuild user menu to update screen() items
         $this->user_menu->clearItems();
@@ -204,7 +202,7 @@ class Menu extends AbstractUIService
         // Rebuild main menu to remove restricted screen() items
         $this->main_menu->clearItems();
         $this->populateMainMenu($this->main_menu);
-        $this->main_menu->setUserPermissions(['no-auth']);
+        // $this->main_menu->setUserPermissions(['no-auth']);
 
         $this->toast('You have been logged out successfully.');
         $this->redirect();

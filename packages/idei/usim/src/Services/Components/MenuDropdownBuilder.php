@@ -80,7 +80,8 @@ class MenuDropdownBuilder extends UIComponent
         array $params = [],
         ?string $icon = null,
         array $submenu = [],
-        ?string $permission = null
+        ?string $permission = null,
+        bool $visible = true
     ): self {
         $item = [
             'label'      => $label,
@@ -91,6 +92,10 @@ class MenuDropdownBuilder extends UIComponent
             'permission' => $permission,
         ];
 
+        if (! $visible) {
+            return $this;
+        }
+
         $this->items[] = $item;
         return $this;
     }
@@ -100,8 +105,12 @@ class MenuDropdownBuilder extends UIComponent
      *
      * @return self
      */
-    public function separator(): self
+    public function separator(bool $visible = true): self
     {
+        if (! $visible) {
+            return $this;
+        }
+
         $this->items[] = [
             'type' => 'separator',
         ];
@@ -149,8 +158,12 @@ class MenuDropdownBuilder extends UIComponent
      * @param string|null $permission Permission required ('auth' for authenticated, specific permission slug, or null for public)
      * @return self
      */
-    public function link(string $label, string $url, ?string $icon = null, ?string $permission = null): self
+    public function link(string $label, string $url, ?string $icon = null, ?string $permission = null, bool $visible = true): self
     {
+        if (! $visible) {
+            return $this;
+        }
+
         $item = [
             'label'      => $label,
             'url'        => $url,
@@ -170,8 +183,12 @@ class MenuDropdownBuilder extends UIComponent
      * @param string|null $icon Parent icon
      * @return self
      */
-    public function submenu(string $label, callable $callback, ?string $icon = null): self
+    public function submenu(string $label, callable $callback, ?string $icon = null, bool $visible = true): self
     {
+        if (! $visible) {
+            return $this;
+        }
+
         $submenuBuilder = new self($label . '_submenu');
         $callback($submenuBuilder);
 
