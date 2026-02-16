@@ -33,7 +33,7 @@ class ButtonDemo extends AbstractUIService
 
     public function onToggleLabel(array $params): void
     {
-        $this->store_state = ! $this->store_state;
+        $this->store_state = !$this->store_state;
         $this->updateButtonState();
     }
 

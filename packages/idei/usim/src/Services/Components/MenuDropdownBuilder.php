@@ -15,7 +15,6 @@ class MenuDropdownBuilder extends UIComponent
         return [
             'name'        => $this->name,
             'items'       => [],
-            'permissions' => [],
         ];
     }
 
@@ -38,11 +37,6 @@ class MenuDropdownBuilder extends UIComponent
         // Copy items to config before rendering
         $this->config['items'] = $this->items;
 
-        // Ensure permissions array is in config
-        if (! isset($this->config['permissions'])) {
-            $this->config['permissions'] = [];
-        }
-
         // Call parent implementation
         return parent::toJson($order);
     }
@@ -57,9 +51,6 @@ class MenuDropdownBuilder extends UIComponent
         if (isset($config['items']) && is_array($config['items'])) {
             $component->items = $config['items'];
         }
-        if (isset($config['permissions']) && is_array($config['permissions'])) {
-            $component->config['permissions'] = $config['permissions'];
-        }
         return $component;
     }
 
@@ -71,7 +62,6 @@ class MenuDropdownBuilder extends UIComponent
      * @param array $params Action parameters
      * @param string|null $icon Icon emoji or text
      * @param array $submenu Submenu items
-     * @param string|null $permission Permission required ('auth' for authenticated, specific permission slug, or null for public)
      * @return self
      */
     public function item(
@@ -80,7 +70,6 @@ class MenuDropdownBuilder extends UIComponent
         array $params = [],
         ?string $icon = null,
         array $submenu = [],
-        ?string $permission = null,
         bool $visible = true
     ): self {
         $item = [
@@ -89,7 +78,6 @@ class MenuDropdownBuilder extends UIComponent
             'params'     => $params,
             'icon'       => $icon,
             'submenu'    => $submenu,
-            'permission' => $permission,
         ];
 
         if (! $visible) {
@@ -124,7 +112,7 @@ class MenuDropdownBuilder extends UIComponent
      * @param string $screenClass The fully qualified class name of the screen
      * @return self
      */
-    public function screen(string $screenClass): self
+    public function screen(string $screenClass, ?string $label = null, ?string $icon = null): self
     {
         if (!class_exists($screenClass) || !is_subclass_of($screenClass, \Idei\Usim\Services\AbstractUIService::class)) {
             return $this;
@@ -138,8 +126,8 @@ class MenuDropdownBuilder extends UIComponent
         }
 
         // Get Metadata
-        $label = $screenClass::getMenuLabel();
-        $icon = $screenClass::getMenuIcon();
+        $label = $label ?? $screenClass::getMenuLabel();
+        $icon = $icon ?? $screenClass::getMenuIcon();
         $url = $screenClass::getRoutePath();
 
         // Add link without explicit permission check (already checked above)
@@ -155,22 +143,18 @@ class MenuDropdownBuilder extends UIComponent
      * @param string $label Item label
      * @param string $url URL to navigate to
      * @param string|null $icon Icon emoji or text
-     * @param string|null $permission Permission required ('auth' for authenticated, specific permission slug, or null for public)
      * @return self
      */
-    public function link(string $label, string $url, ?string $icon = null, ?string $permission = null, bool $visible = true): self
+    public function link(string $label, string $url, ?string $icon = null, bool $visible = true): self
     {
         if (! $visible) {
             return $this;
         }
-
         $item = [
             'label'      => $label,
             'url'        => $url,
             'icon'       => $icon,
-            'permission' => $permission,
         ];
-
         $this->items[] = $item;
         return $this;
     }
@@ -280,22 +264,4 @@ class MenuDropdownBuilder extends UIComponent
         }
         return $this;
     }
-
-    // /**
-    //  * Set user permissions for menu visibility control
-    //  *
-    //  * @param array|null $permissions Array of user permissions, or null to clear
-    //  * @return self
-    //  */
-    // public function setUserPermissions(?array $permissions = null): self
-    // {
-    //     if ($permissions === null || empty($permissions)) {
-    //         // No authenticated user - add 'no-auth' marker
-    //         $this->config['permissions'] = ['no-auth'];
-    //     } else {
-    //         // Set permissions as provided (no automatic additions)
-    //         $this->config['permissions'] = $permissions;
-    //     }
-    //     return $this;
-    // }
 }

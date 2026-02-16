@@ -5,6 +5,16 @@ use App\UI\Components\Modals\RegisterDialogService;
 use App\UI\Screens\Admin\Dashboard;
 use App\UI\Screens\Auth\Login;
 use App\UI\Screens\Auth\Profile;
+use App\UI\Screens\Demo\ButtonDemo;
+use App\UI\Screens\Demo\CalendarDemo;
+use App\UI\Screens\Demo\CheckboxDemo;
+use App\UI\Screens\Demo\DemoUi;
+use App\UI\Screens\Demo\FormDemo;
+use App\UI\Screens\Demo\InputDemo;
+use App\UI\Screens\Demo\ModalDemo;
+use App\UI\Screens\Demo\SelectDemo;
+use App\UI\Screens\Demo\TableDemo;
+use App\UI\Screens\Demo\UploaderDemo;
 use Idei\Usim\Services\AbstractUIService;
 use Idei\Usim\Services\Components\MenuDropdownBuilder;
 use Idei\Usim\Services\Components\UIContainer;
@@ -60,14 +70,9 @@ class Menu extends AbstractUIService
             // Rebuild user menu to check permissions for items
             $this->user_menu->clearItems();
             $this->populateUserMenu($this->user_menu);
-
-            // $this->main_menu->setUserPermissions(['auth']);
-            // $this->user_menu->setUserPermissions(['auth']);
         } else {
             // Caso 1: Usuario no autenticado - trigger con icono de configuración
             $this->user_menu->trigger("⚙️");
-            // $this->user_menu->setUserPermissions(['no-auth']);
-            // $this->main_menu->setUserPermissions(['no-auth']);
         }
     }
 
@@ -119,17 +124,17 @@ class Menu extends AbstractUIService
 
         $menu->separator();
         $menu->submenu('Demos', function ($submenu) {
-            $submenu->link('Demo UI', '/demo/demo-ui', '🎨');
-            $submenu->link('Table Demo', '/demo/table-demo', '📊');
-            $submenu->link('Modal Demo', '/demo/modal-demo', '🪟');
+            $submenu->screen(ButtonDemo::class, "Button Demo", '🖲️');
+            $submenu->screen(TableDemo::class, "Table Demo", '📊');
+            $submenu->screen(ModalDemo::class, "Modal Demo", '🪟');
             $submenu->item('Abort Error', 'show_error_info', [], '❌');
-            $submenu->link('Form Demo', '/demo/form-demo', '📝');
-            $submenu->link('Button Demo', '/demo/button-demo', '🔘');
-            $submenu->link('Input Demo', '/demo/input-demo', '⌨️');
-            $submenu->link('Select Demo', '/demo/select-demo', '📋');
-            $submenu->link('Checkbox Demo', '/demo/checkbox-demo', '☑️');
-            $submenu->link('Uploader Demo', '/demo/uploader-demo', '📤');
-            $submenu->link('Calendar Demo', '/demo/calendar-demo', '📅');
+            $submenu->screen(FormDemo::class, "Form Demo", '📝');
+            $submenu->screen(DemoUi::class, "Demo UI", '🎨');
+            $submenu->screen(InputDemo::class, "Input Demo", '⌨️');
+            $submenu->screen(SelectDemo::class, "Select Demo", '📋');
+            $submenu->screen(CheckboxDemo::class, "Checkbox Demo", '☑️');
+            $submenu->screen(UploaderDemo::class, "Uploader Demo", '📤');
+            $submenu->screen(CalendarDemo::class, "Calendar Demo", '📅');
         }, '🎮');
     }
 
@@ -165,8 +170,6 @@ class Menu extends AbstractUIService
             $this->main_menu->clearItems();
             $this->populateMainMenu($this->main_menu);
         }
-        // $this->main_menu->setUserPermissions(['auth']);
-        // $this->user_menu->setUserPermissions(['auth']);
     }
 
     public function onUpdatedProfile(array $params): void
@@ -191,9 +194,7 @@ class Menu extends AbstractUIService
         $this->store_token = '';
         $this->store_password = '';
 
-        // Update menu permissions
         $this->user_menu->trigger("⚙️");
-        // $this->user_menu->setUserPermissions(['no-auth']);
 
         // Rebuild user menu to update screen() items
         $this->user_menu->clearItems();
@@ -202,7 +203,6 @@ class Menu extends AbstractUIService
         // Rebuild main menu to remove restricted screen() items
         $this->main_menu->clearItems();
         $this->populateMainMenu($this->main_menu);
-        // $this->main_menu->setUserPermissions(['no-auth']);
 
         $this->toast('You have been logged out successfully.');
         $this->redirect();
@@ -301,8 +301,6 @@ class Menu extends AbstractUIService
             cancelAction: 'cancel_logout',
             callerServiceId: $serviceId
         );
-
-        // TODO: Los eventos de los modales no persisten los cambios
     }
 
     /**
