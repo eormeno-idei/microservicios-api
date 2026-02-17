@@ -2901,68 +2901,6 @@ window.closeModal = closeModal;
 
 // ==================== Menu Dropdown Component ====================
 class MenuDropdownComponent extends UIComponent {
-    /**
-     * Check if an item is visible based on permissions
-     *
-     * @param {object} item - Menu item
-     * @param {array} permissions - Array of user permissions
-     * @returns {boolean} - True if item should be visible
-     */
-    isItemVisible(item, permissions) {
-        const itemPermission = item.permission;
-
-        // null/undefined = visible for all
-        if (!itemPermission) {
-            return true;
-        }
-
-        // 'auth' = only authenticated users
-        if (itemPermission === 'auth') {
-            return permissions.includes('auth');
-        }
-
-        // 'no-auth' = only non-authenticated users
-        if (itemPermission === 'no-auth') {
-            return permissions.includes('no-auth');
-        }
-
-        // Any other value = check if it exists in permissions array
-        return permissions.includes(itemPermission);
-    }
-
-    /**
-     * Check if a submenu has any visible children (recursive)
-     *
-     * @param {array} submenu - Array of submenu items
-     * @param {array} permissions - Array of user permissions
-     * @returns {boolean} - True if at least one child is visible
-     */
-    hasVisibleChildren(submenu, permissions) {
-        if (!submenu || !Array.isArray(submenu) || submenu.length === 0) {
-            return false;
-        }
-
-        return submenu.some(item => {
-            // Separators don't count for visibility
-            if (item.type === 'separator') {
-                return false;
-            }
-
-            // If item itself is not visible, skip it
-            if (!this.isItemVisible(item, permissions)) {
-                return false;
-            }
-
-            // If item has submenu, check recursively
-            if (item.submenu && item.submenu.length > 0) {
-                return this.hasVisibleChildren(item.submenu, permissions);
-            }
-
-            // Regular visible item
-            return true;
-        });
-    }
-
     render() {
         const menuContainer = document.createElement('div');
         menuContainer.className = 'menu-dropdown';
@@ -3020,21 +2958,8 @@ class MenuDropdownComponent extends UIComponent {
             });
         }
 
-        // Check if all items are hidden
-        const permissions = this.config.permissions || [];
-        const hasVisibleItems = this.config.items && this.config.items.some(item => {
-            if (item.type === 'separator') {
-                return false;
-            }
-            const isVisible = this.isItemVisible(item, permissions);
-            if (item.submenu && item.submenu.length > 0) {
-                return isVisible && this.hasVisibleChildren(item.submenu, permissions);
-            }
-            return isVisible;
-        });
-
-        // Hide entire menu if no visible items
-        if (!hasVisibleItems) {
+        // Hide entire menu if no items
+        if (!this.config.items || this.config.items.length === 0) {
             menuContainer.style.display = 'none';
         }
 
@@ -3104,28 +3029,12 @@ class MenuDropdownComponent extends UIComponent {
             return separator;
         }
 
-        // Get permissions from config
-        const permissions = this.config.permissions || [];
-
         // Check if item has submenu
         const hasSubmenu = item.submenu && item.submenu.length > 0;
-
-        // Determine visibility
-        let isVisible = this.isItemVisible(item, permissions);
-
-        // If has submenu, check if any children are visible
-        if (hasSubmenu && isVisible) {
-            isVisible = this.hasVisibleChildren(item.submenu, permissions);
-        }
 
         // Regular item or submenu parent
         const menuItem = document.createElement(item.url ? 'a' : 'button');
         menuItem.className = 'menu-item';
-
-        // Apply visibility
-        if (!isVisible) {
-            menuItem.style.display = 'none';
-        }
 
         if (hasSubmenu) {
             menuItem.classList.add('has-submenu');
