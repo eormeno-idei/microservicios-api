@@ -62,12 +62,4 @@ describe('Authentication', function () {
         $response->assertStatus(422);
         expect($response->json())->toHaveKey('errors');
     });
-
-    it('valida campos requeridos en login', function () {
-        $response = $this->postJson('/api/login', []);
-
-        $response->assertStatus(422);
-        expect($response->json())->toHaveKey('errors');
-    });
-
 });

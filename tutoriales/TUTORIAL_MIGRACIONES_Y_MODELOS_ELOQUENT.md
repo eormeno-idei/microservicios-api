@@ -60,29 +60,29 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             // Llave primaria
             $table->id();
-
+            
             // Relación con usuarios (quien crea el post)
             $table->foreignId('user_id')
                   ->constrained()
                   ->onDelete('cascade'); // Si se elimina el usuario, se eliminan sus posts
-
+            
             // Contenido del post
             $table->string('name', 255);               // Nombre del post
             $table->text('content');                   // Contenido principal
-
+            
             // Enums: tipo y estado
             $table->enum('type', PostType::values());
             $table->enum('status', PostStatus::values());
-
+            
             // Comentarios del moderador
             $table->string('moderator_comments', 100)->nullable();
-
+            
             // Fechas especiales
             $table->timestamp('scheduled_at')->nullable();  // Cuándo programar
             $table->timestamp('published_at')->nullable();  // Cuándo se publicó realmente
             $table->timestamp('deadline')->nullable();      // Fecha límite
             $table->timestamp('timeout')->nullable();       // Tiempo límite
-
+            
             // Timestamps automáticos (created_at, updated_at)
             $table->timestamps();
         });
@@ -118,15 +118,15 @@ return new class extends Migration
     {
         Schema::create('channels', function (Blueprint $table) {
             $table->id();
-
+            
             // Información del canal
             $table->string('name');                        // Nombre del canal
             $table->text('description')->nullable();       // Descripción opcional
             $table->enum('type', ChannelType::values()); // Tipo de canal
             $table->boolean('is_active')->default(true);   // Canal activo/inactivo
-
+            
             $table->timestamps();
-
+            
             // Índice compuesto para filtrar por tipo y estado activo
             $table->index(['type', 'is_active']);
         });
@@ -159,16 +159,16 @@ return new class extends Migration
     {
         Schema::create('media', function (Blueprint $table) {
             $table->id();
-
+            
             $table->string('name');                        // Nombre del medio
             $table->enum('type', MediaType::values()); // Tipo de medio
             $table->json('configuration')->nullable();     // Configuración específica (JSON)
             $table->text('semantic_context')->nullable();  // Contexto semántico para IA
             $table->string('url_webhook')->nullable();     // URL para notificaciones
             $table->boolean('is_active')->default(true);   // Medio activo/inactivo
-
+            
             $table->timestamps();
-
+            
             $table->index(['type', 'is_active']);
         });
     }
@@ -199,7 +199,7 @@ return new class extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-
+            
             // Información del archivo
             $table->string('name');                        // Nombre para mostrar
             $table->string('file_name');                   // Nombre real del archivo
@@ -208,15 +208,15 @@ return new class extends Migration
             $table->unsignedBigInteger('size');            // Tamaño en bytes
             $table->string('disk')->default('public');     // Disco de almacenamiento
             $table->text('description')->nullable();       // Descripción opcional
-
+            
             // Estadísticas
             $table->integer('download_count')->default(0); // Contador de descargas
-
+            
             // Relación con el usuario que subió el archivo
             $table->foreignId('user_id')
                   ->constrained()
                   ->onDelete('cascade');
-
+            
             $table->timestamps();
         });
     }
@@ -251,20 +251,20 @@ return new class extends Migration
     {
         Schema::create('user_channels', function (Blueprint $table) {
             $table->id();
-
+            
             // Las dos llaves foráneas que conectamos
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
-
+            
             // Campos adicionales del pivot (información extra de la relación)
             $table->boolean('is_approved')->default(false);    // ¿Está aprobado el usuario?
             $table->timestamp('approved_at')->nullable();      // ¿Cuándo fue aprobado?
-
+            
             $table->timestamps();
-
+            
             // Un usuario solo puede estar una vez en cada canal
             $table->unique(['user_id', 'channel_id']);
-
+            
             // Índice para buscar usuarios aprobados de un canal
             $table->index(['channel_id', 'is_approved']);
         });
@@ -296,12 +296,12 @@ return new class extends Migration
     {
         Schema::create('post_channels', function (Blueprint $table) {
             $table->id();
-
+            
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
-
+            
             $table->timestamps();
-
+            
             // Un post solo puede estar una vez en cada canal
             $table->unique(['post_id', 'channel_id']);
         });
@@ -333,12 +333,12 @@ return new class extends Migration
     {
         Schema::create('post_medias', function (Blueprint $table) {
             $table->id();
-
+            
             $table->foreignId('post_id')->constrained()->onDelete('cascade');
             $table->foreignId('media_id')->constrained()->onDelete('cascade');
-
+            
             $table->timestamps();
-
+            
             $table->unique(['post_id', 'media_id']);
         });
     }
@@ -369,12 +369,12 @@ return new class extends Migration
     {
         Schema::create('channel_medias', function (Blueprint $table) {
             $table->id();
-
+            
             $table->foreignId('channel_id')->constrained()->onDelete('cascade');
             $table->foreignId('media_id')->constrained()->onDelete('cascade');
-
+            
             $table->timestamps();
-
+            
             $table->unique(['channel_id', 'media_id']);
         });
     }
@@ -833,7 +833,7 @@ enum PostStatus: string
 {
     case DRAFT = 'draft';
     case PUBLISHED = 'published';
-
+    
 
 ```php
 // BIEN: Índices en campos consultados frecuentemente
@@ -851,7 +851,7 @@ $table->unique(['post_id', 'channel_id']); // Un post solo una vez por canal
 class Post extends Model
 {
         }
-
+        
         return $this->update([
             'status' => PostStatus::PUBLISHED,
             'published_at' => now(),
@@ -932,7 +932,7 @@ php artisan make:factory PostFactory
 ```
 User (usuarios)
 ├── 1:N → Post (posts)
-├── 1:N → Attachment (attachments)
+├── 1:N → Attachment (attachments)  
 └── N:M → Channel (channels) via user_channels
 
 Post (posts)

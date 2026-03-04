@@ -223,7 +223,7 @@ PostStatus::DRAFT->label()
 ## Mejores Prácticas
 
 1. **Usa el método values()** en migraciones en lugar de hardcodear arrays
-2. **Implementa label()** para todas las interfaces de usuario
+2. **Implementa label()** para todas las interfaces de usuario  
 3. **Usa match() expressions** para mayor legibilidad
 4. **Incluye documentación** de cada caso del enum
 5. **Mantén consistencia** en la estructura de todos los enums

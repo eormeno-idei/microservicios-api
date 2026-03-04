@@ -10,20 +10,14 @@ enum PostType: string
     case IMAGE = 'image';
     case MULTIMEDIA = 'multimedia';
 
-    /**
-     * Obtiene todos los valores como array para migraciones
-     */
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
 
-    /**
-     * Etiquetas legibles para humanos
-     */
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::TEXT => 'Texto',
             self::VIDEO => 'Video',
             self::AUDIO => 'Audio',
@@ -31,5 +25,4 @@ enum PostType: string
             self::MULTIMEDIA => 'Multimedia',
         };
     }
-
 }

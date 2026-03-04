@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Media;
 use App\Enums\MediaType;
 use Illuminate\Database\Seeder;
-use ReturnTypeWillChange;
 
 class MediaSeeder extends Seeder
 {
@@ -15,7 +14,7 @@ class MediaSeeder extends Seeder
     public function run(): void
     {
 
-        if (Media::count() >10){
+        if (Media::count() > 0) {
             return;
         }
 

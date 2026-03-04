@@ -2,20 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use App\Enums\PostType;
 use App\Enums\PostStatus;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Post extends Model
 {
-    use HasFactory;
-
-    /**
-     * Campos que se pueden asignar masivamente
-     */
     protected $fillable = [
         'user_id',
         'name',
@@ -29,9 +24,6 @@ class Post extends Model
         'timeout',
     ];
 
-    /**
-     * Conversión automática de tipos de datos
-     */
     protected $casts = [
         'type' => PostType::class,
         'status' => PostStatus::class,
@@ -40,10 +32,6 @@ class Post extends Model
         'deadline' => 'datetime',
         'timeout' => 'datetime',
     ];
-
-    // ================================
-    // RELACIONES
-    // ================================
 
     /**
      * Un post pertenece a un usuario (relación 1:N inversa)
@@ -72,7 +60,7 @@ class Post extends Model
     /**
      * Un post tiene muchos archivos adjuntos (relación 1:N)
      */
-    public function attachments()
+    public function attachments() : HasMany
     {
         return $this->hasMany(Attachment::class);
     }

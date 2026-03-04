@@ -66,7 +66,8 @@ class CustomVerifyEmailNotification extends Notification
             ]
         );
         // Reemplaza la base de la URL por APP_URL
-        return preg_replace('/^https?:\/\/[^\/]+/', $appUrl, $temporaryUrl);
+        // return preg_replace('/^https?:\/\/[^\/]+/', $appUrl, $temporaryUrl);
+        return $temporaryUrl;
     }
 
     /**

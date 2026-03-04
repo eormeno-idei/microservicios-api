@@ -2,32 +2,30 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Attachment extends Model
 {
-    use HasFactory;
+    /**
+     * Indica que este modelo no usa timestamps.
+     */
+    public $timestamps = false;
 
+    /**
+     * Los atributos que se pueden asignar masivamente.
+     */
     protected $fillable = [
         'post_id',
-        'name',
         'mime_type',
-        'size',
         'path',
-        'url',
-        'protected',
-        'metadata',
-    ];
-
-    protected $casts = [
-        'protected' => 'boolean',
-        'metadata' => 'array',
     ];
 
     /**
-     * Un attachment pertenece a un post (relación 1:N inversa)
+     * Relación 1:N inversa con Post.
+     * Un attachment pertenece a un post.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function post(): BelongsTo
     {

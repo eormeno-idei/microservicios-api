@@ -2,71 +2,64 @@
 
 namespace App\Models;
 
-use App\Enums\PostStatus;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\ChannelType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use App\Enums\ChannelType;
 
 class Channel extends Model
 {
-    use HasFactory;
-
+    /**
+     * Los atributos que se pueden asignar masivamente.
+     */
     protected $fillable = [
         'name',
         'description',
-        'semantic_context',
         'type',
-        'is_active',
+        'semantic_context',
     ];
-
-    protected $casts = [
-        'type' => ChannelType::class,
-        'is_active' => 'boolean',
-    ];
-
-    // ================================
-    // RELACIONES
-    // ================================
 
     /**
-     * Un canal puede tener muchos usuarios (relación N:M)
+     * Los atributos que deben ser convertidos a tipos nativos.
+     */
+    protected $casts = [
+        'type' => ChannelType::class,
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Relación N:M con Users.
+     * Un canal puede tener muchos usuarios, y un usuario puede estar en muchos canales.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_channels')
-                    ->withPivot(['is_approved', 'approved_at', 'approved_by']);
+            ->withPivot('is_approved', 'approved_at', 'approved_by')
+            ->withTimestamps();
     }
 
     /**
-     * Solo usuarios aprobados del canal
-     */
-    public function approvedUsers(): BelongsToMany
-    {
-        return $this->users()->wherePivot('is_approved', true);
-    }
-
-    /**
-     * Un canal puede tener muchos posts (relación N:M)
+     * Relación N:M con Posts.
+     * Un canal puede tener muchos posts, y un post puede publicarse en muchos canales.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function posts(): BelongsToMany
     {
-        return $this->belongsToMany(Post::class, 'post_channels');
+        return $this->belongsToMany(Post::class, 'post_channels', 'channel_id', 'post_id');
     }
 
     /**
-     * Solo posts publicados del canal
-     */
-    public function publishedPosts(): BelongsToMany
-    {
-        return $this->posts()->where('status', PostStatus::ARCHIVED);
-    }
-
-    /**
-     * Un canal puede usar muchos medios (relación N:M)
+     * Relación N:M con Medias.
+     * Un canal puede distribuir contenido a través de muchos medios,
+     * y un medio puede distribuir contenido de muchos canales.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function medias(): BelongsToMany
     {
-        return $this->belongsToMany(Media::class, 'channel_medias');
+        return $this->belongsToMany(Media::class, 'channel_medias', 'channel_id', 'media_id');
     }
 }
